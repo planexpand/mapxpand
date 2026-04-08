@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAPXpand | Inteligência Imobiliária</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:#f1f5f9}
+
+/* ── SIDEBAR – fundo branco, exatamente como na imagem ── */
+#sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:280px;z-index:1000;
+  background:#ffffff;border-right:1px solid #e2e8f0;
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  box-shadow:2px 0 20px rgba(0,0,0,.08)
+}
+
+/* Header escuro com logo */
+#sidebar-head{
+  position:sticky;top:0;z-index:10;
+  padding:14px 16px;
+  background:linear-gradient(160deg,#0a1628 0%,#0B132B 60%,#0d1f38 100%);
+  border-bottom:1px solid rgba(198,166,100,.2);
+  display:flex;align-items:center;gap:12px;
+  flex-shrink:0
+}
+.logo-icon-wrap{
+  width:40px;height:44px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0
+}
+.logo-icon-wrap svg{width:18px;height:18px}
+.logo-text-wrap{display:flex;flex-direction:column}
+.logo-title{
+  font-size:16px;font-weight:800;letter-spacing:.14em;
+  color:#ffffff;line-height:1;text-transform:uppercase
+}
+.logo-title span{color:#C6A664}
+.logo-sub{
+  font-size:8px;letter-spacing:.18em;color:rgba(255,255,255,.5);
+  text-transform:uppercase;margin-top:3px
+}
+
+/* Corpo sidebar */
+#sidebar-body{padding:0}
+#sidebar::-webkit-scrollbar{width:4px}
+#sidebar::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+#sidebar::-webkit-scrollbar-track{background:transparent}
+
+/* Seção */
+.s-section{padding:16px 18px;border-bottom:1px solid #f1f5f9}
+.s-hint{font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:10px}
+
+/* Label de seção igual à imagem: ícone + texto cinza pequeno maiúsculo */
+.s-label{
+  display:flex;align-items:center;gap:7px;
+  font-size:10px;font-weight:600;color:#94a3b8;
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px
+}
+.s-label svg{width:12px;height:12px;flex-shrink:0}
+
+
+/* Campo de busca */
+
+
+
+
+
+
+
+
+
+
+.sf-group{display:flex;flex-direction:column;gap:3px}
+.sf-flex1{flex:1}.sf-flex2{flex:2}.sf-flex3{flex:3}
+
+
+.sf-input::placeholder{color:#94a3b8;font-size:11px}
+
+.search-btn-full{
+  width:100%;padding:10px;background:#0B132B;border:none;
+  border-radius:9px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:7px;color:#fff;font-size:12px;
+  font-weight:600;font-family:'Inter',sans-serif;letter-spacing:.04em;
+  margin-top:2px;transition:background .15s
+}
+.search-btn-full:hover{background:#162445}
+.search-btn-full svg{flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Resultado análise */
+#analysisResult{display:none;margin-top:10px}
+.ar-card{border-radius:10px;overflow:hidden;border:1px solid #e2e8f0}
+.ar-head{padding:11px 13px;display:flex;align-items:center;justify-content:space-between;color:#fff}
+.ar-score-num{font-size:32px;font-weight:800;line-height:1}
+.ar-score-label{font-size:8px;text-transform:uppercase;letter-spacing:.1em;opacity:.85;margin-top:2px}
+.ar-status{font-size:10px;font-weight:700;text-align:right;line-height:1.4}
+.ar-body{background:#f8fafc;padding:11px 13px;font-size:11px}
+.ar-addr{color:#64748b;font-size:10px;margin-bottom:7px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ar-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid #e2e8f0}
+.ar-row:last-child{border-bottom:none}
+.ar-row span{color:#64748b}
+.ar-row strong{color:#1e293b}
+.ar-tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:600;margin-top:7px}
+.ar-tag.green{background:#dcfce7;color:#15803d;border:0.5px solid #bbf7d0}
+.ar-tag.red{background:#fee2e2;color:#b91c1c;border:0.5px solid #fecaca}
+.ar-tag.amber{background:#fef3c7;color:#b45309;border:0.5px solid #fde68a}
+
+/* ── CAMADAS – estilo exato da imagem ── */
+/* Item verde: "Espirais de Crescimento" */
+.layer-green{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;background:#f0fdf4;border:1px solid #bbf7d0;
+  border-radius:10px;cursor:pointer;margin-bottom:7px
+}
+.layer-green:hover{background:#dcfce7}
+.layer-green-left{display:flex;align-items:center;gap:8px}
+.layer-green-icon{width:16px;height:16px;border:2px dashed #22c55e;border-radius:3px;background:#bbf7d0;flex-shrink:0}
+.layer-green-label{font-size:12px;font-weight:700;color:#15803d}
+
+/* Item vermelho: "Zonas Canibalização" */
+.layer-red{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;background:#fff5f5;border:1px solid #fecaca;
+  border-radius:10px;cursor:pointer;margin-bottom:12px
+}
+.layer-red:hover{background:#fee2e2}
+.layer-red-left{display:flex;align-items:center;gap:8px}
+.layer-red-label{font-size:12px;font-weight:700;color:#b91c1c;display:flex;align-items:center;gap:6px}
+
+/* Checkboxes simples */
+.cb-group{display:flex;flex-direction:column;gap:9px;padding-top:8px;border-top:1px solid #f1f5f9}
+.cb-item{display:flex;align-items:center;gap:9px;cursor:pointer}
+.cb-item input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:#0B132B;flex-shrink:0}
+.cb-item.cb-orange input{accent-color:#FF5722}
+.cb-item.cb-slate input{accent-color:#64748b}
+.cb-label{font-size:11px;font-weight:600;color:#475569}
+
+/* Checkbox estilizado como na imagem (toggle para expansion/cannibal) */
+.chk-styled{
+  width:18px;height:18px;border:2px solid #e2e8f0;
+  border-radius:4px;background:#fff;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all .15s
+}
+.chk-styled.on{background:#22c55e;border-color:#22c55e}
+.chk-styled.on::after{content:'✓';color:#fff;font-size:11px;font-weight:700;line-height:1}
+
+/* Raio slider */
+.raio-row{display:flex;align-items:center;gap:10px}
+.raio-row input[type=range]{flex:1;accent-color:#0B132B;cursor:pointer}
+.raio-val{font-size:12px;font-weight:600;color:#0B132B;min-width:36px}
+
+/* Caixa estratégia */
+.strategy-box{
+  background:#f8faff;border:1px solid #e0e7ff;
+  border-radius:12px;padding:13px
+}
+.strategy-box h4{
+  font-size:10px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.1em;color:#3730a3;margin-bottom:7px
+}
+.strategy-box p{font-size:10px;color:#4338ca;line-height:1.7}
+.strategy-box strong{color:#1e1b4b}
+
+/* MAP */
+#map{position:fixed;top:0;left:280px;right:0;bottom:0;z-index:1}
+
+/* Popup Leaflet estilo claro */
+.leaflet-popup-content-wrapper{
+  background:#fff!important;border:1px solid #e2e8f0!important;
+  border-radius:12px!important;padding:0!important;
+  box-shadow:0 10px 40px rgba(0,0,0,.12)!important
+}
+.leaflet-popup-content{margin:0!important;width:240px!important;color:#1e293b}
+.leaflet-popup-tip{background:#fff!important}
+.leaflet-popup-close-button{color:#64748b!important;font-size:16px!important;top:8px!important;right:8px!important}
+.leaflet-popup-close-button:hover{color:#1e293b!important}
+.pop-inner{padding:14px}
+.pop-badge{font-size:9px;text-transform:uppercase;letter-spacing:.1em;padding:2px 8px;border-radius:20px;font-weight:700;display:inline-block;margin-bottom:7px}
+.pop-name{font-size:14px;font-weight:700;color:#1e293b;margin-bottom:5px}
+.pop-sub{font-size:11px;color:#64748b;line-height:1.6}
+
+/* Card legenda no mapa (igual à imagem) */
+#map-legend{
+  position:fixed;bottom:24px;left:300px;z-index:900;
+  background:rgba(255,255,255,.95);border:1px solid #e2e8f0;
+  border-radius:14px;padding:14px 16px;
+  box-shadow:0 4px 20px rgba(0,0,0,.1)
+}
+.ml-title{font-size:11px;font-weight:700;color:#1e293b;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.ml-item{display:flex;align-items:center;gap:8px;font-size:11px;color:#475569;margin-bottom:7px}
+.ml-item:last-child{margin-bottom:0}
+.ml-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Zoom controls */
+.leaflet-control-zoom{border:1px solid #e2e8f0!important;border-radius:8px!important;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08)!important}
+.leaflet-control-zoom-in,.leaflet-control-zoom-out{background:#fff!important;color:#1e293b!important;border-bottom:1px solid #e2e8f0!important;font-size:16px!important;width:30px!important;height:30px!important;line-height:30px!important}
+.leaflet-control-zoom-in:hover,.leaflet-control-zoom-out:hover{background:#f8fafc!important;color:#0B132B!important}
+.leaflet-control-attribution{background:rgba(255,255,255,.85)!important;color:#94a3b8!important;font-size:9px!important;border-radius:6px!important}
+.leaflet-control-attribution a{color:#0B132B!important}
+
+/* ── RELATÓRIO MAPXPAND ─────────────────────────────── */
+#relatorio-modal{display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.75);overflow-y:auto;padding:20px}
+#relatorio-modal.show{display:block}
+.rel-controles{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:850px;margin:0 auto 16px;background:rgba(255,255,255,.1);padding:10px 14px;border-radius:12px}
+.rel-btn{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:8px;font-weight:700;font-size:10px;text-transform:uppercase;cursor:pointer;border:none;letter-spacing:.06em;font-family:Inter,sans-serif}
+.a4-page{
+  width:210mm;min-height:296mm;padding:12mm 15mm;
+  margin:0 auto;background:#fff;
+  box-shadow:0 8px 40px rgba(0,0,0,.25);
+  font-family:Inter,sans-serif;color:#1e293b;
+  display:flex;flex-direction:column
+}
+.ri-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 13px}
+@media print{body{background:#fff}.a4-page{box-shadow:none;margin:0;padding:10mm 15mm;min-height:100vh}.no-print{display:none!important}}
+
+#universal-input:focus{border-color:#0B132B;background:#fff}
+#btn-pin-modo:hover{border-color:#C6A664!important;color:#C6A664!important}
+#universal-input:hover{border-color:#94a3b8}
+#searchBtn:hover{opacity:.88}
+#searchBtn:disabled{opacity:.55;cursor:not-allowed}
+
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <!-- HEADER ESCURO -->
+  <div id="sidebar-head">
+    <svg width="36" height="40" viewBox="0 0 46 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#E8D090"/>
+          <stop offset="50%" stop-color="#C6A664"/>
+          <stop offset="100%" stop-color="#9A7A3A"/>
+        </linearGradient>
+      </defs>
+      <path d="M23 2C14 2 7 9.2 7 17.8C7 29.6 23 46 23 46C23 46 39 29.6 39 17.8C39 9.2 32 2 23 2Z" fill="url(#pg)"/>
+      <path d="M23 5C15.3 5 9 11.4 9 17.8C9 29 23 43 23 43C23 43 37 29 37 17.8C37 11.4 30.7 5 23 5Z" fill="#0B132B"/>
+      <circle cx="23" cy="17.5" r="11.5" fill="none" stroke="#C6A664" stroke-width="1"/>
+      <ellipse cx="23" cy="17.5" rx="11.5" ry="3.8" fill="none" stroke="#C6A664" stroke-width="0.6" opacity="0.6"/>
+      <path d="M23 6 Q28 12 28 17.5 Q28 23 23 29" fill="none" stroke="#C6A664" stroke-width="0.6" opacity="0.5"/>
+      <path d="M23 6 Q18 12 18 17.5 Q18 23 23 29" fill="none" stroke="#C6A664" stroke-width="0.6" opacity="0.5"/>
+      <circle cx="23" cy="7.5" r="1.4" fill="#C6A664"/>
+      <circle cx="14.5" cy="13" r="1.1" fill="#C6A664"/>
+      <circle cx="31.5" cy="13" r="1.1" fill="#C6A664"/>
+      <circle cx="12" cy="18" r="1.1" fill="#C6A664"/>
+      <circle cx="34" cy="18" r="1.1" fill="#C6A664"/>
+      <circle cx="16.5" cy="24" r="1.1" fill="#C6A664"/>
+      <circle cx="29.5" cy="24" r="1.1" fill="#C6A664"/>
+      <circle cx="23" cy="27.5" r="1.4" fill="#C6A664"/>
+      <g stroke="#C6A664" stroke-width="0.55" opacity="0.6" fill="none">
+        <line x1="23" y1="7.5" x2="14.5" y2="13"/>
+        <line x1="23" y1="7.5" x2="31.5" y2="13"/>
+        <line x1="14.5" y1="13" x2="12" y2="18"/>
+        <line x1="31.5" y1="13" x2="34" y2="18"/>
+        <line x1="14.5" y1="13" x2="23" y2="17.5"/>
+        <line x1="31.5" y1="13" x2="23" y2="17.5"/>
+        <line x1="12" y1="18" x2="16.5" y2="24"/>
+        <line x1="34" y1="18" x2="29.5" y2="24"/>
+        <line x1="23" y1="17.5" x2="16.5" y2="24"/>
+        <line x1="23" y1="17.5" x2="29.5" y2="24"/>
+        <line x1="16.5" y1="24" x2="23" y2="27.5"/>
+        <line x1="29.5" y1="24" x2="23" y2="27.5"/>
+        <line x1="14.5" y1="13" x2="31.5" y2="13"/>
+        <line x1="12" y1="18" x2="34" y2="18"/>
+        <line x1="16.5" y1="24" x2="29.5" y2="24"/>
+      </g>
+    </svg>
+    <div class="logo-text-wrap">
+      <div class="logo-title">MAP<span>X</span>PAND</div>
+      <div class="logo-sub">Inteligência Imobiliária</div>
+    </div>
+  </div>
+
+  <div id="sidebar-body">
+
+    <!-- ANALISAR PONTO -->
+    <div class="s-section">
+      <div class="s-label">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="#94a3b8" stroke-width="1.5"/><path d="M10.5 10.5L13 13" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Analisar Ponto
+      </div>
+      <div class="s-hint" style="margin-bottom:10px">
+        Cole endereço, coordenadas ou link do Google Maps
+      </div>
+
+      <!-- BUSCADOR UNIVERSAL -->
+      <div style="position:relative;margin-bottom:10px">
+        <input
+          id="universal-input"
+          type="text"
+          placeholder="Rua X, 60 — ou −23.58, −46.73 — ou link maps.app.goo.gl/..."
+          style="width:100%;padding:10px 42px 10px 12px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;font-size:12px;font-family:Inter,sans-serif;outline:none;color:#1e293b;transition:border-color .2s;box-sizing:border-box"
+          onkeydown="if(event.key==='Enter')buscarUniversal()"
+          oninput="detectarTipoInput(this.value)"
+        />
+        <!-- ícone tipo input -->
+        <span id="input-tipo-icon" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none" title="">📍</span>
+      </div>
+
+      <!-- tag de feedback -->
+      <div id="input-tipo-tag" style="display:none;margin-bottom:8px">
+        <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.07em"></span>
+      </div>
+
+      <!-- erro -->
+      <div id="search-error" style="display:none;font-size:11px;color:#ef4444;margin-bottom:8px;padding:6px 10px;background:#fef2f2;border-radius:7px"></div>
+
+      <!-- botão analisar -->
+      <button id="searchBtn" onclick="buscarUniversal()"
+        style="width:100%;background:#0B132B;color:#fff;border:none;border-radius:10px;padding:11px 0;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:Inter,sans-serif;transition:opacity .2s">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="#fff" stroke-width="2.5"/>
+          <path d="M16.5 16.5L21 21" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        Analisar Ponto
+      </button>
+      <!-- MODO PIN -->
+      <button id="btn-pin-modo" onclick="toggleModoPIN()"
+        style="width:100%;background:transparent;color:#64748b;border:1.5px dashed #cbd5e1;border-radius:10px;padding:9px 0;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:Inter,sans-serif;margin-top:8px;transition:all .2s">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#94a3b8"/></svg>
+        Clique no mapa para adicionar pin
+      </button>
+      </div>
+      <div id="analysisResult"></div>
+    </div>
+
+    <!-- MAPA DE INTELIGÊNCIA -->
+    <div class="s-section">
+      <div class="s-label">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#94a3b8" stroke-width="1.5"/><path d="M5 8h6M8 5v6" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Mapa de Inteligência
+      </div>
+
+      <!-- Espirais de Crescimento (verde, igual imagem) -->
+      <div class="layer-green" onclick="toggleLayer('expansion')">
+        <div class="layer-green-left">
+          <div class="layer-green-icon"></div>
+          <span class="layer-green-label">Espirais de Crescimento</span>
+        </div>
+        <div class="chk-styled on" id="chk-expansion"></div>
+      </div>
+
+      <!-- Zonas Canibalização (vermelho, igual imagem) -->
+      <div class="layer-red" onclick="toggleLayer('cannibal')">
+        <div class="layer-red-left">
+          <div class="layer-red-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#b91c1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Zonas Canibalização
+          </div>
+        </div>
+        <div class="chk-styled" id="chk-cannibal"></div>
+      </div>
+
+      <!-- Checkboxes simples (exatamente como imagem) -->
+      <div class="cb-group">
+        <label class="cb-item" onclick="toggleLayer('dfinefit')">
+          <input type="checkbox" id="cb-dfinefit" checked onchange="return false">
+          <span class="cb-label">Unidades D.Finefit</span>
+        </label>
+        <label class="cb-item cb-orange" onclick="toggleLayer('competitor')">
+          <input type="checkbox" id="cb-competitor" onchange="return false">
+          <span class="cb-label">Concorrentes (Smart Fit...)</span>
+        </label>
+        <label class="cb-item cb-slate">
+          <input type="checkbox" id="cb-raio" checked onchange="toggleRaio(this)">
+          <span class="cb-label">Raio de captação</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- RAIO -->
+    <div class="s-section">
+      <div class="s-label">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#94a3b8" stroke-width="1.5"/><circle cx="8" cy="8" r="1.5" fill="#94a3b8"/></svg>
+        Raio de Análise
+      </div>
+      <div class="raio-row">
+        <input type="range" min="1" max="5" value="2" step="0.5" oninput="updateRaio(this.value)">
+        <span class="raio-val" id="raioVal">2 km</span>
+      </div>
+    </div>
+
+    <!-- ESTRATÉGIA -->
+    <div class="s-section" style="border-bottom:none">
+      <div class="strategy-box">
+        <h4>Estratégia MAPXpand</h4>
+        <p>Ao abrir novas unidades em um raio de 3-5km de unidades atuais, criamos um <strong>corredor de uso</strong>. O cliente transita entre casa e trabalho utilizando sempre a mesma rede, inviabilizando a troca pela concorrência.</p>
+      </div>
+    </div>
+
+    <!-- CONCORRÊNCIA -->
+    <div class="s-section" style="border-bottom:none;padding-top:10px">
+      <div class="s-label" style="margin-bottom:8px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em">Concorrência na Área</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:11px;color:#475569">Academias de bairro:</span>
+          <input type="number" id="gyms-bairro" min="0" value="0" style="width:52px;padding:3px 6px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;text-align:center;font-family:Inter,sans-serif">
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:11px;color:#475569">Redes grandes:</span>
+          <input type="number" id="gyms-rede" min="0" value="0" style="width:52px;padding:3px 6px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;text-align:center;font-family:Inter,sans-serif">
+        </div>
+      </div>
+      <!-- Botão Gerar Relatório -->
+      <button id="btn-gerar-relatorio" onclick="gerarRelatorio()"
+        style="margin-top:14px;width:100%;background:#0B132B;color:#C6A664;border:none;border-radius:10px;padding:11px 0;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:8px;font-family:Inter,sans-serif">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="#C6A664" stroke-width="2" stroke-linecap="round"/></svg>
+        Gerar Relatório Técnico
+      </button>
+    </div>
+
+  
+</aside>
+
+<!-- MAPA -->
+
+<!-- ═══ TELA DE LOGIN MAPXPAND ═══ -->
+<div id="login-screen" style="
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#0B132B 0%,#0d1f38 50%,#0B132B 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:Inter,sans-serif
+">
+
+
+  <div style="
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(198,166,100,.2);
+    border-radius:20px;
+    padding:48px 44px;
+    width:100%;max-width:400px;
+    backdrop-filter:blur(20px);
+    position:relative;z-index:1;
+    box-shadow:0 40px 80px rgba(0,0,0,.4)
+  ">
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:32px">
+      <svg width="48" height="54" viewBox="0 0 46 58" fill="none" style="margin-bottom:12px">
+        <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#E8D090"/><stop offset="50%" stop-color="#C6A664"/><stop offset="100%" stop-color="#9A7A3A"/>
+        </linearGradient></defs>
+        <path d="M23 2C14 2 7 9.2 7 17.8C7 29.6 23 46 23 46S39 29.6 39 17.8C39 9.2 32 2 23 2Z" fill="url(#lg)"/>
+        <path d="M23 5C15.3 5 9 11.4 9 17.8C9 29 23 43 23 43S37 29 37 17.8C37 11.4 30.7 5 23 5Z" fill="#0B132B"/>
+        <circle cx="23" cy="17.5" r="11.5" fill="none" stroke="#C6A664" stroke-width="1"/>
+        <ellipse cx="23" cy="17.5" rx="11.5" ry="3.8" fill="none" stroke="#C6A664" stroke-width="0.7" opacity="0.6"/>
+        <g stroke="#C6A664" stroke-width="0.6" opacity="0.7" fill="none">
+          <line x1="23" y1="7.5" x2="14.5" y2="13"/><line x1="23" y1="7.5" x2="31.5" y2="13"/>
+          <line x1="14.5" y1="13" x2="12" y2="18"/><line x1="31.5" y1="13" x2="34" y2="18"/>
+          <line x1="14.5" y1="13" x2="23" y2="17.5"/><line x1="31.5" y1="13" x2="23" y2="17.5"/>
+          <line x1="12" y1="18" x2="16.5" y2="24"/><line x1="34" y1="18" x2="29.5" y2="24"/>
+          <line x1="16.5" y1="24" x2="23" y2="27.5"/><line x1="29.5" y1="24" x2="23" y2="27.5"/>
+          <circle cx="23" cy="7.5" r="1.4" fill="#C6A664"/>
+          <circle cx="14.5" cy="13" r="1.1" fill="#C6A664"/>
+          <circle cx="31.5" cy="13" r="1.1" fill="#C6A664"/>
+          <circle cx="23" cy="27.5" r="1.4" fill="#C6A664"/>
+        </g>
+      </svg>
+      <div style="font-size:22px;font-weight:800;letter-spacing:.18em;color:#fff">MAP<span style="color:#C6A664">X</span>PAND</div>
+      <div style="font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.35);text-transform:uppercase;margin-top:4px">Inteligência Imobiliária</div>
+    </div>
+
+    <!-- Formulário -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div>
+        <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:6px">E-mail</label>
+        <input id="login-email" type="email" placeholder="seu@email.com"
+          style="width:100%;padding:12px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;font-size:14px;color:#fff;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;transition:border-color .2s"
+          onkeydown="if(event.key==='Enter')fazerLogin()"
+          onfocus="this.style.borderColor='rgba(198,166,100,.6)'"
+          onblur="this.style.borderColor='rgba(255,255,255,.12)'"
+        />
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:6px">Senha</label>
+        <input id="login-senha" type="password" placeholder="••••••••"
+          style="width:100%;padding:12px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;font-size:14px;color:#fff;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;transition:border-color .2s"
+          onkeydown="if(event.key==='Enter')fazerLogin()"
+          onfocus="this.style.borderColor='rgba(198,166,100,.6)'"
+          onblur="this.style.borderColor='rgba(255,255,255,.12)'"
+        />
+      </div>
+
+      <!-- Erro -->
+      <div id="login-erro" style="display:none;font-size:12px;color:#f87171;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px 12px;text-align:center"></div>
+
+      <!-- Botão -->
+      <button onclick="fazerLogin()" id="login-btn"
+        style="width:100%;background:linear-gradient(135deg,#C6A664,#9A7A3A);color:#0B132B;border:none;border-radius:10px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;font-family:Inter,sans-serif;letter-spacing:.06em;margin-top:4px;transition:opacity .2s">
+        ENTRAR NA PLATAFORMA
+      </button>
+
+      <!-- Rodapé -->
+      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.25);margin-top:8px">
+        Sem conta? <span onclick="mostrarCadastro()" style="color:rgba(198,166,100,.7);cursor:pointer;text-decoration:underline">Solicitar acesso</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rodapé -->
+  <div style="position:absolute;bottom:20px;font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.1em">
+    PLANEXPAND © 2025 — Todos os direitos reservados
+  </div>
+</div>
+
+<!-- MODAL SOLICITAR ACESSO -->
+<div id="cadastro-modal" style="
+  display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(0,0,0,.7);
+  display:none;align-items:center;justify-content:center;
+  font-family:Inter,sans-serif
+">
+  <div style="background:#fff;border-radius:16px;padding:32px;width:100%;max-width:380px;position:relative">
+    <button onclick="fecharCadastro()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8">✕</button>
+    <div style="font-size:16px;font-weight:700;color:#0B132B;margin-bottom:4px">Solicitar Acesso</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:20px">Preencha e entraremos em contato em até 24h</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <input id="cad-nome" type="text" placeholder="Nome completo" style="padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none"/>
+      <input id="cad-empresa" type="text" placeholder="Empresa / Rede" style="padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none"/>
+      <input id="cad-email" type="email" placeholder="E-mail" style="padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none"/>
+      <input id="cad-whats" type="tel" placeholder="WhatsApp" style="padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;outline:none"/>
+      <button onclick="enviarSolicitacao()" style="background:#0B132B;color:#C6A664;border:none;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">
+        Solicitar Acesso →
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="map"></div>
+
+<!-- Card legenda no mapa (igual imagem) -->
+<div id="map-legend">
+  <div class="ml-title">Benefício da Rede</div>
+  <div class="ml-item"><div class="ml-dot" style="background:#22c55e"></div>Alta Prioridade (Conecta Clusters Atuais)</div>
+  <div class="ml-item"><div class="ml-dot" style="background:#86efac"></div>Expansão de Borda (Espirais Secundárias)</div>
+</div>
+
+<script>
+const DFINEFIT=[
+  {name:"D.Finefit — Campo Limpo",lat:-23.6491,lng:-46.7481,pop:"82.400",renda:"R$ 2.800",score:78},
+  {name:"D.Finefit — Jd. Jacira",lat:-23.6374,lng:-46.7430,pop:"43.200",renda:"R$ 2.200",score:71},
+  {name:"D.Finefit — Jd. Niterói",lat:-23.6540,lng:-46.7258,pop:"61.800",renda:"R$ 3.100",score:83}
+];
+const COMPETITORS=[
+  {name:"Smart Fit — Capão Redondo",lat:-23.6721,lng:-46.7738},
+  {name:"Smart Fit — Campo Limpo",lat:-23.6358,lng:-46.7583},
+  {name:"Smart Fit — M'Boi Mirim",lat:-23.6732,lng:-46.7431},
+  {name:"Smart Fit — Guarapiranga",lat:-23.6661,lng:-46.7262},
+  {name:"Bio Ritmo — Jabaquara",lat:-23.6450,lng:-46.6410},
+  {name:"Smart Fit — Interlagos",lat:-23.6760,lng:-46.6850}
+];
+const TARGETS=[
+  {id:1,name:"Jardim Ângela / M'Boi Mirim",lat:-23.6961,lng:-46.7628,why:"CONECTIVIDADE MÁXIMA. Une Pq. Independência e Pq. Fernanda. Cria cinturão Sul impenetrável."},
+  {id:2,name:"Jardim São Luís",lat:-23.6690,lng:-46.7340,why:"Centro entre Sto. Antônio e Campo Limpo. Ideal para clientes Premium."},
+  {id:3,name:"Sacomã / Silva Bueno",lat:-23.6020,lng:-46.6020,why:"Espiral Leste. Apoia Heliópolis e expande para o ABC."},
+  {id:4,name:"Cidade Ademar Centro",lat:-23.6600,lng:-46.6700,why:"Elo vital entre Diadema e Zona Sul."},
+  {id:5,name:"Jardim Miriam / Cupecê",lat:-23.6738,lng:-46.6558,why:"Reforça o corredor da Cupecê. Alta densidade classe C/D."},
+  {id:6,name:"Capão Redondo Sul",lat:-23.6900,lng:-46.7900,why:"Expansão da espiral. Dominância territorial."},
+  {id:7,name:"Taboão (Pirajuçara)",lat:-23.6190,lng:-46.7720,why:"Conecta Vila Indiana à RMSP."},
+  {id:8,name:"Sapopemba / Teotônio",lat:-23.6060,lng:-46.5050,why:"Início da espiral Zona Leste."},
+  {id:9,name:"Brasilândia",lat:-23.4682,lng:-46.6853,why:"Nova espiral Norte. Sem concorrência premium."},
+  {id:10,name:"Cidade Tiradentes",lat:-23.5869,lng:-46.4069,why:"Nova espiral Leste. Foco em massa crítica."},
+  {id:11,name:"Guaianases",lat:-23.5430,lng:-46.4150,why:"Conectividade via trilhos."},
+  {id:12,name:"Eldorado Diadema",lat:-23.7093,lng:-46.6171,why:"Fechamento da espiral de Diadema."},
+  {id:13,name:"Cachoeirinha",lat:-23.4680,lng:-46.6710,why:"Fortalecimento do Cluster Norte."},
+  {id:14,name:"Vila Dirce",lat:-23.5501,lng:-46.8322,why:"Consolidação Carapicuíba."},
+  {id:15,name:"Jaraguá",lat:-23.4400,lng:-46.7300,why:"Expansão de borda Norte."},
+  {id:16,name:"Ponte Rasa",lat:-23.5000,lng:-46.4800,why:"Conecta São Miguel à espiral Leste."},
+  {id:17,name:"Parque Bristol",lat:-23.6250,lng:-46.6150,why:"Elo entre Heliópolis e Ipiranga."},
+  {id:18,name:"Grajaú Centro",lat:-23.7700,lng:-46.6950,why:"Apoio à unidade Cocaia."},
+  {id:19,name:"Varginha",lat:-23.7900,lng:-46.7100,why:"Ponta extrema da espiral Sul."},
+  {id:20,name:"Osasco Centro",lat:-23.5320,lng:-46.7780,why:"Porta de entrada nova espiral Oeste."}
+];
+
+
+// ═══════════════════════════════════════════════════════
+// BASE DEMOGRÁFICA — IBGE Censo 2022
+// SP + MG — 1493 municípios (dados reais do Censo 2022)
+// ═══════════════════════════════════════════════════════
+
+// Busca o município mais próximo de uma coordenada lat/lng
+function getDadosIBGE(lat, lng) {
+  let melhor = null, menorDist = Infinity;
+  for (const [nome, d] of Object.entries(IBGE_BASE)) {
+    const dlat = d.lat - lat, dlng = d.lng - lng;
+    const dist = Math.sqrt(dlat*dlat + dlng*dlng);
+    if (dist < menorDist) { menorDist = dist; melhor = { nome, ...d, dist }; }
+  }
+  return melhor;
+}
+
+// Formata painel demográfico para popup/análise
+function painelIBGE(lat, lng) {
+  const d = getDadosIBGE(lat, lng);
+  if (!d || d.dist > 1.5) return ''; // só exibe se estiver perto o suficiente
+  return `
+    <div style="margin-top:8px;padding-top:8px;border-top:0.5px solid #e2e8f0">
+      <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">
+        IBGE Censo 2022 — ${d.nome}/${d.uf}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+        <div style="background:#f8fafc;border-radius:5px;padding:5px 7px">
+          <div style="font-size:9px;color:#64748b">População</div>
+          <div style="font-size:12px;font-weight:700;color:#1e293b">${d.pop.toLocaleString('pt-BR')}</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:5px;padding:5px 7px">
+          <div style="font-size:9px;color:#64748b">Renda média</div>
+          <div style="font-size:12px;font-weight:700;color:#1e293b">R$ ${d.renda.toLocaleString('pt-BR')}</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:5px;padding:5px 7px">
+          <div style="font-size:9px;color:#64748b">Classe A/B</div>
+          <div style="font-size:12px;font-weight:700;color:#0B132B">${d.classAB}%</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:5px;padding:5px 7px">
+          <div style="font-size:9px;color:#64748b">Classe C</div>
+          <div style="font-size:12px;font-weight:700;color:#0B132B">${d.classC}%</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// MAP — Google Maps tiles (igual imagem original)
+const map=L.map('map',{zoomControl:false,center:[-23.651,-46.700],zoom:12});
+L.control.zoom({position:'bottomright'}).addTo(map);
+// Tiles CartoDB Voyager — visual limpo, sem restrição de Referer
+const tileLayers = {
+  ruas:      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+               {subdomains:'abcd',maxZoom:20,attribution:'© <a href="https://openstreetmap.org">OSM</a> © <a href="https://carto.com">CARTO</a>'}),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+               {maxZoom:19,attribution:'© Esri · Satellite'}),
+  topo:      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+               {maxZoom:19,attribution:'© Esri · Topo'}),
+  dark:      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+               {subdomains:'abcd',maxZoom:20,attribution:'© <a href="https://openstreetmap.org">OSM</a> © <a href="https://carto.com">CARTO</a>'})
+};
+let currentTile = tileLayers.ruas.addTo(map);
+
+function setTile(style, btn){
+  document.querySelectorAll('.tile-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  map.removeLayer(currentTile);
+  currentTile = tileLayers[style].addTo(map);
+}
+window.setTile=setTile;
+
+const layers={
+  dfinefit:L.layerGroup().addTo(map),
+  expansion:L.layerGroup().addTo(map),
+  cannibal:L.layerGroup(),
+  competitor:L.layerGroup(),
+  search:L.layerGroup().addTo(map)
+};
+const layerState={dfinefit:true,expansion:true,cannibal:false,competitor:false};
+
+function toggleLayer(id){
+  layerState[id]=!layerState[id];
+  // Atualiza UI
+  const chk=document.getElementById('chk-'+id);
+  const cb=document.getElementById('cb-'+id);
+  if(chk)chk.classList.toggle('on',layerState[id]);
+  if(cb)cb.checked=layerState[id];
+  layerState[id]?map.addLayer(layers[id]):map.removeLayer(layers[id]);
+  if(id==='dfinefit')renderCaptacao(parseFloat(document.querySelector('input[type=range]').value));
+}
+window.toggleLayer=toggleLayer;
+
+function toggleRaio(cb){
+  captacaoCircles.forEach(c=>cb.checked?map.addLayer(c):map.removeLayer(c));
+}
+window.toggleRaio=toggleRaio;
+
+// ÍCONES
+function mkIcon(html,w,h,ax,ay){return L.divIcon({className:'',html,iconSize:[w,h],iconAnchor:[ax,ay]})}
+
+function dfineFitIcon(){
+  return mkIcon(`<div style="display:flex;flex-direction:column;align-items:center">
+    <div style="background:#0B132B;border:2px solid #C6A664;border-radius:6px;padding:4px 9px;display:flex;align-items:center;gap:4px;box-shadow:0 3px 12px rgba(0,0,0,.5);cursor:pointer;transition:transform .15s;white-space:nowrap" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+      <div style="width:7px;height:7px;border-radius:50%;background:#C6A664;flex-shrink:0"></div>
+      <span style="color:#C6A664;font-size:8px;font-weight:800;letter-spacing:.1em;font-family:Inter,sans-serif">D.FINEFIT</span>
+    </div>
+    <div style="width:1.5px;height:7px;background:#C6A664"></div>
+  </div>`,80,30,40,30);
+}
+
+function targetIcon(id,p){
+  const bg=p?'#22c55e':'#4ade80',s=p?22:18,fs=p?9:8;
+  return mkIcon(`<div style="width:${s}px;height:${s}px;background:${bg};border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:800;color:#fff;font-family:Inter,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.3)">${id}</div>`,s,s,s/2,s/2);
+}
+
+function competitorIcon(){
+  return mkIcon(`<div style="background:rgba(0,0,0,.8);border:1px solid #555;border-radius:4px;padding:2px 7px;opacity:.5;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">
+    <span style="color:#aaa;font-size:7px;font-weight:700;letter-spacing:.1em;font-family:Inter,sans-serif">CONCORR.</span>
+  </div>`,60,16,30,8);
+}
+
+function searchIcon(){
+  return mkIcon(`<div style="width:14px;height:14px;border-radius:50%;background:#0B132B;border:2.5px solid #fff;box-shadow:0 0 0 4px rgba(11,19,43,.2)"></div>`,14,14,7,7);
+}
+
+function octagon(lat,lng,km){
+  const pts=[],rlat=km/111,rlng=km/(111*Math.cos(lat*Math.PI/180));
+  for(let i=0;i<8;i++){const a=(i*45)*Math.PI/180;pts.push([lat+rlat*Math.sin(a),lng+rlng*Math.cos(a)]);}
+  return pts;
+}
+
+const popOpts={className:'',maxWidth:260};
+
+// DFINEFIT
+DFINEFIT.forEach(u=>{
+  const sc=u.score>=80?'#15803d':u.score>=70?'#b45309':'#b91c1c';
+  L.marker([u.lat,u.lng],{icon:dfineFitIcon()})
+    .bindPopup(`<div class="pop-inner">
+      <span class="pop-badge" style="background:#fef3c7;color:#92400e;border:0.5px solid #fde68a">Unidade ativa</span>
+      <div class="pop-name">${u.name}</div>
+      <div class="pop-sub">Populacao: <strong>${u.pop}</strong> hab · Renda: <strong>${u.renda}</strong><br>Score MapXpand: <strong style="color:${sc}">${u.score}/100</strong></div>
+    </div>`,popOpts).addTo(layers.dfinefit);
+});
+
+// TARGETS
+TARGETS.forEach(t=>{
+  const p=t.id<=5;
+  L.polygon(octagon(t.lat,t.lng,2),{
+    color:'#22c55e',weight:p?2.5:1.5,dashArray:'8 10',
+    fillColor:'#22c55e',fillOpacity:p?0.18:0.08
+  }).bindPopup(`<div class="pop-inner">
+    <span class="pop-badge" style="background:#dcfce7;color:#15803d;border:0.5px solid #bbf7d0">ALVO #${t.id}${p?' · PRIORITÁRIO':''}</span>
+    <div class="pop-name">${t.name}</div>
+    <div class="pop-sub">${t.why}</div>
+  </div>`,popOpts).addTo(layers.expansion);
+  L.marker([t.lat,t.lng],{icon:targetIcon(t.id,p),interactive:false}).addTo(layers.expansion);
+});
+
+// COMPETITORS
+COMPETITORS.forEach(c=>{
+  L.marker([c.lat,c.lng],{icon:competitorIcon()})
+    .bindPopup(`<div class="pop-inner"><span class="pop-badge" style="background:#f1f5f9;color:#475569;border:0.5px solid #cbd5e1">Concorrente</span><div class="pop-name">${c.name}</div></div>`,popOpts)
+    .addTo(layers.competitor);
+});
+
+// CANNIBAL ZONES
+DFINEFIT.forEach(u=>{
+  L.polygon(octagon(u.lat,u.lng,2),{
+    color:'#ef4444',weight:1.5,dashArray:'6 8',
+    fillColor:'#ef4444',fillOpacity:0.08,interactive:false
+  }).addTo(layers.cannibal);
+});
+
+// RAIO CAPTAÇÃO
+let captacaoCircles=[],showRaio=true;
+function renderCaptacao(km){
+  captacaoCircles.forEach(c=>map.removeLayer(c));
+  captacaoCircles=[];
+  if(!layerState.dfinefit)return;
+  DFINEFIT.forEach(u=>{
+    captacaoCircles.push(L.circle([u.lat,u.lng],{
+      radius:km*1000,color:'#0B132B',fillColor:'#0B132B',
+      fillOpacity:0.04,weight:1.5,dashArray:'5 5',opacity:.35,interactive:false
+    }).addTo(map));
+  });
+}
+function updateRaio(val){
+  document.getElementById('raioVal').textContent=parseFloat(val)+' km';
+  renderCaptacao(parseFloat(val));
+}
+window.updateRaio=updateRaio;
+renderCaptacao(2);
+
+// DISTÂNCIA
+function dist(a,b){
+  const R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLng=(b.lng-a.lng)*Math.PI/180;
+  const x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+// MOTOR DE ANÁLISE
+let searchMarker=null;
+function analyse(lat,lng,label){
+  if(searchMarker){layers.search.removeLayer(searchMarker);searchMarker=null;}
+  searchMarker=L.marker([lat,lng],{icon:searchIcon(),zIndexOffset:1000}).addTo(layers.search);
+  const pt={lat,lng};
+  const dOwn=Math.min(...DFINEFIT.map(u=>dist(pt,u)));
+  const dComp=Math.min(...COMPETITORS.map(c=>dist(pt,c)));
+  const mt=TARGETS.find(t=>dist(pt,t)<=2.2);
+  let score=50;
+  if(dOwn<1.6)score-=50;
+  else if(dOwn>=2&&dOwn<=5)score+=35;
+  if(dComp<1.3)score-=40;
+  else if(dComp>4)score+=15;
+  if(mt)score+=mt.id<=5?40:25;
+  score=Math.max(5,Math.min(100,score));
+  const isG=score>80,isA=score>55;
+  const hBg=isG?'linear-gradient(135deg,#166534,#15803d)':isA?'linear-gradient(135deg,#92400e,#b45309)':'linear-gradient(135deg,#991b1b,#b91c1c)';
+  const stxt=isG?'Ideal para rede':isA?'Ponto viável':'Área saturada';
+  const tc=isG?'green':isA?'amber':'red';
+  const ttxt=dOwn>=2&&dOwn<=5?'Posição estratégica ideal':dOwn<1.6?'Risco de canibalização':'Fora do corredor principal';
+  const ibgeData = painelIBGE(lat, lng);
+  const el=document.getElementById('analysisResult');
+  el.style.display='block';
+  el.innerHTML=`<div class="ar-card" style="margin-top:10px">
+    <div class="ar-head" style="background:${hBg}">
+      <div><div class="ar-score-num">${score}%</div><div class="ar-score-label">Índice de viabilidade</div></div>
+      <div class="ar-status">${stxt}</div>
+    </div>
+    <div class="ar-body">
+      <div class="ar-addr" title="${label}">${label}</div>
+      <div class="ar-row"><span>Dist. unidade própria</span><strong>${dOwn.toFixed(2)} km</strong></div>
+      <div class="ar-row"><span>Dist. concorrente</span><strong>${dComp.toFixed(2)} km</strong></div>
+      ${mt?`<div class="ar-row"><span>Alvo mapeado</span><strong style="color:#15803d">#${mt.id} — ${mt.name}</strong></div>`:''}
+      <span class="ar-tag ${tc}">${ttxt}</span>
+      ${ibgeData}
+    </div>
+  </div>`;
+}
+
+// PARSER DE ENDEREÇO COMPLETO
+
+
+
+
+
+// BASE IBGE — Censo 2022 — SP (640) e MG (853) municípios
+const IBGE_BASE = {"ADAMANTINA":{"id":3500105,"pop":35153,"uf":"SP"},"ADOLFO":{"id":3500204,"pop":3545,"uf":"SP"},"AGUAÍ":{"id":3500303,"pop":36981,"uf":"SP"},"ÁGUAS DA PRATA":{"id":3500402,"pop":8262,"uf":"SP"},"ÁGUAS DE LINDÓIA":{"id":3500501,"pop":18908,"uf":"SP"},"ÁGUAS DE SANTA BÁRBARA":{"id":3500550,"pop":6142,"uf":"SP"},"ÁGUAS DE SÃO PEDRO":{"id":3500600,"pop":3588,"uf":"SP"},"AGUDOS":{"id":3500709,"pop":37582,"uf":"SP"},"ALAMBARI":{"id":3500758,"pop":6231,"uf":"SP"},"ALFREDO MARCONDES":{"id":3500808,"pop":4201,"uf":"SP"},"ALTAIR":{"id":3500907,"pop":4211,"uf":"SP"},"ALTINÓPOLIS":{"id":3501004,"pop":16221,"uf":"SP"},"ALTO ALEGRE":{"id":3501103,"pop":4078,"uf":"SP"},"ALUMÍNIO":{"id":3501152,"pop":18903,"uf":"SP"},"ÁLVARES FLORENCE":{"id":3501202,"pop":3616,"uf":"SP"},"ÁLVARES MACHADO":{"id":3501301,"pop":25078,"uf":"SP"},"ÁLVARO DE CARVALHO":{"id":3501400,"pop":5320,"uf":"SP"},"ALVINLÂNDIA":{"id":3501509,"pop":3251,"uf":"SP"},"AMERICANA":{"id":3501608,"pop":244370,"uf":"SP"},"AMÉRICO BRASILIENSE":{"id":3501707,"pop":41545,"uf":"SP"},"AMÉRICO DE CAMPOS":{"id":3501806,"pop":5993,"uf":"SP"},"AMPARO":{"id":3501905,"pop":73145,"uf":"SP"},"ANALÂNDIA":{"id":3502002,"pop":5115,"uf":"SP"},"ANDRADINA":{"id":3502101,"pop":57245,"uf":"SP"},"ANGATUBA":{"id":3502200,"pop":25724,"uf":"SP"},"ANHEMBI":{"id":3502309,"pop":6911,"uf":"SP"},"ANHUMAS":{"id":3502408,"pop":4172,"uf":"SP"},"APARECIDA":{"id":3502507,"pop":36211,"uf":"SP"},"APARECIDA D'OESTE":{"id":3502606,"pop":4122,"uf":"SP"},"APIAÍ":{"id":3502705,"pop":24081,"uf":"SP"},"ARAÇARIGUAMA":{"id":3502754,"pop":23343,"uf":"SP"},"ARAÇATUBA":{"id":3502804,"pop":199210,"uf":"SP"},"ARAÇOIABA DA SERRA":{"id":3502903,"pop":35389,"uf":"SP"},"ARAMINA":{"id":3503000,"pop":5689,"uf":"SP"},"ARANDU":{"id":3503109,"pop":6373,"uf":"SP"},"ARAPEÍ":{"id":3503158,"pop":2452,"uf":"SP"},"ARARAQUARA":{"id":3503208,"pop":240542,"uf":"SP"},"ARARAS":{"id":3503307,"pop":136739,"uf":"SP"},"ARCO-ÍRIS":{"id":3503356,"pop":1755,"uf":"SP"},"AREALVA":{"id":3503406,"pop":8665,"uf":"SP"},"AREIAS":{"id":3503505,"pop":3906,"uf":"SP"},"AREIÓPOLIS":{"id":3503604,"pop":11186,"uf":"SP"},"ARIRANHA":{"id":3503703,"pop":9851,"uf":"SP"},"ARTUR NOGUEIRA":{"id":3503802,"pop":56247,"uf":"SP"},"ARUJÁ":{"id":3503901,"pop":92453,"uf":"SP"},"ASPÁSIA":{"id":3503950,"pop":1815,"uf":"SP"},"ASSIS":{"id":3504008,"pop":105768,"uf":"SP"},"ATIBAIA":{"id":3504107,"pop":145378,"uf":"SP"},"AURIFLAMA":{"id":3504206,"pop":15316,"uf":"SP"},"AVAÍ":{"id":3504305,"pop":5467,"uf":"SP"},"AVANHANDAVA":{"id":3504404,"pop":14063,"uf":"SP"},"AVARÉ":{"id":3504503,"pop":91792,"uf":"SP"},"BADY BASSITT":{"id":3504602,"pop":18013,"uf":"SP"},"BALBINOS":{"id":3504701,"pop":6127,"uf":"SP"},"BÁLSAMO":{"id":3504800,"pop":9209,"uf":"SP"},"BANANAL":{"id":3504909,"pop":11039,"uf":"SP"},"BARÃO DE ANTONINA":{"id":3505005,"pop":3525,"uf":"SP"},"BARBOSA":{"id":3505104,"pop":7532,"uf":"SP"},"BARIRI":{"id":3505203,"pop":35844,"uf":"SP"},"BARRA BONITA":{"id":3505302,"pop":36125,"uf":"SP"},"BARRA DO CHAPÉU":{"id":3505351,"pop":5794,"uf":"SP"},"BARRA DO TURVO":{"id":3505401,"pop":7606,"uf":"SP"},"BARRETOS":{"id":3505500,"pop":123546,"uf":"SP"},"BARRINHA":{"id":3505609,"pop":33537,"uf":"SP"},"BARUERI":{"id":3505708,"pop":279704,"uf":"SP"},"BASTOS":{"id":3505807,"pop":20952,"uf":"SP"},"BATATAIS":{"id":3505906,"pop":63438,"uf":"SP"},"BAURU":{"id":3506003,"pop":381706,"uf":"SP"},"BEBEDOURO":{"id":3506102,"pop":77612,"uf":"SP"},"BENTO DE ABREU":{"id":3506201,"pop":3028,"uf":"SP"},"BERNARDINO DE CAMPOS":{"id":3506300,"pop":11168,"uf":"SP"},"BERTIOGA":{"id":3506359,"pop":66154,"uf":"SP"},"BILAC":{"id":3506409,"pop":8197,"uf":"SP"},"BIRIGUI":{"id":3506508,"pop":126094,"uf":"SP"},"BIRITIBA MIRIM":{"id":3506607,"pop":33265,"uf":"SP"},"BOA ESPERANÇA DO SUL":{"id":3506706,"pop":15111,"uf":"SP"},"BOCAINA":{"id":3506805,"pop":12571,"uf":"SP"},"BOFETE":{"id":3506904,"pop":12107,"uf":"SP"},"BOITUVA":{"id":3507001,"pop":63310,"uf":"SP"},"BOM JESUS DOS PERDÕES":{"id":3507100,"pop":26506,"uf":"SP"},"BOM SUCESSO DE ITARARÉ":{"id":3507159,"pop":4013,"uf":"SP"},"BORÁ":{"id":3507209,"pop":839,"uf":"SP"},"BORACÉIA":{"id":3507308,"pop":4913,"uf":"SP"},"BORBOREMA":{"id":3507407,"pop":16278,"uf":"SP"},"BOREBI":{"id":3507456,"pop":2713,"uf":"SP"},"BOTUCATU":{"id":3507506,"pop":149718,"uf":"SP"},"BRAGANÇA PAULISTA":{"id":3507605,"pop":172346,"uf":"SP"},"BRAÚNA":{"id":3507704,"pop":5795,"uf":"SP"},"BREJO ALEGRE":{"id":3507753,"pop":2911,"uf":"SP"},"BRODOWSKI":{"id":3507803,"pop":25605,"uf":"SP"},"BROTAS":{"id":3507902,"pop":24862,"uf":"SP"},"BURI":{"id":3508009,"pop":20050,"uf":"SP"},"BURITAMA":{"id":3508108,"pop":17414,"uf":"SP"},"BURITIZAL":{"id":3508207,"pop":4547,"uf":"SP"},"CABRÁLIA PAULISTA":{"id":3508306,"pop":4222,"uf":"SP"},"CABREÚVA":{"id":3508405,"pop":51130,"uf":"SP"},"CAÇAPAVA":{"id":3508504,"pop":95752,"uf":"SP"},"CACHOEIRA PAULISTA":{"id":3508603,"pop":33827,"uf":"SP"},"CACONDE":{"id":3508702,"pop":19031,"uf":"SP"},"CAFELÂNDIA":{"id":3508801,"pop":17917,"uf":"SP"},"CAIABU":{"id":3508900,"pop":4195,"uf":"SP"},"CAIEIRAS":{"id":3509007,"pop":104044,"uf":"SP"},"CAIUÁ":{"id":3509106,"pop":6017,"uf":"SP"},"CAJAMAR":{"id":3509205,"pop":79034,"uf":"SP"},"CAJATI":{"id":3509254,"pop":28441,"uf":"SP"},"CAJOBI":{"id":3509304,"pop":10649,"uf":"SP"},"CAJURU":{"id":3509403,"pop":26613,"uf":"SP"},"CAMPINA DO MONTE ALEGRE":{"id":3509452,"pop":6088,"uf":"SP"},"CAMPINAS":{"id":3509502,"pop":1223237,"uf":"SP"},"CAMPO LIMPO PAULISTA":{"id":3509601,"pop":86407,"uf":"SP"},"CAMPOS DO JORDÃO":{"id":3509700,"pop":52713,"uf":"SP"},"CAMPOS NOVOS PAULISTA":{"id":3509809,"pop":5028,"uf":"SP"},"CANANÉIA":{"id":3509908,"pop":12542,"uf":"SP"},"CANAS":{"id":3509957,"pop":5268,"uf":"SP"},"CÂNDIDO MOTA":{"id":3510005,"pop":31410,"uf":"SP"},"CÂNDIDO RODRIGUES":{"id":3510104,"pop":2805,"uf":"SP"},"CANITAR":{"id":3510153,"pop":5365,"uf":"SP"},"CAPÃO BONITO":{"id":3510203,"pop":47098,"uf":"SP"},"CAPELA DO ALTO":{"id":3510302,"pop":21257,"uf":"SP"},"CAPIVARI":{"id":3510401,"pop":56973,"uf":"SP"},"CARAGUATATUBA":{"id":3510500,"pop":125194,"uf":"SP"},"CARAPICUÍBA":{"id":3510609,"pop":405375,"uf":"SP"},"CARDOSO":{"id":3510708,"pop":12371,"uf":"SP"},"CASA BRANCA":{"id":3510807,"pop":30655,"uf":"SP"},"CÁSSIA DOS COQUEIROS":{"id":3510906,"pop":2488,"uf":"SP"},"CASTILHO":{"id":3511003,"pop":21521,"uf":"SP"},"CATANDUVA":{"id":3511102,"pop":123114,"uf":"SP"},"CATIGUÁ":{"id":3511201,"pop":7905,"uf":"SP"},"CEDRAL":{"id":3511300,"pop":9452,"uf":"SP"},"CERQUEIRA CÉSAR":{"id":3511409,"pop":20391,"uf":"SP"},"CERQUILHO":{"id":3511508,"pop":50631,"uf":"SP"},"CESÁRIO LANGE":{"id":3511607,"pop":18595,"uf":"SP"},"CHARQUEADA":{"id":3511706,"pop":17539,"uf":"SP"},"CLEMENTINA":{"id":3511904,"pop":8894,"uf":"SP"},"COLINA":{"id":3512001,"pop":18601,"uf":"SP"},"COLÔMBIA":{"id":3512100,"pop":6223,"uf":"SP"},"CONCHAL":{"id":3512209,"pop":28491,"uf":"SP"},"CONCHAS":{"id":3512308,"pop":18138,"uf":"SP"},"CORDEIRÓPOLIS":{"id":3512407,"pop":25116,"uf":"SP"},"COROADOS":{"id":3512506,"pop":6197,"uf":"SP"},"CORONEL MACEDO":{"id":3512605,"pop":4591,"uf":"SP"},"CORUMBATAÍ":{"id":3512704,"pop":4072,"uf":"SP"},"COSMÓPOLIS":{"id":3512803,"pop":74662,"uf":"SP"},"COSMORAMA":{"id":3512902,"pop":7289,"uf":"SP"},"COTIA":{"id":3513009,"pop":257882,"uf":"SP"},"CRAVINHOS":{"id":3513108,"pop":35858,"uf":"SP"},"CRISTAIS PAULISTA":{"id":3513207,"pop":8803,"uf":"SP"},"CRUZÁLIA":{"id":3513306,"pop":2021,"uf":"SP"},"CRUZEIRO":{"id":3513405,"pop":82895,"uf":"SP"},"CUBATÃO":{"id":3513504,"pop":132521,"uf":"SP"},"CUNHA":{"id":3513603,"pop":21373,"uf":"SP"},"DESCALVADO":{"id":3513702,"pop":34097,"uf":"SP"},"DIADEMA":{"id":3513801,"pop":429550,"uf":"SP"},"DIRCE REIS":{"id":3513850,"pop":1805,"uf":"SP"},"DIVINOLÂNDIA":{"id":3513900,"pop":11027,"uf":"SP"},"DOBRADA":{"id":3514007,"pop":9088,"uf":"SP"},"DOIS CÓRREGOS":{"id":3514106,"pop":27704,"uf":"SP"},"DOLCINÓPOLIS":{"id":3514205,"pop":2108,"uf":"SP"},"DOURADO":{"id":3514304,"pop":8883,"uf":"SP"},"DRACENA":{"id":3514403,"pop":47287,"uf":"SP"},"DUARTINA":{"id":3514502,"pop":12421,"uf":"SP"},"DUMONT":{"id":3514601,"pop":10174,"uf":"SP"},"ECHAPORÃ":{"id":3514700,"pop":6026,"uf":"SP"},"ELDORADO":{"id":3514809,"pop":15592,"uf":"SP"},"ELIAS FAUSTO":{"id":3514908,"pop":18095,"uf":"SP"},"ELISIÁRIO":{"id":3514924,"pop":3742,"uf":"SP"},"EMBAÚBA":{"id":3514957,"pop":2446,"uf":"SP"},"EMBU DAS ARTES":{"id":3515004,"pop":279264,"uf":"SP"},"EMBU-GUAÇU":{"id":3515103,"pop":70402,"uf":"SP"},"EMILIANÓPOLIS":{"id":3515129,"pop":3238,"uf":"SP"},"ENGENHEIRO COELHO":{"id":3515152,"pop":21712,"uf":"SP"},"ESPÍRITO SANTO DO PINHAL":{"id":3515186,"pop":44607,"uf":"SP"},"ESPÍRITO SANTO DO TURVO":{"id":3515194,"pop":4926,"uf":"SP"},"ESTRELA D'OESTE":{"id":3515202,"pop":8420,"uf":"SP"},"ESTRELA DO NORTE":{"id":3515301,"pop":2774,"uf":"SP"},"EUCLIDES DA CUNHA PAULISTA":{"id":3515350,"pop":9280,"uf":"SP"},"FARTURA":{"id":3515400,"pop":16102,"uf":"SP"},"FERNANDÓPOLIS":{"id":3515509,"pop":69680,"uf":"SP"},"FERNANDO PRESTES":{"id":3515608,"pop":5805,"uf":"SP"},"FERNÃO":{"id":3515657,"pop":1739,"uf":"SP"},"FERRAZ DE VASCONCELOS":{"id":3515707,"pop":198661,"uf":"SP"},"FLORA RICA":{"id":3515806,"pop":1397,"uf":"SP"},"FLOREAL":{"id":3515905,"pop":2884,"uf":"SP"},"FLÓRIDA PAULISTA":{"id":3516002,"pop":14936,"uf":"SP"},"FLORÍNEA":{"id":3516101,"pop":2631,"uf":"SP"},"FRANCA":{"id":3516200,"pop":358539,"uf":"SP"},"FRANCISCO MORATO":{"id":3516309,"pop":179372,"uf":"SP"},"FRANCO DA ROCHA":{"id":3516408,"pop":158438,"uf":"SP"},"GABRIEL MONTEIRO":{"id":3516507,"pop":2776,"uf":"SP"},"GÁLIA":{"id":3516606,"pop":6419,"uf":"SP"},"GARÇA":{"id":3516705,"pop":44429,"uf":"SP"},"GASTÃO VIDIGAL":{"id":3516804,"pop":4911,"uf":"SP"},"GAVIÃO PEIXOTO":{"id":3516853,"pop":4841,"uf":"SP"},"GENERAL SALGADO":{"id":3516903,"pop":10855,"uf":"SP"},"GETULINA":{"id":3517000,"pop":11485,"uf":"SP"},"GLICÉRIO":{"id":3517109,"pop":4842,"uf":"SP"},"GUAIÇARA":{"id":3517208,"pop":12416,"uf":"SP"},"GUAIMBÊ":{"id":3517307,"pop":5806,"uf":"SP"},"GUAÍRA":{"id":3517406,"pop":41283,"uf":"SP"},"GUAPIAÇU":{"id":3517505,"pop":22087,"uf":"SP"},"GUAPIARA":{"id":3517604,"pop":16896,"uf":"SP"},"GUARÁ":{"id":3517703,"pop":21394,"uf":"SP"},"GUARAÇAÍ":{"id":3517802,"pop":8258,"uf":"SP"},"GUARACI":{"id":3517901,"pop":11382,"uf":"SP"},"GUARANI D'OESTE":{"id":3518008,"pop":1996,"uf":"SP"},"GUARANTÃ":{"id":3518107,"pop":6685,"uf":"SP"},"GUARARAPES":{"id":3518206,"pop":33257,"uf":"SP"},"GUARAREMA":{"id":3518305,"pop":30465,"uf":"SP"},"GUARATINGUETÁ":{"id":3518404,"pop":123192,"uf":"SP"},"GUAREÍ":{"id":3518503,"pop":19244,"uf":"SP"},"GUARIBA":{"id":3518602,"pop":40857,"uf":"SP"},"GUARUJÁ":{"id":3518701,"pop":324977,"uf":"SP"},"GUARULHOS":{"id":3518800,"pop":1404694,"uf":"SP"},"GUATAPARÁ":{"id":3518859,"pop":7760,"uf":"SP"},"GUZOLÂNDIA":{"id":3518909,"pop":5346,"uf":"SP"},"HERCULÂNDIA":{"id":3519006,"pop":9649,"uf":"SP"},"HOLAMBRA":{"id":3519055,"pop":15605,"uf":"SP"},"HORTOLÂNDIA":{"id":3519071,"pop":237570,"uf":"SP"},"IACANGA":{"id":3519105,"pop":12002,"uf":"SP"},"IACRI":{"id":3519204,"pop":6269,"uf":"SP"},"IARAS":{"id":3519253,"pop":9786,"uf":"SP"},"IBATÉ":{"id":3519303,"pop":35830,"uf":"SP"},"IBIRÁ":{"id":3519402,"pop":12639,"uf":"SP"},"IBIRAREMA":{"id":3519501,"pop":7926,"uf":"SP"},"IBITINGA":{"id":3519600,"pop":61150,"uf":"SP"},"IBIÚNA":{"id":3519709,"pop":80062,"uf":"SP"},"ICÉM":{"id":3519808,"pop":8363,"uf":"SP"},"IEPÊ":{"id":3519907,"pop":8228,"uf":"SP"},"IGARAÇU DO TIETÊ":{"id":3520004,"pop":24821,"uf":"SP"},"IGARAPAVA":{"id":3520103,"pop":30791,"uf":"SP"},"IGARATÁ":{"id":3520202,"pop":9631,"uf":"SP"},"IGUAPE":{"id":3520301,"pop":31117,"uf":"SP"},"ILHABELA":{"id":3520400,"pop":36194,"uf":"SP"},"ILHA COMPRIDA":{"id":3520426,"pop":11552,"uf":"SP"},"ILHA SOLTEIRA":{"id":3520442,"pop":26886,"uf":"SP"},"INDAIATUBA":{"id":3520509,"pop":260690,"uf":"SP"},"INDIANA":{"id":3520608,"pop":4873,"uf":"SP"},"INDIAPORÃ":{"id":3520707,"pop":3876,"uf":"SP"},"INÚBIA PAULISTA":{"id":3520806,"pop":4045,"uf":"SP"},"IPAUSSU":{"id":3520905,"pop":15165,"uf":"SP"},"IPERÓ":{"id":3521002,"pop":38771,"uf":"SP"},"IPEÚNA":{"id":3521101,"pop":7824,"uf":"SP"},"IPIGUÁ":{"id":3521150,"pop":5557,"uf":"SP"},"IPORANGA":{"id":3521200,"pop":4180,"uf":"SP"},"IPUÃ":{"id":3521309,"pop":16794,"uf":"SP"},"IRACEMÁPOLIS":{"id":3521408,"pop":24982,"uf":"SP"},"IRAPUÃ":{"id":3521507,"pop":8101,"uf":"SP"},"IRAPURU":{"id":3521606,"pop":8356,"uf":"SP"},"ITABERÁ":{"id":3521705,"pop":17405,"uf":"SP"},"ITAÍ":{"id":3521804,"pop":27632,"uf":"SP"},"ITAJOBI":{"id":3521903,"pop":15331,"uf":"SP"},"ITAJU":{"id":3522000,"pop":3937,"uf":"SP"},"ITANHAÉM":{"id":3522109,"pop":104351,"uf":"SP"},"ITAOCA":{"id":3522158,"pop":3332,"uf":"SP"},"ITAPECERICA DA SERRA":{"id":3522208,"pop":179574,"uf":"SP"},"ITAPETININGA":{"id":3522307,"pop":167106,"uf":"SP"},"ITAPEVA":{"id":3133600,"pop":9976,"uf":"MG"},"ITAPEVI":{"id":3522505,"pop":244131,"uf":"SP"},"ITAPIRA":{"id":3522604,"pop":75683,"uf":"SP"},"ITAPIRAPUÃ PAULISTA":{"id":3522653,"pop":4294,"uf":"SP"},"ITÁPOLIS":{"id":3522703,"pop":43536,"uf":"SP"},"ITAPORANGA":{"id":3522802,"pop":15197,"uf":"SP"},"ITAPUÍ":{"id":3522901,"pop":14297,"uf":"SP"},"ITAPURA":{"id":3523008,"pop":4994,"uf":"SP"},"ITAQUAQUECETUBA":{"id":3523107,"pop":379082,"uf":"SP"},"ITARARÉ":{"id":3523206,"pop":50778,"uf":"SP"},"ITARIRI":{"id":3523305,"pop":17754,"uf":"SP"},"ITATIBA":{"id":3523404,"pop":124254,"uf":"SP"},"ITATINGA":{"id":3523503,"pop":21139,"uf":"SP"},"ITIRAPINA":{"id":3523602,"pop":18610,"uf":"SP"},"ITIRAPUÃ":{"id":3523701,"pop":6587,"uf":"SP"},"ITOBI":{"id":3523800,"pop":7862,"uf":"SP"},"ITU":{"id":3523909,"pop":177150,"uf":"SP"},"ITUPEVA":{"id":3524006,"pop":64330,"uf":"SP"},"ITUVERAVA":{"id":3524105,"pop":42259,"uf":"SP"},"JABORANDI":{"id":3524204,"pop":6963,"uf":"SP"},"JABOTICABAL":{"id":3524303,"pop":78029,"uf":"SP"},"JACAREÍ":{"id":3524402,"pop":237119,"uf":"SP"},"JACI":{"id":3524501,"pop":7322,"uf":"SP"},"JACUPIRANGA":{"id":3524600,"pop":17911,"uf":"SP"},"JAGUARIÚNA":{"id":3524709,"pop":59921,"uf":"SP"},"JALES":{"id":3524808,"pop":49291,"uf":"SP"},"JAMBEIRO":{"id":3524907,"pop":6828,"uf":"SP"},"JANDIRA":{"id":3525003,"pop":127734,"uf":"SP"},"JARDINÓPOLIS":{"id":3525102,"pop":45544,"uf":"SP"},"JARINU":{"id":3525201,"pop":31173,"uf":"SP"},"JAÚ":{"id":3525300,"pop":153463,"uf":"SP"},"JERIQUARA":{"id":3525409,"pop":3143,"uf":"SP"},"JOANÓPOLIS":{"id":3525508,"pop":13453,"uf":"SP"},"JOÃO RAMALHO":{"id":3525607,"pop":4577,"uf":"SP"},"JOSÉ BONIFÁCIO":{"id":3525706,"pop":37707,"uf":"SP"},"JÚLIO MESQUITA":{"id":3525805,"pop":4824,"uf":"SP"},"JUMIRIM":{"id":3525854,"pop":3467,"uf":"SP"},"JUNDIAÍ":{"id":3525904,"pop":426935,"uf":"SP"},"JUNQUEIRÓPOLIS":{"id":3526001,"pop":20978,"uf":"SP"},"JUQUIÁ":{"id":3526100,"pop":18627,"uf":"SP"},"JUQUITIBA":{"id":3526209,"pop":31844,"uf":"SP"},"LAGOINHA":{"id":3526308,"pop":4882,"uf":"SP"},"LARANJAL PAULISTA":{"id":3526407,"pop":29047,"uf":"SP"},"LAVÍNIA":{"id":3526506,"pop":12581,"uf":"SP"},"LAVRINHAS":{"id":3526605,"pop":7361,"uf":"SP"},"LEME":{"id":3526704,"pop":105273,"uf":"SP"},"LENÇÓIS PAULISTA":{"id":3526803,"pop":69533,"uf":"SP"},"LIMEIRA":{"id":3526902,"pop":310783,"uf":"SP"},"LINDÓIA":{"id":3527009,"pop":8201,"uf":"SP"},"LINS":{"id":3527108,"pop":78978,"uf":"SP"},"LORENA":{"id":3527207,"pop":89532,"uf":"SP"},"LOURDES":{"id":3527256,"pop":2311,"uf":"SP"},"LOUVEIRA":{"id":3527306,"pop":51007,"uf":"SP"},"LUCÉLIA":{"id":3527405,"pop":22022,"uf":"SP"},"LUCIANÓPOLIS":{"id":3527504,"pop":2412,"uf":"SP"},"LUÍS ANTÔNIO":{"id":3527603,"pop":15628,"uf":"SP"},"LUIZIÂNIA":{"id":3527702,"pop":5918,"uf":"SP"},"LUPÉRCIO":{"id":3527801,"pop":4608,"uf":"SP"},"LUTÉCIA":{"id":3527900,"pop":2623,"uf":"SP"},"MACATUBA":{"id":3528007,"pop":17263,"uf":"SP"},"MACAUBAL":{"id":3528106,"pop":8174,"uf":"SP"},"MACEDÔNIA":{"id":3528205,"pop":3686,"uf":"SP"},"MAGDA":{"id":3528304,"pop":3086,"uf":"SP"},"MAIRINQUE":{"id":3528403,"pop":47723,"uf":"SP"},"MAIRIPORÃ":{"id":3528502,"pop":103645,"uf":"SP"},"MANDURI":{"id":3528601,"pop":9972,"uf":"SP"},"MARABÁ PAULISTA":{"id":3528700,"pop":6039,"uf":"SP"},"MARACAÍ":{"id":3528809,"pop":14069,"uf":"SP"},"MARAPOAMA":{"id":3528858,"pop":3097,"uf":"SP"},"MARIÁPOLIS":{"id":3528908,"pop":4098,"uf":"SP"},"MARÍLIA":{"id":3529005,"pop":242249,"uf":"SP"},"MARINÓPOLIS":{"id":3529104,"pop":2101,"uf":"SP"},"MARTINÓPOLIS":{"id":3529203,"pop":26791,"uf":"SP"},"MATÃO":{"id":3529302,"pop":84069,"uf":"SP"},"MAUÁ":{"id":3529401,"pop":481725,"uf":"SP"},"MENDONÇA":{"id":3529500,"pop":5638,"uf":"SP"},"MERIDIANO":{"id":3529609,"pop":3813,"uf":"SP"},"MESÓPOLIS":{"id":3529658,"pop":1903,"uf":"SP"},"MIGUELÓPOLIS":{"id":3529708,"pop":22480,"uf":"SP"},"MINEIROS DO TIETÊ":{"id":3529807,"pop":13023,"uf":"SP"},"MIRACATU":{"id":3529906,"pop":19511,"uf":"SP"},"MIRA ESTRELA":{"id":3530003,"pop":3125,"uf":"SP"},"MIRANDÓPOLIS":{"id":3530102,"pop":29844,"uf":"SP"},"MIRANTE DO PARANAPANEMA":{"id":3530201,"pop":18415,"uf":"SP"},"MIRASSOL":{"id":3530300,"pop":60768,"uf":"SP"},"MIRASSOLÂNDIA":{"id":3530409,"pop":4966,"uf":"SP"},"MOCOCA":{"id":3530508,"pop":69072,"uf":"SP"},"MOGI DAS CRUZES":{"id":3530607,"pop":455587,"uf":"SP"},"MOGI GUAÇU":{"id":3530706,"pop":154146,"uf":"SP"},"MOGI MIRIM":{"id":3530805,"pop":94098,"uf":"SP"},"MOMBUCA":{"id":3530904,"pop":3523,"uf":"SP"},"MONÇÕES":{"id":3531001,"pop":2274,"uf":"SP"},"MONGAGUÁ":{"id":3531100,"pop":58567,"uf":"SP"},"MONTE ALEGRE DO SUL":{"id":3531209,"pop":8181,"uf":"SP"},"MONTE ALTO":{"id":3531308,"pop":51039,"uf":"SP"},"MONTE APRAZÍVEL":{"id":3531407,"pop":25651,"uf":"SP"},"MONTE AZUL PAULISTA":{"id":3531506,"pop":18928,"uf":"SP"},"MONTE CASTELO":{"id":3531605,"pop":4166,"uf":"SP"},"MONTEIRO LOBATO":{"id":3531704,"pop":4739,"uf":"SP"},"MONTE MOR":{"id":3531803,"pop":61707,"uf":"SP"},"MORRO AGUDO":{"id":3531902,"pop":33598,"uf":"SP"},"MORUNGABA":{"id":3532009,"pop":13936,"uf":"SP"},"MOTUCA":{"id":3532058,"pop":4831,"uf":"SP"},"MURUTINGA DO SUL":{"id":3532108,"pop":4525,"uf":"SP"},"NANTES":{"id":3532157,"pop":3215,"uf":"SP"},"NARANDIBA":{"id":3532207,"pop":4950,"uf":"SP"},"NATIVIDADE DA SERRA":{"id":3532306,"pop":6624,"uf":"SP"},"NAZARÉ PAULISTA":{"id":3532405,"pop":18866,"uf":"SP"},"NEVES PAULISTA":{"id":3532504,"pop":8917,"uf":"SP"},"NHANDEARA":{"id":3532603,"pop":11575,"uf":"SP"},"NIPOÃ":{"id":3532702,"pop":5381,"uf":"SP"},"NOVA ALIANÇA":{"id":3532801,"pop":7161,"uf":"SP"},"NOVA CAMPINA":{"id":3532827,"pop":9962,"uf":"SP"},"NOVA CANAÃ PAULISTA":{"id":3532843,"pop":1824,"uf":"SP"},"NOVA CASTILHO":{"id":3532868,"pop":1290,"uf":"SP"},"NOVA EUROPA":{"id":3532900,"pop":11519,"uf":"SP"},"NOVA GRANADA":{"id":3533007,"pop":21871,"uf":"SP"},"NOVA GUATAPORANGA":{"id":3533106,"pop":2333,"uf":"SP"},"NOVA INDEPENDÊNCIA":{"id":3533205,"pop":4135,"uf":"SP"},"NOVAIS":{"id":3533254,"pop":6057,"uf":"SP"},"NOVA LUZITÂNIA":{"id":3533304,"pop":4217,"uf":"SP"},"NOVA ODESSA":{"id":3533403,"pop":61716,"uf":"SP"},"NOVO HORIZONTE":{"id":3533502,"pop":41765,"uf":"SP"},"NUPORANGA":{"id":3533601,"pop":7522,"uf":"SP"},"OCAUÇU":{"id":3533700,"pop":4294,"uf":"SP"},"ÓLEO":{"id":3533809,"pop":2447,"uf":"SP"},"OLÍMPIA":{"id":3533908,"pop":55477,"uf":"SP"},"ONDA VERDE":{"id":3534005,"pop":4462,"uf":"SP"},"ORIENTE":{"id":3534104,"pop":6569,"uf":"SP"},"ORINDIÚVA":{"id":3534203,"pop":7318,"uf":"SP"},"ORLÂNDIA":{"id":3534302,"pop":44682,"uf":"SP"},"OSASCO":{"id":3534401,"pop":701428,"uf":"SP"},"OSCAR BRESSANE":{"id":3534500,"pop":2603,"uf":"SP"},"OSVALDO CRUZ":{"id":3534609,"pop":33118,"uf":"SP"},"OURINHOS":{"id":3534708,"pop":115139,"uf":"SP"},"OUROESTE":{"id":3534757,"pop":10712,"uf":"SP"},"OURO VERDE":{"id":3534807,"pop":8676,"uf":"SP"},"PACAEMBU":{"id":3534906,"pop":14326,"uf":"SP"},"PALESTINA":{"id":3535002,"pop":13285,"uf":"SP"},"PALMARES PAULISTA":{"id":3535101,"pop":13691,"uf":"SP"},"PALMEIRA D'OESTE":{"id":3535200,"pop":9173,"uf":"SP"},"PALMITAL":{"id":3535309,"pop":22322,"uf":"SP"},"PANORAMA":{"id":3535408,"pop":15944,"uf":"SP"},"PARAGUAÇU PAULISTA":{"id":3535507,"pop":46180,"uf":"SP"},"PARAIBUNA":{"id":3535606,"pop":18302,"uf":"SP"},"PARAÍSO":{"id":3535705,"pop":6536,"uf":"SP"},"PARANAPANEMA":{"id":3535804,"pop":20588,"uf":"SP"},"PARANAPUÃ":{"id":3535903,"pop":4112,"uf":"SP"},"PARAPUÃ":{"id":3536000,"pop":10934,"uf":"SP"},"PARDINHO":{"id":3536109,"pop":6579,"uf":"SP"},"PARIQUERA-AÇU":{"id":3536208,"pop":19797,"uf":"SP"},"PARISI":{"id":3536257,"pop":2177,"uf":"SP"},"PATROCÍNIO PAULISTA":{"id":3536307,"pop":14941,"uf":"SP"},"PAULICÉIA":{"id":3536406,"pop":7540,"uf":"SP"},"PAULÍNIA":{"id":3536505,"pop":114508,"uf":"SP"},"PAULISTÂNIA":{"id":3536570,"pop":1835,"uf":"SP"},"PAULO DE FARIA":{"id":3536604,"pop":8973,"uf":"SP"},"PEDERNEIRAS":{"id":3536703,"pop":47523,"uf":"SP"},"PEDRA BELA":{"id":3536802,"pop":6127,"uf":"SP"},"PEDRANÓPOLIS":{"id":3536901,"pop":2468,"uf":"SP"},"PEDREGULHO":{"id":3537008,"pop":16876,"uf":"SP"},"PEDREIRA":{"id":3537107,"pop":48992,"uf":"SP"},"PEDRINHAS PAULISTA":{"id":3537156,"pop":3109,"uf":"SP"},"PEDRO DE TOLEDO":{"id":3537206,"pop":11507,"uf":"SP"},"PENÁPOLIS":{"id":3537305,"pop":64098,"uf":"SP"},"PEREIRA BARRETO":{"id":3537404,"pop":25685,"uf":"SP"},"PEREIRAS":{"id":3537503,"pop":8875,"uf":"SP"},"PERUÍBE":{"id":3537602,"pop":69697,"uf":"SP"},"PIACATU":{"id":3537701,"pop":6093,"uf":"SP"},"PIEDADE":{"id":3537800,"pop":55731,"uf":"SP"},"PILAR DO SUL":{"id":3537909,"pop":29612,"uf":"SP"},"PINDAMONHANGABA":{"id":3538006,"pop":171885,"uf":"SP"},"PINDORAMA":{"id":3538105,"pop":17378,"uf":"SP"},"PINHALZINHO":{"id":3538204,"pop":15564,"uf":"SP"},"PIQUEROBI":{"id":3538303,"pop":3706,"uf":"SP"},"PIQUETE":{"id":3538501,"pop":13495,"uf":"SP"},"PIRACAIA":{"id":3538600,"pop":27617,"uf":"SP"},"PIRACICABA":{"id":3538709,"pop":410275,"uf":"SP"},"PIRAJU":{"id":3538808,"pop":29930,"uf":"SP"},"PIRAJUÍ":{"id":3538907,"pop":25939,"uf":"SP"},"PIRANGI":{"id":3539004,"pop":11524,"uf":"SP"},"PIRAPORA DO BOM JESUS":{"id":3539103,"pop":19453,"uf":"SP"},"PIRAPOZINHO":{"id":3539202,"pop":27974,"uf":"SP"},"PIRASSUNUNGA":{"id":3539301,"pop":77330,"uf":"SP"},"PIRATININGA":{"id":3539400,"pop":13890,"uf":"SP"},"PITANGUEIRAS":{"id":3539509,"pop":40430,"uf":"SP"},"PLANALTO":{"id":3539608,"pop":5370,"uf":"SP"},"PLATINA":{"id":3539707,"pop":3606,"uf":"SP"},"POÁ":{"id":3539806,"pop":119221,"uf":"SP"},"POLONI":{"id":3539905,"pop":6166,"uf":"SP"},"POMPÉIA":{"id":3540002,"pop":22326,"uf":"SP"},"PONGAÍ":{"id":3540101,"pop":3385,"uf":"SP"},"PONTAL":{"id":3540200,"pop":51717,"uf":"SP"},"PONTALINDA":{"id":3540259,"pop":4719,"uf":"SP"},"PONTES GESTAL":{"id":3540309,"pop":2576,"uf":"SP"},"POPULINA":{"id":3540408,"pop":4136,"uf":"SP"},"PORANGABA":{"id":3540507,"pop":10205,"uf":"SP"},"PORTO FELIZ":{"id":3540606,"pop":53698,"uf":"SP"},"PORTO FERREIRA":{"id":3540705,"pop":56848,"uf":"SP"},"POTIM":{"id":3540754,"pop":25603,"uf":"SP"},"POTIRENDABA":{"id":3540804,"pop":17668,"uf":"SP"},"PRACINHA":{"id":3540853,"pop":4327,"uf":"SP"},"PRADÓPOLIS":{"id":3540903,"pop":22239,"uf":"SP"},"PRAIA GRANDE":{"id":3541000,"pop":336454,"uf":"SP"},"PRATÂNIA":{"id":3541059,"pop":5371,"uf":"SP"},"PRESIDENTE ALVES":{"id":3541109,"pop":4067,"uf":"SP"},"PRESIDENTE BERNARDES":{"id":3153103,"pop":5315,"uf":"MG"},"PRESIDENTE EPITÁCIO":{"id":3541307,"pop":44572,"uf":"SP"},"PRESIDENTE PRUDENTE":{"id":3541406,"pop":231953,"uf":"SP"},"PRESIDENTE VENCESLAU":{"id":3541505,"pop":39648,"uf":"SP"},"PROMISSÃO":{"id":3541604,"pop":41211,"uf":"SP"},"QUADRA":{"id":3541653,"pop":3902,"uf":"SP"},"QUATÁ":{"id":3541703,"pop":14309,"uf":"SP"},"QUEIROZ":{"id":3541802,"pop":3513,"uf":"SP"},"QUELUZ":{"id":3541901,"pop":13788,"uf":"SP"},"QUINTANA":{"id":3542008,"pop":6736,"uf":"SP"},"RAFARD":{"id":3542107,"pop":9126,"uf":"SP"},"RANCHARIA":{"id":3542206,"pop":29743,"uf":"SP"},"REDENÇÃO DA SERRA":{"id":3542305,"pop":3827,"uf":"SP"},"REGENTE FEIJÓ":{"id":3542404,"pop":20523,"uf":"SP"},"REGINÓPOLIS":{"id":3542503,"pop":10047,"uf":"SP"},"REGISTRO":{"id":3542602,"pop":56463,"uf":"SP"},"RESTINGA":{"id":3542701,"pop":7762,"uf":"SP"},"RIBEIRA":{"id":3542800,"pop":3320,"uf":"SP"},"RIBEIRÃO BONITO":{"id":3542909,"pop":13376,"uf":"SP"},"RIBEIRÃO BRANCO":{"id":3543006,"pop":15984,"uf":"SP"},"RIBEIRÃO CORRENTE":{"id":3543105,"pop":4786,"uf":"SP"},"RIBEIRÃO DO SUL":{"id":3543204,"pop":4537,"uf":"SP"},"RIBEIRÃO DOS ÍNDIOS":{"id":3543238,"pop":2222,"uf":"SP"},"RIBEIRÃO GRANDE":{"id":3543253,"pop":7686,"uf":"SP"},"RIBEIRÃO PIRES":{"id":3543303,"pop":125238,"uf":"SP"},"RIBEIRÃO PRETO":{"id":3543402,"pop":720116,"uf":"SP"},"RIVERSUL":{"id":3543501,"pop":5364,"uf":"SP"},"RIFAINA":{"id":3543600,"pop":3651,"uf":"SP"},"RINCÃO":{"id":3543709,"pop":10824,"uf":"SP"},"RINÓPOLIS":{"id":3543808,"pop":9940,"uf":"SP"},"RIO CLARO":{"id":3543907,"pop":209548,"uf":"SP"},"RIO DAS PEDRAS":{"id":3544004,"pop":36233,"uf":"SP"},"RIO GRANDE DA SERRA":{"id":3544103,"pop":52009,"uf":"SP"},"RIOLÂNDIA":{"id":3544202,"pop":12856,"uf":"SP"},"ROSANA":{"id":3544251,"pop":15929,"uf":"SP"},"ROSEIRA":{"id":3544301,"pop":10888,"uf":"SP"},"RUBIÁCEA":{"id":3544400,"pop":3195,"uf":"SP"},"RUBINÉIA":{"id":3544509,"pop":3191,"uf":"SP"},"SABINO":{"id":3544608,"pop":5638,"uf":"SP"},"SAGRES":{"id":3544707,"pop":2427,"uf":"SP"},"SALES":{"id":3544806,"pop":6481,"uf":"SP"},"SALES OLIVEIRA":{"id":3544905,"pop":12103,"uf":"SP"},"SALESÓPOLIS":{"id":3545001,"pop":17363,"uf":"SP"},"SALMOURÃO":{"id":3545100,"pop":5372,"uf":"SP"},"SALTINHO":{"id":3545159,"pop":8498,"uf":"SP"},"SALTO":{"id":3545209,"pop":120779,"uf":"SP"},"SALTO DE PIRAPORA":{"id":3545308,"pop":46285,"uf":"SP"},"SALTO GRANDE":{"id":3545407,"pop":9396,"uf":"SP"},"SANDOVALINA":{"id":3545506,"pop":4405,"uf":"SP"},"SANTA ADÉLIA":{"id":3545605,"pop":15639,"uf":"SP"},"SANTA ALBERTINA":{"id":3545704,"pop":6036,"uf":"SP"},"SANTA BÁRBARA D'OESTE":{"id":3545803,"pop":195278,"uf":"SP"},"SANTA BRANCA":{"id":3546009,"pop":14925,"uf":"SP"},"SANTA CLARA D'OESTE":{"id":3546108,"pop":2111,"uf":"SP"},"SANTA CRUZ DA CONCEIÇÃO":{"id":3546207,"pop":4584,"uf":"SP"},"SANTA CRUZ DA ESPERANÇA":{"id":3546256,"pop":2166,"uf":"SP"},"SANTA CRUZ DAS PALMEIRAS":{"id":3546306,"pop":35102,"uf":"SP"},"SANTA CRUZ DO RIO PARDO":{"id":3546405,"pop":48207,"uf":"SP"},"SANTA ERNESTINA":{"id":3546504,"pop":5577,"uf":"SP"},"SANTA FÉ DO SUL":{"id":3546603,"pop":32796,"uf":"SP"},"SANTA GERTRUDES":{"id":3546702,"pop":27850,"uf":"SP"},"SANTA ISABEL":{"id":3546801,"pop":58529,"uf":"SP"},"SANTA LÚCIA":{"id":3546900,"pop":8889,"uf":"SP"},"SANTA MARIA DA SERRA":{"id":3547007,"pop":6298,"uf":"SP"},"SANTA MERCEDES":{"id":3547106,"pop":2947,"uf":"SP"},"SANTANA DA PONTE PENSA":{"id":3547205,"pop":1448,"uf":"SP"},"SANTANA DE PARNAÍBA":{"id":3547304,"pop":145073,"uf":"SP"},"SANTA RITA D'OESTE":{"id":3547403,"pop":2476,"uf":"SP"},"SANTA RITA DO PASSA QUATRO":{"id":3547502,"pop":27641,"uf":"SP"},"SANTA ROSA DE VITERBO":{"id":3547601,"pop":26960,"uf":"SP"},"SANTA SALETE":{"id":3547650,"pop":1558,"uf":"SP"},"SANTO ANASTÁCIO":{"id":3547700,"pop":20855,"uf":"SP"},"SANTO ANDRÉ":{"id":3547809,"pop":723889,"uf":"SP"},"SANTO ANTÔNIO DA ALEGRIA":{"id":3547908,"pop":7024,"uf":"SP"},"SANTO ANTÔNIO DE POSSE":{"id":3548005,"pop":23742,"uf":"SP"},"SANTO ANTÔNIO DO ARACANGUÁ":{"id":3548054,"pop":8541,"uf":"SP"},"SANTO ANTÔNIO DO JARDIM":{"id":3548104,"pop":5926,"uf":"SP"},"SANTO ANTÔNIO DO PINHAL":{"id":3548203,"pop":6843,"uf":"SP"},"SANTO EXPEDITO":{"id":3548302,"pop":3159,"uf":"SP"},"SANTÓPOLIS DO AGUAPEÍ":{"id":3548401,"pop":4856,"uf":"SP"},"SANTOS":{"id":3548500,"pop":433991,"uf":"SP"},"SÃO BENTO DO SAPUCAÍ":{"id":3548609,"pop":10907,"uf":"SP"},"SÃO BERNARDO DO CAMPO":{"id":3548708,"pop":849874,"uf":"SP"},"SÃO CAETANO DO SUL":{"id":3548807,"pop":162763,"uf":"SP"},"SÃO CARLOS":{"id":3548906,"pop":256915,"uf":"SP"},"SÃO FRANCISCO":{"id":3161106,"pop":56625,"uf":"MG"},"SÃO JOÃO DA BOA VISTA":{"id":3549102,"pop":92315,"uf":"SP"},"SÃO JOÃO DAS DUAS PONTES":{"id":3549201,"pop":2555,"uf":"SP"},"SÃO JOÃO DE IRACEMA":{"id":3549250,"pop":1942,"uf":"SP"},"SÃO JOÃO DO PAU D'ALHO":{"id":3549300,"pop":2095,"uf":"SP"},"SÃO JOAQUIM DA BARRA":{"id":3549409,"pop":52737,"uf":"SP"},"SÃO JOSÉ DA BELA VISTA":{"id":3549508,"pop":8991,"uf":"SP"},"SÃO JOSÉ DO BARREIRO":{"id":3549607,"pop":4141,"uf":"SP"},"SÃO JOSÉ DO RIO PARDO":{"id":3549706,"pop":55298,"uf":"SP"},"SÃO JOSÉ DO RIO PRETO":{"id":3549805,"pop":469173,"uf":"SP"},"SÃO JOSÉ DOS CAMPOS":{"id":3549904,"pop":737310,"uf":"SP"},"SÃO LOURENÇO DA SERRA":{"id":3549953,"pop":16127,"uf":"SP"},"SÃO LUIZ DO PARAITINGA":{"id":3550001,"pop":10693,"uf":"SP"},"SÃO MANUEL":{"id":3550100,"pop":41287,"uf":"SP"},"SÃO MIGUEL ARCANJO":{"id":3550209,"pop":33071,"uf":"SP"},"SÃO PAULO":{"id":3550308,"pop":12396372,"uf":"SP"},"SÃO PEDRO":{"id":3550407,"pop":36298,"uf":"SP"},"SÃO PEDRO DO TURVO":{"id":3550506,"pop":7724,"uf":"SP"},"SÃO ROQUE":{"id":3550605,"pop":93076,"uf":"SP"},"SÃO SEBASTIÃO":{"id":3550704,"pop":91637,"uf":"SP"},"SÃO SEBASTIÃO DA GRAMA":{"id":3550803,"pop":12137,"uf":"SP"},"SÃO SIMÃO":{"id":3550902,"pop":15446,"uf":"SP"},"SÃO VICENTE":{"id":3551009,"pop":370839,"uf":"SP"},"SARAPUÍ":{"id":3551108,"pop":10493,"uf":"SP"},"SARUTAIÁ":{"id":3551207,"pop":3623,"uf":"SP"},"SEBASTIANÓPOLIS DO SUL":{"id":3551306,"pop":3595,"uf":"SP"},"SERRA AZUL":{"id":3551405,"pop":15292,"uf":"SP"},"SERRANA":{"id":3551504,"pop":46166,"uf":"SP"},"SERRA NEGRA":{"id":3551603,"pop":29669,"uf":"SP"},"SERTÃOZINHO":{"id":3551702,"pop":128432,"uf":"SP"},"SETE BARRAS":{"id":3551801,"pop":12731,"uf":"SP"},"SEVERÍNIA":{"id":3551900,"pop":17820,"uf":"SP"},"SILVEIRAS":{"id":3552007,"pop":6375,"uf":"SP"},"SOCORRO":{"id":3552106,"pop":41690,"uf":"SP"},"SOROCABA":{"id":3552205,"pop":695328,"uf":"SP"},"SUD MENNUCCI":{"id":3552304,"pop":7738,"uf":"SP"},"SUMARÉ":{"id":3552403,"pop":289875,"uf":"SP"},"SUZANO":{"id":3552502,"pop":303397,"uf":"SP"},"SUZANÁPOLIS":{"id":3552551,"pop":4063,"uf":"SP"},"TABAPUÃ":{"id":3552601,"pop":12561,"uf":"SP"},"TABATINGA":{"id":3552700,"pop":16787,"uf":"SP"},"TABOÃO DA SERRA":{"id":3552809,"pop":297528,"uf":"SP"},"TACIBA":{"id":3552908,"pop":6371,"uf":"SP"},"TAGUAÍ":{"id":3553005,"pop":14415,"uf":"SP"},"TAIAÇU":{"id":3553104,"pop":6346,"uf":"SP"},"TAIÚVA":{"id":3553203,"pop":5562,"uf":"SP"},"TAMBAÚ":{"id":3553302,"pop":23255,"uf":"SP"},"TANABI":{"id":3553401,"pop":26231,"uf":"SP"},"TAPIRAÍ":{"id":3168200,"pop":1869,"uf":"MG"},"TAPIRATIBA":{"id":3553609,"pop":12940,"uf":"SP"},"TAQUARAL":{"id":3553658,"pop":2815,"uf":"SP"},"TAQUARITINGA":{"id":3553708,"pop":57547,"uf":"SP"},"TAQUARITUBA":{"id":3553807,"pop":23292,"uf":"SP"},"TAQUARIVAÍ":{"id":3553856,"pop":5968,"uf":"SP"},"TARABAI":{"id":3553906,"pop":7609,"uf":"SP"},"TARUMÃ":{"id":3553955,"pop":15361,"uf":"SP"},"TATUÍ":{"id":3554003,"pop":124134,"uf":"SP"},"TAUBATÉ":{"id":3554102,"pop":320820,"uf":"SP"},"TEJUPÁ":{"id":3554201,"pop":4452,"uf":"SP"},"TEODORO SAMPAIO":{"id":3554300,"pop":23395,"uf":"SP"},"TERRA ROXA":{"id":3554409,"pop":9502,"uf":"SP"},"TIETÊ":{"id":3554508,"pop":42946,"uf":"SP"},"TIMBURI":{"id":3554607,"pop":2647,"uf":"SP"},"TORRE DE PEDRA":{"id":3554656,"pop":2432,"uf":"SP"},"TORRINHA":{"id":3554706,"pop":10100,"uf":"SP"},"TRABIJU":{"id":3554755,"pop":1752,"uf":"SP"},"TREMEMBÉ":{"id":3554805,"pop":48228,"uf":"SP"},"TRÊS FRONTEIRAS":{"id":3554904,"pop":5856,"uf":"SP"},"TUIUTI":{"id":3554953,"pop":7058,"uf":"SP"},"TUPÃ":{"id":3555000,"pop":65615,"uf":"SP"},"TUPI PAULISTA":{"id":3555109,"pop":15670,"uf":"SP"},"TURIÚBA":{"id":3555208,"pop":2024,"uf":"SP"},"TURMALINA":{"id":3169703,"pop":20280,"uf":"MG"},"UBARANA":{"id":3555356,"pop":6488,"uf":"SP"},"UBATUBA":{"id":3555406,"pop":92819,"uf":"SP"},"UBIRAJARA":{"id":3555505,"pop":4828,"uf":"SP"},"UCHOA":{"id":3555604,"pop":10191,"uf":"SP"},"UNIÃO PAULISTA":{"id":3555703,"pop":1886,"uf":"SP"},"URÂNIA":{"id":3555802,"pop":9125,"uf":"SP"},"URU":{"id":3555901,"pop":1142,"uf":"SP"},"URUPÊS":{"id":3556008,"pop":13965,"uf":"SP"},"VALENTIM GENTIL":{"id":3556107,"pop":13732,"uf":"SP"},"VALINHOS":{"id":3556206,"pop":133169,"uf":"SP"},"VALPARAÍSO":{"id":3556305,"pop":27154,"uf":"SP"},"VARGEM":{"id":3556354,"pop":10842,"uf":"SP"},"VARGEM GRANDE DO SUL":{"id":3556404,"pop":43368,"uf":"SP"},"VARGEM GRANDE PAULISTA":{"id":3556453,"pop":54315,"uf":"SP"},"VÁRZEA PAULISTA":{"id":3556503,"pop":124269,"uf":"SP"},"VERA CRUZ":{"id":3556602,"pop":10804,"uf":"SP"},"VINHEDO":{"id":3556701,"pop":81516,"uf":"SP"},"VIRADOURO":{"id":3556800,"pop":19133,"uf":"SP"},"VISTA ALEGRE DO ALTO":{"id":3556909,"pop":9163,"uf":"SP"},"VITÓRIA BRASIL":{"id":3556958,"pop":1852,"uf":"SP"},"VOTORANTIM":{"id":3557006,"pop":124468,"uf":"SP"},"VOTUPORANGA":{"id":3557105,"pop":96106,"uf":"SP"},"ZACARIAS":{"id":3557154,"pop":2784,"uf":"SP"},"CHAVANTES":{"id":3557204,"pop":12418,"uf":"SP"},"ESTIVA GERBI":{"id":3557303,"pop":11507,"uf":"SP"},"ABADIA DOS DOURADOS":{"id":3100104,"pop":7022,"uf":"MG"},"ABAETÉ":{"id":3100203,"pop":23263,"uf":"MG"},"ABRE CAMPO":{"id":3100302,"pop":13434,"uf":"MG"},"ACAIACA":{"id":3100401,"pop":3995,"uf":"MG"},"AÇUCENA":{"id":3100500,"pop":9270,"uf":"MG"},"ÁGUA BOA":{"id":3100609,"pop":13319,"uf":"MG"},"ÁGUA COMPRIDA":{"id":3100708,"pop":1986,"uf":"MG"},"AGUANIL":{"id":3100807,"pop":4557,"uf":"MG"},"ÁGUAS FORMOSAS":{"id":3100906,"pop":19285,"uf":"MG"},"ÁGUAS VERMELHAS":{"id":3101003,"pop":13656,"uf":"MG"},"AIMORÉS":{"id":3101102,"pop":25116,"uf":"MG"},"AIURUOCA":{"id":3101201,"pop":5949,"uf":"MG"},"ALAGOA":{"id":3101300,"pop":2657,"uf":"MG"},"ALBERTINA":{"id":3101409,"pop":3015,"uf":"MG"},"ALÉM PARAÍBA":{"id":3101508,"pop":35438,"uf":"MG"},"ALFENAS":{"id":3101607,"pop":80973,"uf":"MG"},"ALFREDO VASCONCELOS":{"id":3101631,"pop":7052,"uf":"MG"},"ALMENARA":{"id":3101706,"pop":42380,"uf":"MG"},"ALPERCATA":{"id":3101805,"pop":7448,"uf":"MG"},"ALPINÓPOLIS":{"id":3101904,"pop":20059,"uf":"MG"},"ALTEROSA":{"id":3102001,"pop":14566,"uf":"MG"},"ALTO CAPARAÓ":{"id":3102050,"pop":5938,"uf":"MG"},"ALTO RIO DOCE":{"id":3102100,"pop":10723,"uf":"MG"},"ALVARENGA":{"id":3102209,"pop":3783,"uf":"MG"},"ALVINÓPOLIS":{"id":3102308,"pop":15135,"uf":"MG"},"ALVORADA DE MINAS":{"id":3102407,"pop":3605,"uf":"MG"},"AMPARO DO SERRA":{"id":3102506,"pop":4643,"uf":"MG"},"ANDRADAS":{"id":3102605,"pop":41704,"uf":"MG"},"CACHOEIRA DE PAJEÚ":{"id":3102704,"pop":9470,"uf":"MG"},"ANDRELÂNDIA":{"id":3102803,"pop":12189,"uf":"MG"},"ANGELÂNDIA":{"id":3102852,"pop":8594,"uf":"MG"},"ANTÔNIO CARLOS":{"id":3102902,"pop":11471,"uf":"MG"},"ANTÔNIO DIAS":{"id":3103009,"pop":9233,"uf":"MG"},"ANTÔNIO PRADO DE MINAS":{"id":3103108,"pop":1577,"uf":"MG"},"ARAÇAÍ":{"id":3103207,"pop":2360,"uf":"MG"},"ARACITABA":{"id":3103306,"pop":2056,"uf":"MG"},"ARAÇUAÍ":{"id":3103405,"pop":36715,"uf":"MG"},"ARAGUARI":{"id":3103504,"pop":118361,"uf":"MG"},"ARANTINA":{"id":3103603,"pop":2779,"uf":"MG"},"ARAPONGA":{"id":3103702,"pop":8467,"uf":"MG"},"ARAPORÃ":{"id":3103751,"pop":6992,"uf":"MG"},"ARAPUÁ":{"id":3103801,"pop":2836,"uf":"MG"},"ARAÚJOS":{"id":3103900,"pop":9523,"uf":"MG"},"ARAXÁ":{"id":3104007,"pop":108403,"uf":"MG"},"ARCEBURGO":{"id":3104106,"pop":10990,"uf":"MG"},"ARCOS":{"id":3104205,"pop":40658,"uf":"MG"},"AREADO":{"id":3104304,"pop":15288,"uf":"MG"},"ARGIRITA":{"id":3104403,"pop":2681,"uf":"MG"},"ARICANDUVA":{"id":3104452,"pop":5305,"uf":"MG"},"ARINOS":{"id":3104502,"pop":17850,"uf":"MG"},"ASTOLFO DUTRA":{"id":3104601,"pop":14358,"uf":"MG"},"ATALÉIA":{"id":3104700,"pop":12496,"uf":"MG"},"AUGUSTO DE LIMA":{"id":3104809,"pop":4833,"uf":"MG"},"BAEPENDI":{"id":3104908,"pop":19249,"uf":"MG"},"BALDIM":{"id":3105004,"pop":7780,"uf":"MG"},"BAMBUÍ":{"id":3105103,"pop":23964,"uf":"MG"},"BANDEIRA":{"id":3105202,"pop":4738,"uf":"MG"},"BANDEIRA DO SUL":{"id":3105301,"pop":5808,"uf":"MG"},"BARÃO DE COCAIS":{"id":3105400,"pop":33232,"uf":"MG"},"BARÃO DO MONTE ALTO":{"id":3105509,"pop":5311,"uf":"MG"},"BARBACENA":{"id":3105608,"pop":139061,"uf":"MG"},"BARRA LONGA":{"id":3105707,"pop":4905,"uf":"MG"},"BARROSO":{"id":3105905,"pop":20981,"uf":"MG"},"BELA VISTA DE MINAS":{"id":3106002,"pop":10269,"uf":"MG"},"BELMIRO BRAGA":{"id":3106101,"pop":3422,"uf":"MG"},"BELO HORIZONTE":{"id":3106200,"pop":2530701,"uf":"MG"},"BELO ORIENTE":{"id":3106309,"pop":27277,"uf":"MG"},"BELO VALE":{"id":3106408,"pop":7723,"uf":"MG"},"BERILO":{"id":3106507,"pop":11813,"uf":"MG"},"BERTÓPOLIS":{"id":3106606,"pop":4609,"uf":"MG"},"BERIZAL":{"id":3106655,"pop":4792,"uf":"MG"},"BETIM":{"id":3106705,"pop":450024,"uf":"MG"},"BIAS FORTES":{"id":3106804,"pop":3282,"uf":"MG"},"BICAS":{"id":3106903,"pop":14612,"uf":"MG"},"BIQUINHAS":{"id":3107000,"pop":2482,"uf":"MG"},"BOA ESPERANÇA":{"id":3107109,"pop":40308,"uf":"MG"},"BOCAINA DE MINAS":{"id":3107208,"pop":5088,"uf":"MG"},"BOCAIÚVA":{"id":3107307,"pop":50521,"uf":"MG"},"BOM DESPACHO":{"id":3107406,"pop":51436,"uf":"MG"},"BOM JARDIM DE MINAS":{"id":3107505,"pop":6444,"uf":"MG"},"BOM JESUS DA PENHA":{"id":3107604,"pop":4270,"uf":"MG"},"BOM JESUS DO AMPARO":{"id":3107703,"pop":6182,"uf":"MG"},"BOM JESUS DO GALHO":{"id":3107802,"pop":14792,"uf":"MG"},"BOM REPOUSO":{"id":3107901,"pop":10527,"uf":"MG"},"BOM SUCESSO":{"id":3108008,"pop":17612,"uf":"MG"},"BONFIM":{"id":3108107,"pop":6852,"uf":"MG"},"BONFINÓPOLIS DE MINAS":{"id":3108206,"pop":5397,"uf":"MG"},"BONITO DE MINAS":{"id":3108255,"pop":11502,"uf":"MG"},"BORDA DA MATA":{"id":3108305,"pop":19809,"uf":"MG"},"BOTELHOS":{"id":3108404,"pop":14927,"uf":"MG"},"BOTUMIRIM":{"id":3108503,"pop":6259,"uf":"MG"},"BRASILÂNDIA DE MINAS":{"id":3108552,"pop":16950,"uf":"MG"},"BRASÍLIA DE MINAS":{"id":3108602,"pop":32460,"uf":"MG"},"BRÁS PIRES":{"id":3108701,"pop":4255,"uf":"MG"},"BRAÚNAS":{"id":3108800,"pop":4737,"uf":"MG"},"BRAZÓPOLIS":{"id":3108909,"pop":14364,"uf":"MG"},"BRUMADINHO":{"id":3109006,"pop":41208,"uf":"MG"},"BUENO BRANDÃO":{"id":3109105,"pop":10982,"uf":"MG"},"BUENÓPOLIS":{"id":3109204,"pop":10342,"uf":"MG"},"BUGRE":{"id":3109253,"pop":3984,"uf":"MG"},"BURITIS":{"id":3109303,"pop":25179,"uf":"MG"},"BURITIZEIRO":{"id":3109402,"pop":28184,"uf":"MG"},"CABECEIRA GRANDE":{"id":3109451,"pop":7025,"uf":"MG"},"CABO VERDE":{"id":3109501,"pop":14074,"uf":"MG"},"CACHOEIRA DA PRATA":{"id":3109600,"pop":3580,"uf":"MG"},"CACHOEIRA DE MINAS":{"id":3109709,"pop":11609,"uf":"MG"},"CACHOEIRA DOURADA":{"id":3109808,"pop":2720,"uf":"MG"},"CAETANÓPOLIS":{"id":3109907,"pop":11869,"uf":"MG"},"CAETÉ":{"id":3110004,"pop":45364,"uf":"MG"},"CAIANA":{"id":3110103,"pop":5584,"uf":"MG"},"CAJURI":{"id":3110202,"pop":3961,"uf":"MG"},"CALDAS":{"id":3110301,"pop":14600,"uf":"MG"},"CAMACHO":{"id":3110400,"pop":2839,"uf":"MG"},"CAMANDUCAIA":{"id":3110509,"pop":21831,"uf":"MG"},"CAMBUÍ":{"id":3110608,"pop":30068,"uf":"MG"},"CAMBUQUIRA":{"id":3110707,"pop":12810,"uf":"MG"},"CAMPANÁRIO":{"id":3110806,"pop":3739,"uf":"MG"},"CAMPANHA":{"id":3110905,"pop":16855,"uf":"MG"},"CAMPESTRE":{"id":3111002,"pop":21052,"uf":"MG"},"CAMPINA VERDE":{"id":3111101,"pop":19759,"uf":"MG"},"CAMPO AZUL":{"id":3111150,"pop":3830,"uf":"MG"},"CAMPO BELO":{"id":3111200,"pop":54338,"uf":"MG"},"CAMPO DO MEIO":{"id":3111309,"pop":11648,"uf":"MG"},"CAMPO FLORIDO":{"id":3111408,"pop":8383,"uf":"MG"},"CAMPOS ALTOS":{"id":3111507,"pop":15661,"uf":"MG"},"CAMPOS GERAIS":{"id":3111606,"pop":28908,"uf":"MG"},"CANAÃ":{"id":3111705,"pop":4533,"uf":"MG"},"CANÁPOLIS":{"id":3111804,"pop":12251,"uf":"MG"},"CANA VERDE":{"id":3111903,"pop":5585,"uf":"MG"},"CANDEIAS":{"id":3112000,"pop":14890,"uf":"MG"},"CANTAGALO":{"id":3112059,"pop":4575,"uf":"MG"},"CAPARAÓ":{"id":3112109,"pop":5464,"uf":"MG"},"CAPELA NOVA":{"id":3112208,"pop":4616,"uf":"MG"},"CAPELINHA":{"id":3112307,"pop":38321,"uf":"MG"},"CAPETINGA":{"id":3112406,"pop":6860,"uf":"MG"},"CAPIM BRANCO":{"id":3112505,"pop":9896,"uf":"MG"},"CAPINÓPOLIS":{"id":3112604,"pop":16294,"uf":"MG"},"CAPITÃO ANDRADE":{"id":3112653,"pop":5559,"uf":"MG"},"CAPITÃO ENÉAS":{"id":3112703,"pop":15388,"uf":"MG"},"CAPITÓLIO":{"id":3112802,"pop":8693,"uf":"MG"},"CAPUTIRA":{"id":3112901,"pop":9318,"uf":"MG"},"CARAÍ":{"id":3113008,"pop":23872,"uf":"MG"},"CARANAÍBA":{"id":3113107,"pop":3150,"uf":"MG"},"CARANDAÍ":{"id":3113206,"pop":25831,"uf":"MG"},"CARANGOLA":{"id":3113305,"pop":33022,"uf":"MG"},"CARATINGA":{"id":3113404,"pop":93124,"uf":"MG"},"CARBONITA":{"id":3113503,"pop":9423,"uf":"MG"},"CAREAÇU":{"id":3113602,"pop":6826,"uf":"MG"},"CARLOS CHAGAS":{"id":3113701,"pop":18516,"uf":"MG"},"CARMÉSIA":{"id":3113800,"pop":2660,"uf":"MG"},"CARMO DA CACHOEIRA":{"id":3113909,"pop":12193,"uf":"MG"},"CARMO DA MATA":{"id":3114006,"pop":11546,"uf":"MG"},"CARMO DE MINAS":{"id":3114105,"pop":15031,"uf":"MG"},"CARMO DO CAJURU":{"id":3114204,"pop":22900,"uf":"MG"},"CARMO DO PARANAÍBA":{"id":3114303,"pop":30339,"uf":"MG"},"CARMO DO RIO CLARO":{"id":3114402,"pop":21310,"uf":"MG"},"CARMÓPOLIS DE MINAS":{"id":3114501,"pop":19756,"uf":"MG"},"CARNEIRINHO":{"id":3114550,"pop":10103,"uf":"MG"},"CARRANCAS":{"id":3114600,"pop":4052,"uf":"MG"},"CARVALHÓPOLIS":{"id":3114709,"pop":3614,"uf":"MG"},"CARVALHOS":{"id":3114808,"pop":4445,"uf":"MG"},"CASA GRANDE":{"id":3114907,"pop":2251,"uf":"MG"},"CASCALHO RICO":{"id":3115003,"pop":3108,"uf":"MG"},"CÁSSIA":{"id":3115102,"pop":17741,"uf":"MG"},"CONCEIÇÃO DA BARRA DE MINAS":{"id":3115201,"pop":3939,"uf":"MG"},"CATAGUASES":{"id":3115300,"pop":75942,"uf":"MG"},"CATAS ALTAS":{"id":3115359,"pop":5465,"uf":"MG"},"CATAS ALTAS DA NORUEGA":{"id":3115409,"pop":3665,"uf":"MG"},"CATUJI":{"id":3115458,"pop":6206,"uf":"MG"},"CATUTI":{"id":3115474,"pop":4944,"uf":"MG"},"CAXAMBU":{"id":3115508,"pop":21566,"uf":"MG"},"CEDRO DO ABAETÉ":{"id":3115607,"pop":1150,"uf":"MG"},"CENTRAL DE MINAS":{"id":3115706,"pop":7059,"uf":"MG"},"CENTRALINA":{"id":3115805,"pop":10343,"uf":"MG"},"CHÁCARA":{"id":3115904,"pop":3216,"uf":"MG"},"CHALÉ":{"id":3116001,"pop":5695,"uf":"MG"},"CHAPADA DO NORTE":{"id":3116100,"pop":15334,"uf":"MG"},"CHAPADA GAÚCHA":{"id":3116159,"pop":14217,"uf":"MG"},"CHIADOR":{"id":3116209,"pop":2657,"uf":"MG"},"CIPOTÂNEA":{"id":3116308,"pop":6811,"uf":"MG"},"CLARAVAL":{"id":3116407,"pop":4873,"uf":"MG"},"CLARO DOS POÇÕES":{"id":3116506,"pop":7478,"uf":"MG"},"CLÁUDIO":{"id":3116605,"pop":29093,"uf":"MG"},"COIMBRA":{"id":3116704,"pop":7631,"uf":"MG"},"COLUNA":{"id":3116803,"pop":8810,"uf":"MG"},"COMENDADOR GOMES":{"id":3116902,"pop":3128,"uf":"MG"},"COMERCINHO":{"id":3117009,"pop":6624,"uf":"MG"},"CONCEIÇÃO DA APARECIDA":{"id":3117108,"pop":10351,"uf":"MG"},"CONCEIÇÃO DAS PEDRAS":{"id":3117207,"pop":2814,"uf":"MG"},"CONCEIÇÃO DAS ALAGOAS":{"id":3117306,"pop":28782,"uf":"MG"},"CONCEIÇÃO DE IPANEMA":{"id":3117405,"pop":4581,"uf":"MG"},"CONCEIÇÃO DO MATO DENTRO":{"id":3117504,"pop":17438,"uf":"MG"},"CONCEIÇÃO DO PARÁ":{"id":3117603,"pop":5558,"uf":"MG"},"CONCEIÇÃO DO RIO VERDE":{"id":3117702,"pop":13729,"uf":"MG"},"CONCEIÇÃO DOS OUROS":{"id":3117801,"pop":11852,"uf":"MG"},"CÔNEGO MARINHO":{"id":3117836,"pop":7730,"uf":"MG"},"CONFINS":{"id":3117876,"pop":6867,"uf":"MG"},"CONGONHAL":{"id":3117900,"pop":12209,"uf":"MG"},"CONGONHAS":{"id":3118007,"pop":55836,"uf":"MG"},"CONGONHAS DO NORTE":{"id":3118106,"pop":5047,"uf":"MG"},"CONQUISTA":{"id":3118205,"pop":6997,"uf":"MG"},"CONSELHEIRO LAFAIETE":{"id":3118304,"pop":130584,"uf":"MG"},"CONSELHEIRO PENA":{"id":3118403,"pop":22975,"uf":"MG"},"CONSOLAÇÃO":{"id":3118502,"pop":1786,"uf":"MG"},"CONTAGEM":{"id":3118601,"pop":673849,"uf":"MG"},"COQUEIRAL":{"id":3118700,"pop":9099,"uf":"MG"},"CORAÇÃO DE JESUS":{"id":3118809,"pop":26620,"uf":"MG"},"CORDISBURGO":{"id":3118908,"pop":8903,"uf":"MG"},"CORDISLÂNDIA":{"id":3119005,"pop":3546,"uf":"MG"},"CORINTO":{"id":3119104,"pop":23607,"uf":"MG"},"COROACI":{"id":3119203,"pop":9897,"uf":"MG"},"COROMANDEL":{"id":3119302,"pop":27958,"uf":"MG"},"CORONEL FABRICIANO":{"id":3119401,"pop":110709,"uf":"MG"},"CORONEL MURTA":{"id":3119500,"pop":9209,"uf":"MG"},"CORONEL PACHECO":{"id":3119609,"pop":3095,"uf":"MG"},"CORONEL XAVIER CHAVES":{"id":3119708,"pop":3448,"uf":"MG"},"CÓRREGO DANTA":{"id":3119807,"pop":3168,"uf":"MG"},"CÓRREGO DO BOM JESUS":{"id":3119906,"pop":3685,"uf":"MG"},"CÓRREGO FUNDO":{"id":3119955,"pop":6425,"uf":"MG"},"CÓRREGO NOVO":{"id":3120003,"pop":2688,"uf":"MG"},"COUTO DE MAGALHÃES DE MINAS":{"id":3120102,"pop":4436,"uf":"MG"},"CRISÓLITA":{"id":3120151,"pop":6814,"uf":"MG"},"CRISTAIS":{"id":3120201,"pop":13060,"uf":"MG"},"CRISTÁLIA":{"id":3120300,"pop":5992,"uf":"MG"},"CRISTIANO OTONI":{"id":3120409,"pop":5161,"uf":"MG"},"CRISTINA":{"id":3120508,"pop":10211,"uf":"MG"},"CRUCILÂNDIA":{"id":3120607,"pop":5072,"uf":"MG"},"CRUZEIRO DA FORTALEZA":{"id":3120706,"pop":3651,"uf":"MG"},"CRUZÍLIA":{"id":3120805,"pop":15529,"uf":"MG"},"CUPARAQUE":{"id":3120839,"pop":5026,"uf":"MG"},"CURRAL DE DENTRO":{"id":3120870,"pop":7867,"uf":"MG"},"CURVELO":{"id":3120904,"pop":81085,"uf":"MG"},"DATAS":{"id":3121001,"pop":5431,"uf":"MG"},"DELFIM MOREIRA":{"id":3121100,"pop":8007,"uf":"MG"},"DELFINÓPOLIS":{"id":3121209,"pop":7146,"uf":"MG"},"DELTA":{"id":3121258,"pop":10994,"uf":"MG"},"DESCOBERTO":{"id":3121308,"pop":5044,"uf":"MG"},"DESTERRO DE ENTRE RIOS":{"id":3121407,"pop":7266,"uf":"MG"},"DESTERRO DO MELO":{"id":3121506,"pop":2867,"uf":"MG"},"DIAMANTINA":{"id":3121605,"pop":47924,"uf":"MG"},"DIOGO DE VASCONCELOS":{"id":3121704,"pop":3779,"uf":"MG"},"DIONÍSIO":{"id":3121803,"pop":7493,"uf":"MG"},"DIVINÉSIA":{"id":3121902,"pop":3430,"uf":"MG"},"DIVINO":{"id":3122009,"pop":20020,"uf":"MG"},"DIVINO DAS LARANJEIRAS":{"id":3122108,"pop":4969,"uf":"MG"},"DIVINOLÂNDIA DE MINAS":{"id":3122207,"pop":7655,"uf":"MG"},"DIVINÓPOLIS":{"id":3122306,"pop":242505,"uf":"MG"},"DIVISA ALEGRE":{"id":3122355,"pop":6946,"uf":"MG"},"DIVISA NOVA":{"id":3122405,"pop":6039,"uf":"MG"},"DIVISÓPOLIS":{"id":3122454,"pop":11396,"uf":"MG"},"DOM BOSCO":{"id":3122470,"pop":3635,"uf":"MG"},"DOM CAVATI":{"id":3122504,"pop":5025,"uf":"MG"},"DOM JOAQUIM":{"id":3122603,"pop":4436,"uf":"MG"},"DOM SILVÉRIO":{"id":3122702,"pop":5227,"uf":"MG"},"DOM VIÇOSO":{"id":3122801,"pop":2992,"uf":"MG"},"DONA EUZÉBIA":{"id":3122900,"pop":6664,"uf":"MG"},"DORES DE CAMPOS":{"id":3123007,"pop":10291,"uf":"MG"},"DORES DE GUANHÃES":{"id":3123106,"pop":5139,"uf":"MG"},"DORES DO INDAIÁ":{"id":3123205,"pop":13373,"uf":"MG"},"DORES DO TURVO":{"id":3123304,"pop":4202,"uf":"MG"},"DORESÓPOLIS":{"id":3123403,"pop":1539,"uf":"MG"},"DOURADOQUARA":{"id":3123502,"pop":1915,"uf":"MG"},"DURANDÉ":{"id":3123528,"pop":7898,"uf":"MG"},"ELÓI MENDES":{"id":3123601,"pop":28556,"uf":"MG"},"ENGENHEIRO CALDAS":{"id":3123700,"pop":11268,"uf":"MG"},"ENGENHEIRO NAVARRO":{"id":3123809,"pop":7240,"uf":"MG"},"ENTRE FOLHAS":{"id":3123858,"pop":5383,"uf":"MG"},"ENTRE RIOS DE MINAS":{"id":3123908,"pop":15458,"uf":"MG"},"ERVÁLIA":{"id":3124005,"pop":19019,"uf":"MG"},"ESMERALDAS":{"id":3124104,"pop":72512,"uf":"MG"},"ESPERA FELIZ":{"id":3124203,"pop":25287,"uf":"MG"},"ESPINOSA":{"id":3124302,"pop":31603,"uf":"MG"},"ESPÍRITO SANTO DO DOURADO":{"id":3124401,"pop":4728,"uf":"MG"},"ESTIVA":{"id":3124500,"pop":11416,"uf":"MG"},"ESTRELA DALVA":{"id":3124609,"pop":2308,"uf":"MG"},"ESTRELA DO INDAIÁ":{"id":3124708,"pop":3483,"uf":"MG"},"ESTRELA DO SUL":{"id":3124807,"pop":8057,"uf":"MG"},"EUGENÓPOLIS":{"id":3124906,"pop":11383,"uf":"MG"},"EWBANK DA CÂMARA":{"id":3125002,"pop":3932,"uf":"MG"},"EXTREMA":{"id":3125101,"pop":37649,"uf":"MG"},"FAMA":{"id":3125200,"pop":2374,"uf":"MG"},"FARIA LEMOS":{"id":3125309,"pop":3202,"uf":"MG"},"FELÍCIO DOS SANTOS":{"id":3125408,"pop":4656,"uf":"MG"},"SÃO GONÇALO DO RIO PRETO":{"id":3125507,"pop":3178,"uf":"MG"},"FELISBURGO":{"id":3125606,"pop":7548,"uf":"MG"},"FELIXLÂNDIA":{"id":3125705,"pop":15528,"uf":"MG"},"FERNANDES TOURINHO":{"id":3125804,"pop":3500,"uf":"MG"},"FERROS":{"id":3125903,"pop":9576,"uf":"MG"},"FERVEDOURO":{"id":3125952,"pop":11100,"uf":"MG"},"FLORESTAL":{"id":3126000,"pop":7602,"uf":"MG"},"FORMIGA":{"id":3126109,"pop":67956,"uf":"MG"},"FORMOSO":{"id":3126208,"pop":9810,"uf":"MG"},"FORTALEZA DE MINAS":{"id":3126307,"pop":4460,"uf":"MG"},"FORTUNA DE MINAS":{"id":3126406,"pop":2986,"uf":"MG"},"FRANCISCO BADARÓ":{"id":3126505,"pop":10311,"uf":"MG"},"FRANCISCO DUMONT":{"id":3126604,"pop":5268,"uf":"MG"},"FRANCISCO SÁ":{"id":3126703,"pop":26459,"uf":"MG"},"FRANCISCÓPOLIS":{"id":3126752,"pop":5287,"uf":"MG"},"FREI GASPAR":{"id":3126802,"pop":5858,"uf":"MG"},"FREI INOCÊNCIO":{"id":3126901,"pop":9716,"uf":"MG"},"FREI LAGONEGRO":{"id":3126950,"pop":3496,"uf":"MG"},"FRONTEIRA":{"id":3127008,"pop":18866,"uf":"MG"},"FRONTEIRA DOS VALES":{"id":3127057,"pop":4542,"uf":"MG"},"FRUTA DE LEITE":{"id":3127073,"pop":5232,"uf":"MG"},"FRUTAL":{"id":3127107,"pop":60508,"uf":"MG"},"FUNILÂNDIA":{"id":3127206,"pop":4434,"uf":"MG"},"GALILÉIA":{"id":3127305,"pop":6764,"uf":"MG"},"GAMELEIRAS":{"id":3127339,"pop":5084,"uf":"MG"},"GLAUCILÂNDIA":{"id":3127354,"pop":3177,"uf":"MG"},"GOIABEIRA":{"id":3127370,"pop":3402,"uf":"MG"},"GOIANÁ":{"id":3127388,"pop":4014,"uf":"MG"},"GONÇALVES":{"id":3127404,"pop":4360,"uf":"MG"},"GONZAGA":{"id":3127503,"pop":6184,"uf":"MG"},"GOUVEIA":{"id":3127602,"pop":11811,"uf":"MG"},"GOVERNADOR VALADARES":{"id":3127701,"pop":282164,"uf":"MG"},"GRÃO MOGOL":{"id":3127800,"pop":15943,"uf":"MG"},"GRUPIARA":{"id":3127909,"pop":1386,"uf":"MG"},"GUANHÃES":{"id":3128006,"pop":34818,"uf":"MG"},"GUAPÉ":{"id":3128105,"pop":14269,"uf":"MG"},"GUARACIABA":{"id":3128204,"pop":10307,"uf":"MG"},"GUARACIAMA":{"id":3128253,"pop":5005,"uf":"MG"},"GUARANÉSIA":{"id":3128303,"pop":19014,"uf":"MG"},"GUARANI":{"id":3128402,"pop":8926,"uf":"MG"},"GUARARÁ":{"id":3128501,"pop":3755,"uf":"MG"},"GUARDA-MOR":{"id":3128600,"pop":6558,"uf":"MG"},"GUAXUPÉ":{"id":3128709,"pop":52234,"uf":"MG"},"GUIDOVAL":{"id":3128808,"pop":7026,"uf":"MG"},"GUIMARÂNIA":{"id":3128907,"pop":8168,"uf":"MG"},"GUIRICEMA":{"id":3129004,"pop":8296,"uf":"MG"},"GURINHATÃ":{"id":3129103,"pop":5516,"uf":"MG"},"HELIODORA":{"id":3129202,"pop":6623,"uf":"MG"},"IAPU":{"id":3129301,"pop":11085,"uf":"MG"},"IBERTIOGA":{"id":3129400,"pop":4999,"uf":"MG"},"IBIÁ":{"id":3129509,"pop":25511,"uf":"MG"},"IBIAÍ":{"id":3129608,"pop":8478,"uf":"MG"},"IBIRACATU":{"id":3129657,"pop":5340,"uf":"MG"},"IBIRACI":{"id":3129707,"pop":14128,"uf":"MG"},"IBIRITÉ":{"id":3129806,"pop":184030,"uf":"MG"},"IBITIÚRA DE MINAS":{"id":3129905,"pop":3497,"uf":"MG"},"IBITURUNA":{"id":3130002,"pop":3003,"uf":"MG"},"ICARAÍ DE MINAS":{"id":3130051,"pop":12200,"uf":"MG"},"IGARAPÉ":{"id":3130101,"pop":44561,"uf":"MG"},"IGARATINGA":{"id":3130200,"pop":11146,"uf":"MG"},"IGUATAMA":{"id":3130309,"pop":7901,"uf":"MG"},"IJACI":{"id":3130408,"pop":6667,"uf":"MG"},"ILICÍNEA":{"id":3130507,"pop":12511,"uf":"MG"},"IMBÉ DE MINAS":{"id":3130556,"pop":6976,"uf":"MG"},"INCONFIDENTES":{"id":3130606,"pop":7387,"uf":"MG"},"INDAIABIRA":{"id":3130655,"pop":7328,"uf":"MG"},"INDIANÓPOLIS":{"id":3130705,"pop":7009,"uf":"MG"},"INGAÍ":{"id":3130804,"pop":2785,"uf":"MG"},"INHAPIM":{"id":3130903,"pop":24020,"uf":"MG"},"INHAÚMA":{"id":3131000,"pop":6352,"uf":"MG"},"INIMUTABA":{"id":3131109,"pop":7605,"uf":"MG"},"IPABA":{"id":3131158,"pop":18926,"uf":"MG"},"IPANEMA":{"id":3131208,"pop":20133,"uf":"MG"},"IPATINGA":{"id":3131307,"pop":267333,"uf":"MG"},"IPIAÇU":{"id":3131406,"pop":4229,"uf":"MG"},"IPUIÚNA":{"id":3131505,"pop":10156,"uf":"MG"},"IRAÍ DE MINAS":{"id":3131604,"pop":7067,"uf":"MG"},"ITABIRA":{"id":3131703,"pop":121717,"uf":"MG"},"ITABIRINHA":{"id":3131802,"pop":11637,"uf":"MG"},"ITABIRITO":{"id":3131901,"pop":52996,"uf":"MG"},"ITACAMBIRA":{"id":3132008,"pop":5447,"uf":"MG"},"ITACARAMBI":{"id":3132107,"pop":18175,"uf":"MG"},"ITAGUARA":{"id":3132206,"pop":13510,"uf":"MG"},"ITAIPÉ":{"id":3132305,"pop":12910,"uf":"MG"},"ITAJUBÁ":{"id":3132404,"pop":97782,"uf":"MG"},"ITAMARANDIBA":{"id":3132503,"pop":35130,"uf":"MG"},"ITAMARATI DE MINAS":{"id":3132602,"pop":4395,"uf":"MG"},"ITAMBACURI":{"id":3132701,"pop":23207,"uf":"MG"},"ITAMBÉ DO MATO DENTRO":{"id":3132800,"pop":2032,"uf":"MG"},"ITAMOGI":{"id":3132909,"pop":10122,"uf":"MG"},"ITAMONTE":{"id":3133006,"pop":15844,"uf":"MG"},"ITANHANDU":{"id":3133105,"pop":15511,"uf":"MG"},"ITANHOMI":{"id":3133204,"pop":12259,"uf":"MG"},"ITAOBIM":{"id":3133303,"pop":20997,"uf":"MG"},"ITAPAGIPE":{"id":3133402,"pop":15511,"uf":"MG"},"ITAPECERICA":{"id":3133501,"pop":21760,"uf":"MG"},"ITATIAIUÇU":{"id":3133709,"pop":11354,"uf":"MG"},"ITAÚ DE MINAS":{"id":3133758,"pop":16286,"uf":"MG"},"ITAÚNA":{"id":3133808,"pop":94455,"uf":"MG"},"ITAVERAVA":{"id":3133907,"pop":5321,"uf":"MG"},"ITINGA":{"id":3134004,"pop":15053,"uf":"MG"},"ITUETA":{"id":3134103,"pop":6074,"uf":"MG"},"ITUIUTABA":{"id":3134202,"pop":105818,"uf":"MG"},"ITUMIRIM":{"id":3134301,"pop":5978,"uf":"MG"},"ITURAMA":{"id":3134400,"pop":40101,"uf":"MG"},"ITUTINGA":{"id":3134509,"pop":3749,"uf":"MG"},"JABOTICATUBAS":{"id":3134608,"pop":20683,"uf":"MG"},"JACINTO":{"id":3134707,"pop":12320,"uf":"MG"},"JACUÍ":{"id":3134806,"pop":7695,"uf":"MG"},"JACUTINGA":{"id":3134905,"pop":26538,"uf":"MG"},"JAGUARAÇU":{"id":3135001,"pop":3151,"uf":"MG"},"JAÍBA":{"id":3135050,"pop":39850,"uf":"MG"},"JAMPRUCA":{"id":3135076,"pop":5453,"uf":"MG"},"JANAÚBA":{"id":3135100,"pop":72374,"uf":"MG"},"JANUÁRIA":{"id":3135209,"pop":67958,"uf":"MG"},"JAPARAÍBA":{"id":3135308,"pop":4418,"uf":"MG"},"JAPONVAR":{"id":3135357,"pop":7991,"uf":"MG"},"JECEABA":{"id":3135407,"pop":4795,"uf":"MG"},"JENIPAPO DE MINAS":{"id":3135456,"pop":7781,"uf":"MG"},"JEQUERI":{"id":3135506,"pop":12246,"uf":"MG"},"JEQUITAÍ":{"id":3135605,"pop":7407,"uf":"MG"},"JEQUITIBÁ":{"id":3135704,"pop":5203,"uf":"MG"},"JEQUITINHONHA":{"id":3135803,"pop":25555,"uf":"MG"},"JESUÂNIA":{"id":3135902,"pop":4774,"uf":"MG"},"JOAÍMA":{"id":3136009,"pop":15476,"uf":"MG"},"JOANÉSIA":{"id":3136108,"pop":4382,"uf":"MG"},"JOÃO MONLEVADE":{"id":3136207,"pop":80903,"uf":"MG"},"JOÃO PINHEIRO":{"id":3136306,"pop":47990,"uf":"MG"},"JOAQUIM FELÍCIO":{"id":3136405,"pop":4757,"uf":"MG"},"JORDÂNIA":{"id":3136504,"pop":10872,"uf":"MG"},"JOSÉ GONÇALVES DE MINAS":{"id":3136520,"pop":4474,"uf":"MG"},"JOSÉ RAYDAN":{"id":3136553,"pop":5104,"uf":"MG"},"JOSENÓPOLIS":{"id":3136579,"pop":4911,"uf":"MG"},"NOVA UNIÃO":{"id":3136603,"pop":5739,"uf":"MG"},"JUATUBA":{"id":3136652,"pop":27823,"uf":"MG"},"JUIZ DE FORA":{"id":3136702,"pop":577532,"uf":"MG"},"JURAMENTO":{"id":3136801,"pop":4359,"uf":"MG"},"JURUAIA":{"id":3136900,"pop":10795,"uf":"MG"},"JUVENÍLIA":{"id":3136959,"pop":5706,"uf":"MG"},"LADAINHA":{"id":3137007,"pop":18272,"uf":"MG"},"LAGAMAR":{"id":3137106,"pop":7588,"uf":"MG"},"LAGOA DA PRATA":{"id":3137205,"pop":53236,"uf":"MG"},"LAGOA DOS PATOS":{"id":3137304,"pop":4062,"uf":"MG"},"LAGOA DOURADA":{"id":3137403,"pop":13115,"uf":"MG"},"LAGOA FORMOSA":{"id":3137502,"pop":18168,"uf":"MG"},"LAGOA GRANDE":{"id":3137536,"pop":9681,"uf":"MG"},"LAGOA SANTA":{"id":3137601,"pop":66744,"uf":"MG"},"LAJINHA":{"id":3137700,"pop":19914,"uf":"MG"},"LAMBARI":{"id":3137809,"pop":20995,"uf":"MG"},"LAMIM":{"id":3137908,"pop":3366,"uf":"MG"},"LARANJAL":{"id":3138005,"pop":6856,"uf":"MG"},"LASSANCE":{"id":3138104,"pop":6494,"uf":"MG"},"LAVRAS":{"id":3138203,"pop":105756,"uf":"MG"},"LEANDRO FERREIRA":{"id":3138302,"pop":3222,"uf":"MG"},"LEME DO PRADO":{"id":3138351,"pop":4923,"uf":"MG"},"LEOPOLDINA":{"id":3138401,"pop":52690,"uf":"MG"},"LIBERDADE":{"id":3138500,"pop":4994,"uf":"MG"},"LIMA DUARTE":{"id":3138609,"pop":16749,"uf":"MG"},"LIMEIRA DO OESTE":{"id":3138625,"pop":7640,"uf":"MG"},"LONTRA":{"id":3138658,"pop":9766,"uf":"MG"},"LUISBURGO":{"id":3138674,"pop":6249,"uf":"MG"},"LUISLÂNDIA":{"id":3138682,"pop":6735,"uf":"MG"},"LUMINÁRIAS":{"id":3138708,"pop":5431,"uf":"MG"},"LUZ":{"id":3138807,"pop":18297,"uf":"MG"},"MACHACALIS":{"id":3138906,"pop":7112,"uf":"MG"},"MACHADO":{"id":3139003,"pop":42682,"uf":"MG"},"MADRE DE DEUS DE MINAS":{"id":3139102,"pop":5119,"uf":"MG"},"MALACACHETA":{"id":3139201,"pop":18556,"uf":"MG"},"MAMONAS":{"id":3139250,"pop":6565,"uf":"MG"},"MANGA":{"id":3139300,"pop":18051,"uf":"MG"},"MANHUAÇU":{"id":3139409,"pop":92074,"uf":"MG"},"MANHUMIRIM":{"id":3139508,"pop":22894,"uf":"MG"},"MANTENA":{"id":3139607,"pop":27651,"uf":"MG"},"MARAVILHAS":{"id":3139706,"pop":8113,"uf":"MG"},"MAR DE ESPANHA":{"id":3139805,"pop":12985,"uf":"MG"},"MARIA DA FÉ":{"id":3139904,"pop":14019,"uf":"MG"},"MARIANA":{"id":3140001,"pop":61830,"uf":"MG"},"MARILAC":{"id":3140100,"pop":4079,"uf":"MG"},"MÁRIO CAMPOS":{"id":3140159,"pop":15814,"uf":"MG"},"MARIPÁ DE MINAS":{"id":3140209,"pop":3000,"uf":"MG"},"MARLIÉRIA":{"id":3140308,"pop":4030,"uf":"MG"},"MARMELÓPOLIS":{"id":3140407,"pop":2701,"uf":"MG"},"MARTINHO CAMPOS":{"id":3140506,"pop":13497,"uf":"MG"},"MARTINS SOARES":{"id":3140530,"pop":8640,"uf":"MG"},"MATA VERDE":{"id":3140555,"pop":8700,"uf":"MG"},"MATERLÂNDIA":{"id":3140605,"pop":4415,"uf":"MG"},"MATEUS LEME":{"id":3140704,"pop":31631,"uf":"MG"},"MATIAS BARBOSA":{"id":3140803,"pop":14626,"uf":"MG"},"MATIAS CARDOSO":{"id":3140852,"pop":11360,"uf":"MG"},"MATIPÓ":{"id":3140902,"pop":19098,"uf":"MG"},"MATO VERDE":{"id":3141009,"pop":12367,"uf":"MG"},"MATOZINHOS":{"id":3141108,"pop":38469,"uf":"MG"},"MATUTINA":{"id":3141207,"pop":3733,"uf":"MG"},"MEDEIROS":{"id":3141306,"pop":3861,"uf":"MG"},"MEDINA":{"id":3141405,"pop":20701,"uf":"MG"},"MENDES PIMENTEL":{"id":3141504,"pop":6446,"uf":"MG"},"MERCÊS":{"id":3141603,"pop":10775,"uf":"MG"},"MESQUITA":{"id":3141702,"pop":5489,"uf":"MG"},"MINAS NOVAS":{"id":3141801,"pop":31509,"uf":"MG"},"MINDURI":{"id":3141900,"pop":3891,"uf":"MG"},"MIRABELA":{"id":3142007,"pop":13651,"uf":"MG"},"MIRADOURO":{"id":3142106,"pop":10818,"uf":"MG"},"MIRAÍ":{"id":3142205,"pop":15205,"uf":"MG"},"MIRAVÂNIA":{"id":3142254,"pop":4939,"uf":"MG"},"MOEDA":{"id":3142304,"pop":4948,"uf":"MG"},"MOEMA":{"id":3142403,"pop":7589,"uf":"MG"},"MONJOLOS":{"id":3142502,"pop":2184,"uf":"MG"},"MONSENHOR PAULO":{"id":3142601,"pop":8764,"uf":"MG"},"MONTALVÂNIA":{"id":3142700,"pop":14621,"uf":"MG"},"MONTE ALEGRE DE MINAS":{"id":3142809,"pop":21349,"uf":"MG"},"MONTE AZUL":{"id":3142908,"pop":20544,"uf":"MG"},"MONTE BELO":{"id":3143005,"pop":13139,"uf":"MG"},"MONTE CARMELO":{"id":3143104,"pop":48049,"uf":"MG"},"MONTE FORMOSO":{"id":3143153,"pop":4939,"uf":"MG"},"MONTE SANTO DE MINAS":{"id":3143203,"pop":21504,"uf":"MG"},"MONTES CLAROS":{"id":3143302,"pop":417478,"uf":"MG"},"MONTE SIÃO":{"id":3143401,"pop":24247,"uf":"MG"},"MONTEZUMA":{"id":3143450,"pop":8379,"uf":"MG"},"MORADA NOVA DE MINAS":{"id":3143500,"pop":8955,"uf":"MG"},"MORRO DA GARÇA":{"id":3143609,"pop":2413,"uf":"MG"},"MORRO DO PILAR":{"id":3143708,"pop":3126,"uf":"MG"},"MUNHOZ":{"id":3143807,"pop":5960,"uf":"MG"},"MURIAÉ":{"id":3143906,"pop":109997,"uf":"MG"},"MUTUM":{"id":3144003,"pop":26945,"uf":"MG"},"MUZAMBINHO":{"id":3144102,"pop":20522,"uf":"MG"},"NACIP RAYDAN":{"id":3144201,"pop":3221,"uf":"MG"},"NANUQUE":{"id":3144300,"pop":40583,"uf":"MG"},"NAQUE":{"id":3144359,"pop":7104,"uf":"MG"},"NATALÂNDIA":{"id":3144375,"pop":3306,"uf":"MG"},"NATÉRCIA":{"id":3144409,"pop":4727,"uf":"MG"},"NAZARENO":{"id":3144508,"pop":8710,"uf":"MG"},"NEPOMUCENO":{"id":3144607,"pop":26882,"uf":"MG"},"NINHEIRA":{"id":3144656,"pop":10355,"uf":"MG"},"NOVA BELÉM":{"id":3144672,"pop":3067,"uf":"MG"},"NOVA ERA":{"id":3144706,"pop":17524,"uf":"MG"},"NOVA LIMA":{"id":3144805,"pop":97378,"uf":"MG"},"NOVA MÓDICA":{"id":3144904,"pop":3548,"uf":"MG"},"NOVA PONTE":{"id":3145000,"pop":16046,"uf":"MG"},"NOVA PORTEIRINHA":{"id":3145059,"pop":7493,"uf":"MG"},"NOVA RESENDE":{"id":3145109,"pop":16937,"uf":"MG"},"NOVA SERRANA":{"id":3145208,"pop":108241,"uf":"MG"},"NOVO CRUZEIRO":{"id":3145307,"pop":31339,"uf":"MG"},"NOVO ORIENTE DE MINAS":{"id":3145356,"pop":10800,"uf":"MG"},"NOVORIZONTE":{"id":3145372,"pop":5348,"uf":"MG"},"OLARIA":{"id":3145406,"pop":1694,"uf":"MG"},"OLHOS-D'ÁGUA":{"id":3145455,"pop":6243,"uf":"MG"},"OLÍMPIO NORONHA":{"id":3145505,"pop":2829,"uf":"MG"},"OLIVEIRA":{"id":3145604,"pop":41987,"uf":"MG"},"OLIVEIRA FORTES":{"id":3145703,"pop":2128,"uf":"MG"},"ONÇA DE PITANGUI":{"id":3145802,"pop":3155,"uf":"MG"},"ORATÓRIOS":{"id":3145851,"pop":4671,"uf":"MG"},"ORIZÂNIA":{"id":3145877,"pop":8138,"uf":"MG"},"OURO BRANCO":{"id":3145901,"pop":40220,"uf":"MG"},"OURO FINO":{"id":3146008,"pop":33938,"uf":"MG"},"OURO PRETO":{"id":3146107,"pop":74824,"uf":"MG"},"OURO VERDE DE MINAS":{"id":3146206,"pop":5895,"uf":"MG"},"PADRE CARVALHO":{"id":3146255,"pop":6466,"uf":"MG"},"PADRE PARAÍSO":{"id":3146305,"pop":20346,"uf":"MG"},"PAINEIRAS":{"id":3146404,"pop":4440,"uf":"MG"},"PAINS":{"id":3146503,"pop":8308,"uf":"MG"},"PAI PEDRO":{"id":3146552,"pop":6098,"uf":"MG"},"PAIVA":{"id":3146602,"pop":1517,"uf":"MG"},"PALMA":{"id":3146701,"pop":6606,"uf":"MG"},"PALMÓPOLIS":{"id":3146750,"pop":5196,"uf":"MG"},"PAPAGAIOS":{"id":3146909,"pop":15922,"uf":"MG"},"PARACATU":{"id":3147006,"pop":94539,"uf":"MG"},"PARÁ DE MINAS":{"id":3147105,"pop":95616,"uf":"MG"},"PARAGUAÇU":{"id":3147204,"pop":21693,"uf":"MG"},"PARAISÓPOLIS":{"id":3147303,"pop":21353,"uf":"MG"},"PARAOPEBA":{"id":3147402,"pop":24854,"uf":"MG"},"PASSABÉM":{"id":3147501,"pop":1619,"uf":"MG"},"PASSA QUATRO":{"id":3147600,"pop":16439,"uf":"MG"},"PASSA TEMPO":{"id":3147709,"pop":8031,"uf":"MG"},"PASSA VINTE":{"id":3147808,"pop":2024,"uf":"MG"},"PASSOS":{"id":3147907,"pop":115970,"uf":"MG"},"PATIS":{"id":3147956,"pop":6031,"uf":"MG"},"PATOS DE MINAS":{"id":3148004,"pop":154641,"uf":"MG"},"PATROCÍNIO":{"id":3148103,"pop":92116,"uf":"MG"},"PATROCÍNIO DO MURIAÉ":{"id":3148202,"pop":5744,"uf":"MG"},"PAULA CÂNDIDO":{"id":3148301,"pop":9597,"uf":"MG"},"PAULISTAS":{"id":3148400,"pop":4794,"uf":"MG"},"PAVÃO":{"id":3148509,"pop":8390,"uf":"MG"},"PEÇANHA":{"id":3148608,"pop":17534,"uf":"MG"},"PEDRA AZUL":{"id":3148707,"pop":24333,"uf":"MG"},"PEDRA BONITA":{"id":3148756,"pop":7157,"uf":"MG"},"PEDRA DO ANTA":{"id":3148806,"pop":2960,"uf":"MG"},"PEDRA DO INDAIÁ":{"id":3148905,"pop":3977,"uf":"MG"},"PEDRA DOURADA":{"id":3149002,"pop":2559,"uf":"MG"},"PEDRALVA":{"id":3149101,"pop":11098,"uf":"MG"},"PEDRAS DE MARIA DA CRUZ":{"id":3149150,"pop":12313,"uf":"MG"},"PEDRINÓPOLIS":{"id":3149200,"pop":3651,"uf":"MG"},"PEDRO LEOPOLDO":{"id":3149309,"pop":65149,"uf":"MG"},"PEDRO TEIXEIRA":{"id":3149408,"pop":1804,"uf":"MG"},"PEQUERI":{"id":3149507,"pop":3340,"uf":"MG"},"PEQUI":{"id":3149606,"pop":4457,"uf":"MG"},"PERDIGÃO":{"id":3149705,"pop":11994,"uf":"MG"},"PERDIZES":{"id":3149804,"pop":16469,"uf":"MG"},"PERDÕES":{"id":3149903,"pop":21577,"uf":"MG"},"PERIQUITO":{"id":3149952,"pop":6738,"uf":"MG"},"PESCADOR":{"id":3150000,"pop":4261,"uf":"MG"},"PIAU":{"id":3150109,"pop":2719,"uf":"MG"},"PIEDADE DE CARATINGA":{"id":3150158,"pop":8832,"uf":"MG"},"PIEDADE DE PONTE NOVA":{"id":3150208,"pop":4141,"uf":"MG"},"PIEDADE DO RIO GRANDE":{"id":3150307,"pop":4436,"uf":"MG"},"PIEDADE DOS GERAIS":{"id":3150406,"pop":5034,"uf":"MG"},"PIMENTA":{"id":3150505,"pop":8715,"uf":"MG"},"PINGO-D'ÁGUA":{"id":3150539,"pop":5029,"uf":"MG"},"PINTÓPOLIS":{"id":3150570,"pop":7540,"uf":"MG"},"PIRACEMA":{"id":3150604,"pop":6386,"uf":"MG"},"PIRAJUBA":{"id":3150703,"pop":6491,"uf":"MG"},"PIRANGA":{"id":3150802,"pop":17641,"uf":"MG"},"PIRANGUÇU":{"id":3150901,"pop":5504,"uf":"MG"},"PIRANGUINHO":{"id":3151008,"pop":8683,"uf":"MG"},"PIRAPETINGA":{"id":3151107,"pop":10791,"uf":"MG"},"PIRAPORA":{"id":3151206,"pop":56845,"uf":"MG"},"PIRAÚBA":{"id":3151305,"pop":10732,"uf":"MG"},"PITANGUI":{"id":3151404,"pop":28433,"uf":"MG"},"PIUMHI":{"id":3151503,"pop":35137,"uf":"MG"},"PLANURA":{"id":3151602,"pop":12445,"uf":"MG"},"POÇO FUNDO":{"id":3151701,"pop":16900,"uf":"MG"},"POÇOS DE CALDAS":{"id":3151800,"pop":169838,"uf":"MG"},"POCRANE":{"id":3151909,"pop":8288,"uf":"MG"},"POMPÉU":{"id":3152006,"pop":32248,"uf":"MG"},"PONTE NOVA":{"id":3152105,"pop":60003,"uf":"MG"},"PONTO CHIQUE":{"id":3152131,"pop":4305,"uf":"MG"},"PONTO DOS VOLANTES":{"id":3152170,"pop":12235,"uf":"MG"},"PORTEIRINHA":{"id":3152204,"pop":37823,"uf":"MG"},"PORTO FIRME":{"id":3152303,"pop":11414,"uf":"MG"},"POTÉ":{"id":3152402,"pop":16675,"uf":"MG"},"POUSO ALEGRE":{"id":3152501,"pop":154293,"uf":"MG"},"POUSO ALTO":{"id":3152600,"pop":5862,"uf":"MG"},"PRADOS":{"id":3152709,"pop":9128,"uf":"MG"},"PRATA":{"id":3152808,"pop":28173,"uf":"MG"},"PRATÁPOLIS":{"id":3152907,"pop":8530,"uf":"MG"},"PRATINHA":{"id":3153004,"pop":3658,"uf":"MG"},"PRESIDENTE JUSCELINO":{"id":3153202,"pop":3572,"uf":"MG"},"PRESIDENTE KUBITSCHEK":{"id":3153301,"pop":3000,"uf":"MG"},"PRESIDENTE OLEGÁRIO":{"id":3153400,"pop":19680,"uf":"MG"},"ALTO JEQUITIBÁ":{"id":3153509,"pop":8286,"uf":"MG"},"PRUDENTE DE MORAIS":{"id":3153608,"pop":10931,"uf":"MG"},"QUARTEL GERAL":{"id":3153707,"pop":3603,"uf":"MG"},"QUELUZITO":{"id":3153806,"pop":1948,"uf":"MG"},"RAPOSOS":{"id":3153905,"pop":16501,"uf":"MG"},"RAUL SOARES":{"id":3154002,"pop":23663,"uf":"MG"},"RECREIO":{"id":3154101,"pop":10522,"uf":"MG"},"REDUTO":{"id":3154150,"pop":7247,"uf":"MG"},"RESENDE COSTA":{"id":3154200,"pop":11578,"uf":"MG"},"RESPLENDOR":{"id":3154309,"pop":17396,"uf":"MG"},"RESSAQUINHA":{"id":3154408,"pop":4826,"uf":"MG"},"RIACHINHO":{"id":3154457,"pop":8132,"uf":"MG"},"RIACHO DOS MACHADOS":{"id":3154507,"pop":9471,"uf":"MG"},"RIBEIRÃO DAS NEVES":{"id":3154606,"pop":341415,"uf":"MG"},"RIBEIRÃO VERMELHO":{"id":3154705,"pop":4061,"uf":"MG"},"RIO ACIMA":{"id":3154804,"pop":10524,"uf":"MG"},"RIO CASCA":{"id":3154903,"pop":13384,"uf":"MG"},"RIO DOCE":{"id":3155009,"pop":2630,"uf":"MG"},"RIO DO PRADO":{"id":3155108,"pop":5117,"uf":"MG"},"RIO ESPERA":{"id":3155207,"pop":5332,"uf":"MG"},"RIO MANSO":{"id":3155306,"pop":5924,"uf":"MG"},"RIO NOVO":{"id":3155405,"pop":8964,"uf":"MG"},"RIO PARANAÍBA":{"id":3155504,"pop":12356,"uf":"MG"},"RIO PARDO DE MINAS":{"id":3155603,"pop":31171,"uf":"MG"},"RIO PIRACICABA":{"id":3155702,"pop":14325,"uf":"MG"},"RIO POMBA":{"id":3155801,"pop":18007,"uf":"MG"},"RIO PRETO":{"id":3155900,"pop":5493,"uf":"MG"},"RIO VERMELHO":{"id":3156007,"pop":12635,"uf":"MG"},"RITÁPOLIS":{"id":3156106,"pop":4521,"uf":"MG"},"ROCHEDO DE MINAS":{"id":3156205,"pop":2335,"uf":"MG"},"RODEIRO":{"id":3156304,"pop":8333,"uf":"MG"},"ROMARIA":{"id":3156403,"pop":3507,"uf":"MG"},"ROSÁRIO DA LIMEIRA":{"id":3156452,"pop":4648,"uf":"MG"},"RUBELITA":{"id":3156502,"pop":5609,"uf":"MG"},"RUBIM":{"id":3156601,"pop":10269,"uf":"MG"},"SABARÁ":{"id":3156700,"pop":137877,"uf":"MG"},"SABINÓPOLIS":{"id":3156809,"pop":15364,"uf":"MG"},"SACRAMENTO":{"id":3156908,"pop":26556,"uf":"MG"},"SALINAS":{"id":3157005,"pop":41864,"uf":"MG"},"SALTO DA DIVISA":{"id":3157104,"pop":7014,"uf":"MG"},"SANTA BÁRBARA":{"id":3157203,"pop":31873,"uf":"MG"},"SANTA BÁRBARA DO LESTE":{"id":3157252,"pop":8212,"uf":"MG"},"SANTA BÁRBARA DO MONTE VERDE":{"id":3157278,"pop":3212,"uf":"MG"},"SANTA BÁRBARA DO TUGÚRIO":{"id":3157302,"pop":4385,"uf":"MG"},"SANTA CRUZ DE MINAS":{"id":3157336,"pop":8723,"uf":"MG"},"SANTA CRUZ DE SALINAS":{"id":3157377,"pop":4074,"uf":"MG"},"SANTA CRUZ DO ESCALVADO":{"id":3157401,"pop":4693,"uf":"MG"},"SANTA EFIGÊNIA DE MINAS":{"id":3157500,"pop":4354,"uf":"MG"},"SANTA FÉ DE MINAS":{"id":3157609,"pop":3806,"uf":"MG"},"SANTA HELENA DE MINAS":{"id":3157658,"pop":6406,"uf":"MG"},"SANTA JULIANA":{"id":3157708,"pop":14497,"uf":"MG"},"SANTA LUZIA":{"id":3157807,"pop":221705,"uf":"MG"},"SANTA MARGARIDA":{"id":3157906,"pop":16393,"uf":"MG"},"SANTA MARIA DE ITABIRA":{"id":3158003,"pop":10867,"uf":"MG"},"SANTA MARIA DO SALTO":{"id":3158102,"pop":5203,"uf":"MG"},"SANTA MARIA DO SUAÇUÍ":{"id":3158201,"pop":14607,"uf":"MG"},"SANTANA DA VARGEM":{"id":3158300,"pop":7047,"uf":"MG"},"SANTANA DE CATAGUASES":{"id":3158409,"pop":3909,"uf":"MG"},"SANTANA DE PIRAPAMA":{"id":3158508,"pop":7538,"uf":"MG"},"SANTANA DO DESERTO":{"id":3158607,"pop":3985,"uf":"MG"},"SANTANA DO GARAMBÉU":{"id":3158706,"pop":2494,"uf":"MG"},"SANTANA DO JACARÉ":{"id":3158805,"pop":4847,"uf":"MG"},"SANTANA DO MANHUAÇU":{"id":3158904,"pop":8660,"uf":"MG"},"SANTANA DO PARAÍSO":{"id":3158953,"pop":36048,"uf":"MG"},"SANTANA DO RIACHO":{"id":3159001,"pop":4334,"uf":"MG"},"SANTANA DOS MONTES":{"id":3159100,"pop":3753,"uf":"MG"},"SANTA RITA DE CALDAS":{"id":3159209,"pop":8900,"uf":"MG"},"SANTA RITA DE JACUTINGA":{"id":3159308,"pop":4843,"uf":"MG"},"SANTA RITA DE MINAS":{"id":3159357,"pop":7322,"uf":"MG"},"SANTA RITA DE IBITIPOCA":{"id":3159407,"pop":3380,"uf":"MG"},"SANTA RITA DO ITUETO":{"id":3159506,"pop":5426,"uf":"MG"},"SANTA RITA DO SAPUCAÍ":{"id":3159605,"pop":44226,"uf":"MG"},"SANTA ROSA DA SERRA":{"id":3159704,"pop":3364,"uf":"MG"},"SANTA VITÓRIA":{"id":3159803,"pop":19997,"uf":"MG"},"SANTO ANTÔNIO DO AMPARO":{"id":3159902,"pop":18697,"uf":"MG"},"SANTO ANTÔNIO DO AVENTUREIRO":{"id":3160009,"pop":3602,"uf":"MG"},"SANTO ANTÔNIO DO GRAMA":{"id":3160108,"pop":3861,"uf":"MG"},"SANTO ANTÔNIO DO ITAMBÉ":{"id":3160207,"pop":3763,"uf":"MG"},"SANTO ANTÔNIO DO JACINTO":{"id":3160306,"pop":11570,"uf":"MG"},"SANTO ANTÔNIO DO MONTE":{"id":3160405,"pop":28603,"uf":"MG"},"SANTO ANTÔNIO DO RETIRO":{"id":3160454,"pop":7316,"uf":"MG"},"SANTO ANTÔNIO DO RIO ABAIXO":{"id":3160504,"pop":1756,"uf":"MG"},"SANTO HIPÓLITO":{"id":3160603,"pop":3044,"uf":"MG"},"SANTOS DUMONT":{"id":3160702,"pop":46357,"uf":"MG"},"SÃO BENTO ABADE":{"id":3160801,"pop":5411,"uf":"MG"},"SÃO BRÁS DO SUAÇUÍ":{"id":3160900,"pop":3770,"uf":"MG"},"SÃO DOMINGOS DAS DORES":{"id":3160959,"pop":5672,"uf":"MG"},"SÃO DOMINGOS DO PRATA":{"id":3161007,"pop":17296,"uf":"MG"},"SÃO FÉLIX DE MINAS":{"id":3161056,"pop":3354,"uf":"MG"},"SÃO FRANCISCO DE PAULA":{"id":3161205,"pop":6512,"uf":"MG"},"SÃO FRANCISCO DE SALES":{"id":3161304,"pop":6309,"uf":"MG"},"SÃO FRANCISCO DO GLÓRIA":{"id":3161403,"pop":4758,"uf":"MG"},"SÃO GERALDO":{"id":3161502,"pop":12751,"uf":"MG"},"SÃO GERALDO DA PIEDADE":{"id":3161601,"pop":3860,"uf":"MG"},"SÃO GERALDO DO BAIXIO":{"id":3161650,"pop":4104,"uf":"MG"},"SÃO GONÇALO DO ABAETÉ":{"id":3161700,"pop":8527,"uf":"MG"},"SÃO GONÇALO DO PARÁ":{"id":3161809,"pop":12776,"uf":"MG"},"SÃO GONÇALO DO RIO ABAIXO":{"id":3161908,"pop":11114,"uf":"MG"},"SÃO GONÇALO DO SAPUCAÍ":{"id":3162005,"pop":25670,"uf":"MG"},"SÃO GOTARDO":{"id":3162104,"pop":36084,"uf":"MG"},"SÃO JOÃO BATISTA DO GLÓRIA":{"id":3162203,"pop":7541,"uf":"MG"},"SÃO JOÃO DA LAGOA":{"id":3162252,"pop":4949,"uf":"MG"},"SÃO JOÃO DA MATA":{"id":3162302,"pop":2743,"uf":"MG"},"SÃO JOÃO DA PONTE":{"id":3162401,"pop":25033,"uf":"MG"},"SÃO JOÃO DAS MISSÕES":{"id":3162450,"pop":13232,"uf":"MG"},"SÃO JOÃO DEL REI":{"id":3162500,"pop":90897,"uf":"MG"},"SÃO JOÃO DO MANHUAÇU":{"id":3162559,"pop":11785,"uf":"MG"},"SÃO JOÃO DO MANTENINHA":{"id":3162575,"pop":5975,"uf":"MG"},"SÃO JOÃO DO ORIENTE":{"id":3162609,"pop":7393,"uf":"MG"},"SÃO JOÃO DO PACUÍ":{"id":3162658,"pop":4476,"uf":"MG"},"SÃO JOÃO DO PARAÍSO":{"id":3162708,"pop":23797,"uf":"MG"},"SÃO JOÃO EVANGELISTA":{"id":3162807,"pop":15761,"uf":"MG"},"SÃO JOÃO NEPOMUCENO":{"id":3162906,"pop":26530,"uf":"MG"},"SÃO JOAQUIM DE BICAS":{"id":3162922,"pop":32696,"uf":"MG"},"SÃO JOSÉ DA BARRA":{"id":3162948,"pop":7532,"uf":"MG"},"SÃO JOSÉ DA LAPA":{"id":3162955,"pop":24490,"uf":"MG"},"SÃO JOSÉ DA SAFIRA":{"id":3163003,"pop":4291,"uf":"MG"},"SÃO JOSÉ DA VARGINHA":{"id":3163102,"pop":5151,"uf":"MG"},"SÃO JOSÉ DO ALEGRE":{"id":3163201,"pop":4222,"uf":"MG"},"SÃO JOSÉ DO DIVINO":{"id":3163300,"pop":3851,"uf":"MG"},"SÃO JOSÉ DO GOIABAL":{"id":3163409,"pop":5356,"uf":"MG"},"SÃO JOSÉ DO JACURI":{"id":3163508,"pop":6409,"uf":"MG"},"SÃO JOSÉ DO MANTIMENTO":{"id":3163607,"pop":2821,"uf":"MG"},"SÃO LOURENÇO":{"id":3163706,"pop":46539,"uf":"MG"},"SÃO MIGUEL DO ANTA":{"id":3163805,"pop":6949,"uf":"MG"},"SÃO PEDRO DA UNIÃO":{"id":3163904,"pop":4563,"uf":"MG"},"SÃO PEDRO DOS FERROS":{"id":3164001,"pop":7634,"uf":"MG"},"SÃO PEDRO DO SUAÇUÍ":{"id":3164100,"pop":5160,"uf":"MG"},"SÃO ROMÃO":{"id":3164209,"pop":12713,"uf":"MG"},"SÃO ROQUE DE MINAS":{"id":3164308,"pop":7100,"uf":"MG"},"SÃO SEBASTIÃO DA BELA VISTA":{"id":3164407,"pop":5598,"uf":"MG"},"SÃO SEBASTIÃO DA VARGEM ALEGRE":{"id":3164431,"pop":3039,"uf":"MG"},"SÃO SEBASTIÃO DO ANTA":{"id":3164472,"pop":6697,"uf":"MG"},"SÃO SEBASTIÃO DO MARANHÃO":{"id":3164506,"pop":9884,"uf":"MG"},"SÃO SEBASTIÃO DO OESTE":{"id":3164605,"pop":6948,"uf":"MG"},"SÃO SEBASTIÃO DO PARAÍSO":{"id":3164704,"pop":71915,"uf":"MG"},"SÃO SEBASTIÃO DO RIO PRETO":{"id":3164803,"pop":1478,"uf":"MG"},"SÃO SEBASTIÃO DO RIO VERDE":{"id":3164902,"pop":2259,"uf":"MG"},"SÃO TIAGO":{"id":3165008,"pop":10979,"uf":"MG"},"SÃO TOMÁS DE AQUINO":{"id":3165107,"pop":6980,"uf":"MG"},"SÃO TOMÉ DAS LETRAS":{"id":3165206,"pop":7151,"uf":"MG"},"SÃO VICENTE DE MINAS":{"id":3165305,"pop":7876,"uf":"MG"},"SAPUCAÍ-MIRIM":{"id":3165404,"pop":7045,"uf":"MG"},"SARDOÁ":{"id":3165503,"pop":6421,"uf":"MG"},"SARZEDO":{"id":3165537,"pop":34050,"uf":"MG"},"SETUBINHA":{"id":3165552,"pop":12493,"uf":"MG"},"SEM-PEIXE":{"id":3165560,"pop":2579,"uf":"MG"},"SENADOR AMARAL":{"id":3165578,"pop":5365,"uf":"MG"},"SENADOR CORTES":{"id":3165602,"pop":2001,"uf":"MG"},"SENADOR FIRMINO":{"id":3165701,"pop":7902,"uf":"MG"},"SENADOR JOSÉ BENTO":{"id":3165800,"pop":1422,"uf":"MG"},"SENADOR MODESTINO GONÇALVES":{"id":3165909,"pop":4056,"uf":"MG"},"SENHORA DE OLIVEIRA":{"id":3166006,"pop":5786,"uf":"MG"},"SENHORA DO PORTO":{"id":3166105,"pop":3516,"uf":"MG"},"SENHORA DOS REMÉDIOS":{"id":3166204,"pop":10474,"uf":"MG"},"SERICITA":{"id":3166303,"pop":7340,"uf":"MG"},"SERITINGA":{"id":3166402,"pop":1857,"uf":"MG"},"SERRA AZUL DE MINAS":{"id":3166501,"pop":4292,"uf":"MG"},"SERRA DA SAUDADE":{"id":3166600,"pop":771,"uf":"MG"},"SERRA DOS AIMORÉS":{"id":3166709,"pop":8725,"uf":"MG"},"SERRA DO SALITRE":{"id":3166808,"pop":11750,"uf":"MG"},"SERRANIA":{"id":3166907,"pop":7667,"uf":"MG"},"SERRANÓPOLIS DE MINAS":{"id":3166956,"pop":4836,"uf":"MG"},"SERRANOS":{"id":3167004,"pop":1949,"uf":"MG"},"SERRO":{"id":3167103,"pop":20915,"uf":"MG"},"SETE LAGOAS":{"id":3167202,"pop":243950,"uf":"MG"},"SILVEIRÂNIA":{"id":3167301,"pop":2267,"uf":"MG"},"SILVIANÓPOLIS":{"id":3167400,"pop":6258,"uf":"MG"},"SIMÃO PEREIRA":{"id":3167509,"pop":2621,"uf":"MG"},"SIMONÉSIA":{"id":3167608,"pop":19834,"uf":"MG"},"SOBRÁLIA":{"id":3167707,"pop":5476,"uf":"MG"},"SOLEDADE DE MINAS":{"id":3167806,"pop":6226,"uf":"MG"},"TABULEIRO":{"id":3167905,"pop":3669,"uf":"MG"},"TAIOBEIRAS":{"id":3168002,"pop":34653,"uf":"MG"},"TAPARUBA":{"id":3168051,"pop":3093,"uf":"MG"},"TAPIRA":{"id":3168101,"pop":4890,"uf":"MG"},"TAQUARAÇU DE MINAS":{"id":3168309,"pop":4120,"uf":"MG"},"TARUMIRIM":{"id":3168408,"pop":14280,"uf":"MG"},"TEIXEIRAS":{"id":3168507,"pop":11680,"uf":"MG"},"TEÓFILO OTONI":{"id":3168606,"pop":141269,"uf":"MG"},"TIMÓTEO":{"id":3168705,"pop":91268,"uf":"MG"},"TIRADENTES":{"id":3168804,"pop":8160,"uf":"MG"},"TIROS":{"id":3168903,"pop":6369,"uf":"MG"},"TOCANTINS":{"id":3169000,"pop":16769,"uf":"MG"},"TOCOS DO MOJI":{"id":3169059,"pop":4117,"uf":"MG"},"TOLEDO":{"id":3169109,"pop":6336,"uf":"MG"},"TOMBOS":{"id":3169208,"pop":7683,"uf":"MG"},"TRÊS CORAÇÕES":{"id":3169307,"pop":80561,"uf":"MG"},"TRÊS MARIAS":{"id":3169356,"pop":33062,"uf":"MG"},"TRÊS PONTAS":{"id":3169406,"pop":57127,"uf":"MG"},"TUMIRITINGA":{"id":3169505,"pop":6797,"uf":"MG"},"TUPACIGUARA":{"id":3169604,"pop":25466,"uf":"MG"},"TURVOLÂNDIA":{"id":3169802,"pop":5099,"uf":"MG"},"UBÁ":{"id":3169901,"pop":117995,"uf":"MG"},"UBAÍ":{"id":3170008,"pop":12661,"uf":"MG"},"UBAPORANGA":{"id":3170057,"pop":12514,"uf":"MG"},"UBERABA":{"id":3170107,"pop":340277,"uf":"MG"},"UBERLÂNDIA":{"id":3170206,"pop":706597,"uf":"MG"},"UMBURATIBA":{"id":3170305,"pop":2582,"uf":"MG"},"UNAÍ":{"id":3170404,"pop":85461,"uf":"MG"},"UNIÃO DE MINAS":{"id":3170438,"pop":4265,"uf":"MG"},"URUANA DE MINAS":{"id":3170479,"pop":3256,"uf":"MG"},"URUCÂNIA":{"id":3170503,"pop":10333,"uf":"MG"},"URUCUIA":{"id":3170529,"pop":17470,"uf":"MG"},"VARGEM ALEGRE":{"id":3170578,"pop":6460,"uf":"MG"},"VARGEM BONITA":{"id":3170602,"pop":2143,"uf":"MG"},"VARGEM GRANDE DO RIO PARDO":{"id":3170651,"pop":5045,"uf":"MG"},"VARGINHA":{"id":3170701,"pop":137608,"uf":"MG"},"VARJÃO DE MINAS":{"id":3170750,"pop":7235,"uf":"MG"},"VÁRZEA DA PALMA":{"id":3170800,"pop":40101,"uf":"MG"},"VARZELÂNDIA":{"id":3170909,"pop":19290,"uf":"MG"},"VAZANTE":{"id":3171006,"pop":20692,"uf":"MG"},"VERDELÂNDIA":{"id":3171030,"pop":9527,"uf":"MG"},"VEREDINHA":{"id":3171071,"pop":5733,"uf":"MG"},"VERÍSSIMO":{"id":3171105,"pop":4090,"uf":"MG"},"VERMELHO NOVO":{"id":3171154,"pop":4852,"uf":"MG"},"VESPASIANO":{"id":3171204,"pop":131849,"uf":"MG"},"VIÇOSA":{"id":3171303,"pop":79910,"uf":"MG"},"VIEIRAS":{"id":3171402,"pop":3570,"uf":"MG"},"MATHIAS LOBATO":{"id":3171501,"pop":3157,"uf":"MG"},"VIRGEM DA LAPA":{"id":3171600,"pop":13729,"uf":"MG"},"VIRGÍNIA":{"id":3171709,"pop":8652,"uf":"MG"},"VIRGINÓPOLIS":{"id":3171808,"pop":10459,"uf":"MG"},"VIRGOLÂNDIA":{"id":3171907,"pop":5303,"uf":"MG"},"VISCONDE DO RIO BRANCO":{"id":3172004,"pop":43351,"uf":"MG"},"VOLTA GRANDE":{"id":3172103,"pop":5270,"uf":"MG"},"WENCESLAU BRAZ":{"id":3172202,"pop":2543,"uf":"MG"}};
+
+function getIBGEByNome(nomeMunicipio) {
+  if (!nomeMunicipio) return null;
+  const chave = nomeMunicipio.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  for (const [k, v] of Object.entries(IBGE_BASE)) {
+    const kNorm = k.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if (kNorm === chave) return {nome:k,...v};
+  }
+  for (const [k, v] of Object.entries(IBGE_BASE)) {
+    const kNorm = k.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if (kNorm.includes(chave) || chave.includes(kNorm)) return {nome:k,...v};
+  }
+  return null;
+}
+
+function extrairMunicipio(displayName) {
+  if (!displayName) return null;
+  const partes = displayName.split(',').map(p => p.replace(/\s*-\s*[A-Z]{2}$/,'').trim());
+  for (const parte of partes) {
+    if (parte.length < 3) continue;
+    const dados = getIBGEByNome(parte);
+    if (dados && dados.pop > 5000) return dados;
+  }
+  return null;
+}
+window.getIBGEByNome = getIBGEByNome;
+window.extrairMunicipio = extrairMunicipio;
+
+// GEOCODING via Anthropic API — funciona sem servidor, sem CORS
+// Seleciona o melhor trecho de rua para um número específico via interpolação
+
+// GEOCODING — Nominatim funciona quando hospedado (GitHub Pages, etc)
+// Google Maps Geocoding API — precisão de número de porta exato
+const GMAPS_KEY = 'AIzaSyBxf8WQy6U7eiO_QYQ6KMxPANrFElcQy_Y';
+
+async function geocodeEndereco(query) {
+  try {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&region=br&language=pt-BR&key=${GMAPS_KEY}`;
+    const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (d.status !== 'OK' || !d.results.length) return null;
+    const res = d.results[0];
+    return {
+      lat: res.geometry.location.lat.toString(),
+      lon: res.geometry.location.lng.toString(),
+      display_name: res.formatted_address,
+      type: res.types[0] || 'address'
+    };
+  } catch(e) {
+    console.warn('Google Geocoding erro:', e);
+    return null;
+  }
+}
+
+async function geocodeEnderecoAll(query) {
+  const result = await geocodeEndereco(query);
+  return result ? [result] : null;
+}
+
+async function reverseGeocode(lat, lng) {
+  try {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=pt-BR&key=${GMAPS_KEY}`;
+    const r = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    if (!r.ok) return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    const d = await r.json();
+    if (d.status === 'OK' && d.results.length) return d.results[0].formatted_address;
+    return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  } catch(e) {
+    return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// BUSCADOR UNIVERSAL — lê qualquer formato do Google Maps
+// ═══════════════════════════════════════════════════════════════
+
+function detectarTipoInput(texto) {
+  const tag  = document.getElementById('input-tipo-tag');
+  const icon = document.getElementById('input-tipo-icon');
+  if (!texto || texto.trim().length < 3) {
+    tag.style.display = 'none';
+    icon.textContent = '📍';
+    return;
+  }
+  const t = texto.trim();
+  let tipo = '', cor = '', icone = '';
+
+  if (/maps\.app\.goo\.gl|goo\.gl\/maps/i.test(t)) {
+    tipo = 'Link curto Google Maps'; cor = '#7c3aed'; icone = '🔗';
+  } else if (/google\.com\/maps/i.test(t)) {
+    tipo = 'Link Google Maps'; cor = '#16a34a'; icone = '🗺️';
+  } else if (/^-?\d{1,3}\.\d+\s*,\s*-?\d{1,3}\.\d+$/.test(t)) {
+    tipo = 'Coordenadas'; cor = '#0284c7'; icone = '🎯';
+  } else if (/^\d{5}-?\d{3}$/.test(t.replace(/\s/g,''))) {
+    tipo = 'CEP'; cor = '#d97706'; icone = '📮';
+  } else {
+    tipo = 'Endereço'; cor = '#475569'; icone = '📍';
+  }
+
+  icon.textContent = icone;
+  const span = tag.querySelector('span');
+  span.textContent = tipo;
+  span.style.background = cor + '18';
+  span.style.color = cor;
+  span.style.border = '1px solid ' + cor + '44';
+  tag.style.display = 'block';
+}
+
+function parsearInputUniversal(texto) {
+  // Retorna { tipo, lat, lng, query }
+  const t = texto.trim();
+
+  // 1. Coordenadas !3d!4d no link (mais preciso)
+  let m = t.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+  if (m) return { tipo:'coord', lat:parseFloat(m[1]), lng:parseFloat(m[2]) };
+
+  // 2. Coordenadas @lat,lng no link
+  m = t.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (m) return { tipo:'coord', lat:parseFloat(m[1]), lng:parseFloat(m[2]) };
+
+  // 3. Coordenadas puras
+  m = t.match(/^(-?\d{1,3}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)$/);
+  if (m) return { tipo:'coord', lat:parseFloat(m[1]), lng:parseFloat(m[2]) };
+
+  // 4. Link curto (precisa resolver redirect)
+  if (/maps\.app\.goo\.gl|goo\.gl\/maps/i.test(t))
+    return { tipo:'link_curto', query:t };
+
+  // 5. Link longo — extrai nome do lugar
+  if (/google\.com\/maps/i.test(t)) {
+    const nm = t.match(/\/(?:place|search)\/([^/@?]+)/);
+    const nome = nm ? decodeURIComponent(nm[1]).replace(/\+/g,' ') : '';
+    return { tipo:'endereco', query: nome ? nome + ' Brasil' : 'São Paulo Brasil' };
+  }
+
+  // 6. CEP isolado
+  if (/^\d{5}-?\d{3}$/.test(t.replace(/\s/g,'')))
+    return { tipo:'endereco', query: t + ' São Paulo Brasil' };
+
+  // 7. Endereço genérico
+  return { tipo:'endereco', query: t };
+}
+
+async function resolverLinkCurto(url) {
+  // Tenta resolver o redirect via allorigins (CORS)
+  try {
+    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const r = await fetch(proxy, { signal: AbortSignal.timeout(6000) });
+    const d = await r.json();
+    // allorigins retorna o URL final nos headers ou no body
+    const finalUrl = d.status?.url || d.contents || '';
+    if (finalUrl) {
+      // tenta extrair coords do URL expandido
+      const parsed = parsearInputUniversal(finalUrl);
+      if (parsed.tipo === 'coord') return parsed;
+      // tenta pegar o nome do lugar
+      const nm = finalUrl.match(/\/(?:place|search)\/([^/@?]+)/);
+      if (nm) return { tipo:'endereco', query: decodeURIComponent(nm[1]).replace(/\+/g,' ') + ' Brasil' };
+    }
+  } catch(e) { /* silencioso */ }
+  return null;
+}
+
+function showSearchError(msg) {
+  const el = document.getElementById('search-error');
+  el.innerHTML = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 5000);
+}
+
+async function buscarUniversal() {
+  const input = document.getElementById('universal-input');
+  const texto = input.value.trim();
+  if (!texto) return;
+
+  const btn = document.getElementById('searchBtn');
+  btn.innerHTML = '<div style="width:12px;height:12px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;margin-right:6px"></div>Localizando...';
+  btn.disabled = true;
+  document.getElementById('search-error').style.display = 'none';
+
+  const reset = () => {
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#fff" stroke-width="2.5"/><path d="M16.5 16.5L21 21" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg> Analisar Ponto';
+    btn.disabled = false;
+  };
+
+  let parsed = parsearInputUniversal(texto);
+
+  // Resolve link curto
+  if (parsed.tipo === 'link_curto') {
+    const resolvido = await resolverLinkCurto(parsed.query);
+    if (resolvido) parsed = resolvido;
+    else parsed = { tipo:'endereco', query:'São Paulo Brasil' };
+  }
+
+  let lat, lng, label;
+
+  if (parsed.tipo === 'coord') {
+    lat = parsed.lat;
+    lng = parsed.lng;
+    label = await reverseGeocode(lat, lng);
+  } else {
+    // Geocodifica via Google Maps API
+    const result = await geocodeEndereco(parsed.query);
+    if (!result) {
+      reset();
+      showSearchError('Endereço não encontrado. Tente outro formato ou clique no mapa.');
+      return;
+    }
+    lat   = parseFloat(result.lat);
+    lng   = parseFloat(result.lon);
+    label = result.display_name;
+  }
+
+  reset();
+
+  // Determina zoom: mais preciso = mais zoom
+  const isExato = /\d/.test(texto.split(',')[0]); // tem número no início
+  const zoom = parsed.tipo === 'coord' ? 17 : isExato ? 17 : 15;
+
+  map.flyTo([lat, lng], zoom, { animate:true, duration:1 });
+  analyse(lat, lng, label);
+
+  // Feedback visual no input
+  input.style.borderColor = '#22c55e';
+  input.style.background  = '#f0fdf4';
+  setTimeout(() => { input.style.borderColor = ''; input.style.background = ''; }, 2000);
+}
+window.buscarUniversal = buscarUniversal;
+
+// ═══════════════════════════════════════════════════════
+// SISTEMA DE CLIENTES — MapXpand Demo
+// ═══════════════════════════════════════════════════════
+
+const CLIENTES = {
+  'admin@planexpand.com.br': {
+    senha: 'mapxpand2025',
+    nome: 'Ricardo Chaves',
+    empresa: 'PLANEXPAND',
+    role: 'admin',
+    cor: '#0B132B',
+    logo: null,
+    segmento: 'admin',
+    unidades: [],
+    plano: 'Admin'
+  },
+  'ceo@dfinefit.com.br': {
+    senha: 'dfinefit2025',
+    nome: 'CEO D.Finefit',
+    empresa: 'D.Finefit Academia',
+    role: 'cliente',
+    cor: '#1a1a2e',
+    corAcento: '#e94560',
+    logo: null,
+    segmento: 'academia',
+    plano: 'Professional',
+    unidades: [
+      {name:'D.Finefit — Campo Limpo', lat:-23.6491, lng:-46.7481, pop:'82.400', renda:'R$ 2.800', score:78},
+      {name:'D.Finefit — Jd. Jacira',  lat:-23.6374, lng:-46.7430, pop:'43.200', renda:'R$ 2.200', score:71},
+      {name:'D.Finefit — Jd. Niterói', lat:-23.6540, lng:-46.7258, pop:'61.800', renda:'R$ 3.100', score:83}
+    ]
+  },
+  'demo@mapxpand.com.br': {
+    senha: 'demo123',
+    nome: 'Usuário Demo',
+    empresa: 'Empresa Teste',
+    role: 'cliente',
+    cor: '#0B132B',
+    corAcento: '#C6A664',
+    logo: null,
+    segmento: 'varejo',
+    plano: 'Starter',
+    unidades: []
+  }
+};
+
+let clienteAtivo = null;
+
+function fazerLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const senha = document.getElementById('login-senha').value;
+  const erro  = document.getElementById('login-erro');
+  const btn   = document.getElementById('login-btn');
+
+  if (!email || !senha) {
+    erro.textContent = 'Preencha e-mail e senha.';
+    erro.style.display = 'block';
+    return;
+  }
+
+  btn.textContent = 'Verificando...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    const cliente = CLIENTES[email];
+    if (!cliente || cliente.senha !== senha) {
+      erro.textContent = 'E-mail ou senha incorretos.';
+      erro.style.display = 'block';
+      btn.textContent = 'ENTRAR NA PLATAFORMA';
+      btn.disabled = false;
+      return;
+    }
+
+    clienteAtivo = { ...cliente, email };
+    document.getElementById('login-screen').style.display = 'none';
+    inicializarParaCliente(clienteAtivo);
+  }, 800);
+}
+
+function inicializarParaCliente(cliente) {
+  // Atualiza header com dados do cliente
+  const logoTxt = document.querySelector('.logo-title');
+  const logoSub  = document.querySelector('.logo-sub');
+  if (logoTxt) {
+    if (cliente.role === 'admin') {
+      logoTxt.innerHTML = 'MAP<span style="color:#C6A664">X</span>PAND';
+      logoSub.textContent = 'Painel Admin';
+    } else {
+      logoTxt.innerHTML = `<span style="font-size:13px;letter-spacing:.06em">${cliente.empresa}</span>`;
+      logoSub.textContent = 'by MapXpand';
+    }
+  }
+
+  // Adiciona info do usuário no header
+  const head = document.getElementById('sidebar-head');
+  if (head && !document.getElementById('user-info')) {
+    const userInfo = document.createElement('div');
+    userInfo.id = 'user-info';
+    userInfo.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 16px;background:rgba(0,0,0,.2);border-bottom:1px solid rgba(198,166,100,.1);flex-shrink:0';
+    userInfo.innerHTML = `
+      <div style="display:flex;align-items:center;gap:7px">
+        <div style="width:22px;height:22px;border-radius:50%;background:rgba(198,166,100,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="#C6A664" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="#C6A664" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.85);line-height:1">${cliente.nome}</div>
+          <div style="font-size:9px;color:rgba(198,166,100,.6);margin-top:1px">${cliente.plano} · ${cliente.empresa}</div>
+        </div>
+      </div>
+      <div onclick="fazerLogout()" title="Sair" style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.06);transition:background .2s"
+        onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round"/></svg>
+        <span style="font-size:9px;color:rgba(255,255,255,.4)">Sair</span>
+      </div>
+    `;
+    // Insere APÓS o sidebar-head, não dentro dele
+    head.insertAdjacentElement('afterend', userInfo);
+  }
+
+  // Carrega unidades do cliente no mapa
+  if (cliente.unidades && cliente.unidades.length > 0) {
+    // Limpa e recarrega as unidades da rede no mapa
+    layers.dfinefit.clearLayers();
+    cliente.unidades.forEach(u => {
+      const icon = L.divIcon({
+        className: '', iconSize:[0,0],
+        html: `<div style="background:#0B132B;color:#C6A664;border:2px solid #C6A664;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;white-space:nowrap;font-family:Inter,sans-serif">${u.name.split('—')[0].trim()}</div>`
+      });
+      L.marker([u.lat, u.lng], {icon})
+        .bindPopup(`<strong>${u.name}</strong><br>Pop: ${u.pop} hab<br>Renda: ${u.renda}<br>Score: ${u.score}/100`)
+        .addTo(layers.dfinefit);
+    });
+
+    // Centraliza mapa nas unidades do cliente
+    if (cliente.unidades.length > 0) {
+      const lats = cliente.unidades.map(u => u.lat);
+      const lngs = cliente.unidades.map(u => u.lng);
+      const bounds = [[Math.min(...lats)-0.05, Math.min(...lngs)-0.05], [Math.max(...lats)+0.05, Math.max(...lngs)+0.05]];
+      map.fitBounds(bounds);
+    }
+  }
+
+  // Badge do plano no sidebar
+  const planoEl = document.getElementById('plano-badge');
+  if (!planoEl) {
+    const badge = document.createElement('div');
+    badge.id = 'plano-badge';
+    badge.style.cssText = 'margin:0 18px 0;padding:6px 12px;background:rgba(198,166,100,.1);border:1px solid rgba(198,166,100,.2);border-radius:8px;font-size:10px;font-weight:700;color:#C6A664;text-align:center;letter-spacing:.08em';
+    badge.textContent = `Plano ${cliente.plano} — ${cliente.empresa}`;
+    const sb = document.getElementById('sidebar-body');
+    if (sb) sb.prepend(badge);
+  }
+}
+
+function fazerLogout() {
+  clienteAtivo = null;
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-senha').value = '';
+  document.getElementById('login-erro').style.display = 'none';
+  document.getElementById('login-btn').textContent = 'ENTRAR NA PLATAFORMA';
+  document.getElementById('login-btn').disabled = false;
+  document.getElementById('login-screen').style.display = 'flex';
+  const planoEl = document.getElementById('plano-badge');
+  if (planoEl) planoEl.remove();
+  const userInfo = document.getElementById('user-info');
+  if (userInfo) userInfo.remove();
+}
+
+function mostrarCadastro() {
+  document.getElementById('cadastro-modal').style.display = 'flex';
+}
+
+function fecharCadastro() {
+  document.getElementById('cadastro-modal').style.display = 'none';
+}
+
+function enviarSolicitacao() {
+  const nome  = document.getElementById('cad-nome').value;
+  const emp   = document.getElementById('cad-empresa').value;
+  const email = document.getElementById('cad-email').value;
+  const wa    = document.getElementById('cad-whats').value;
+  if (!nome || !email) { alert('Preencha nome e e-mail.'); return; }
+  // Abre WhatsApp para Ricardo com os dados
+  const msg = encodeURIComponent(`Novo lead MapXpand!\nNome: ${nome}\nEmpresa: ${emp}\nEmail: ${email}\nWhatsApp: ${wa}`);
+  window.open(`https://wa.me/5513982305997?text=${msg}`, '_blank');
+  fecharCadastro();
+  alert('Solicitação enviada! Ricardo entrará em contato em breve.');
+}
+
+window.fazerLogin = fazerLogin;
+
+// ═══════════════════════════════════════════════════════
+// MAPA DE CALOR DEMOGRÁFICO
+// Usa pontos dos municípios SP/MG com peso pela população
+// ═══════════════════════════════════════════════════════
+
+let heatLayer = null;
+let heatAtivo = false;
+
+// Coordenadas dos principais municípios SP com lat/lng reais
+const MUNICIPIOS_SP_COORDS = [
+  [-23.5505,-46.6333,12396372],[-23.4543,-46.5333,1404694],[-22.9056,-47.0608,1223237],
+  [-23.6939,-46.5650,849874],  [-23.1896,-45.8841,737310],  [-23.6637,-46.5383,723889],
+  [-21.1704,-47.8103,720116],  [-23.5325,-46.7919,701428],  [-23.5015,-47.4526,695328],
+  [-23.9608,-46.3336,433991],  [-23.5228,-46.8353,405375],  [-23.6678,-46.4614,481725],
+  [-23.6228,-46.5500,162763],  [-22.3246,-49.0710,381706],  [-23.1864,-46.8964,426935],
+  [-22.7253,-47.6480,410275],  [-23.6861,-46.6228,429550],  [-23.4867,-46.3486,379082],
+  [-23.5228,-46.1875,455587],  [-20.5386,-47.4008,358539],  [-24.0056,-46.4025,336454],
+  [-22.5644,-47.4017,310783],  [-23.5422,-46.3119,303397],  [-23.6050,-46.7728,297528],
+  [-23.0266,-45.5556,320820],  [-23.6039,-46.9192,257882],  [-23.5053,-46.8764,279704],
+  [-23.6492,-46.8522,279264],  [-23.0900,-47.2194,260690],  [-22.7386,-47.3319,244370],
+  [-23.5228,-46.8353,405375],  [-23.1042,-46.5500,426935],  [-22.9056,-47.0608,237570],
+  [-23.5250,-46.6100,289875],  [-23.4867,-46.2000,237119],  [-23.3200,-46.8000,179574],
+  [-23.3500,-46.5500,179372],  [-23.5500,-46.8700,158438],  [-23.1600,-45.7800,171885],
+  [-20.8167,-49.3833,199210],  [-21.7856,-48.1756,240542],  [-21.9900,-47.8800,136739],
+  [-22.7400,-47.3300,246285],  [-23.0900,-47.2200,260690],  [-23.1400,-47.0600,114508],
+  [-22.8900,-47.0800,172346],  [-21.5300,-48.5000,123546],  [-21.1700,-47.8100,720116],
+  [-23.6250,-46.6200,429550],  [-23.0500,-45.5800,320820],  [-23.5015,-47.4526,149718]
+];
+
+const MUNICIPIOS_MG_COORDS = [
+  [-19.9167,-43.9345,2530701],[-18.9186,-48.2772,706597],[-19.9317,-44.0536,673849],
+  [-21.7642,-43.3503,577532], [-19.9683,-44.1986,450024],[-16.7286,-43.8647,417478],
+  [-19.7639,-44.0864,341415], [-19.7500,-47.9306,340277],[-18.8514,-41.9494,282164],
+  [-19.4681,-42.5361,267333], [-19.4658,-44.2453,243950],[-20.1389,-44.8839,242505],
+  [-19.8856,-43.8075,137877], [-19.7714,-43.8536,221705],[-21.7878,-46.5614,169838],
+  [-18.5786,-46.5183,154641], [-19.5181,-42.6283,110709],[-19.6192,-43.2258,121717],
+  [-21.5514,-45.4306,137608], [-21.2450,-45.0000,105756],[-20.9000,-44.4200,139061],
+  [-19.6500,-43.9000,65149],  [-20.1200,-44.9200,67956], [-18.0000,-43.2000,47924],
+  [-19.7500,-47.9300,108403], [-20.4667,-54.6201,94539], [-19.7500,-44.0000,95616]
+];
+
+function construirHeatmapData() {
+  const pts = [];
+  const maxPop = 12396372;
+
+  [...MUNICIPIOS_SP_COORDS, ...MUNICIPIOS_MG_COORDS].forEach(([lat, lng, pop]) => {
+    const intensidade = Math.pow(pop / maxPop, 0.35); // escala logarítmica suave
+    pts.push([lat, lng, intensidade]);
+
+    // Adiciona pontos satélites ao redor para suavizar o heatmap
+    if (pop > 100000) {
+      const offset = 0.04;
+      const fator = intensidade * 0.4;
+      pts.push([lat+offset, lng, fator], [lat-offset, lng, fator],
+               [lat, lng+offset, fator], [lat, lng-offset, fator]);
+    }
+  });
+  return pts;
+}
+
+function toggleHeatmap(labelEl) {
+  const cb = document.getElementById('cb-heatmap');
+  heatAtivo = !heatAtivo;
+  cb.checked = heatAtivo;
+
+  if (heatAtivo) {
+    if (!heatLayer) {
+      const pts = construirHeatmapData();
+      heatLayer = L.heatLayer(pts, {
+        radius: 35,
+        blur: 25,
+        maxZoom: 13,
+        max: 1.0,
+        gradient: {
+          0.0: '#313695',
+          0.2: '#4575b4',
+          0.35: '#74add1',
+          0.5: '#abd9e9',
+          0.6: '#ffffbf',
+          0.75: '#fdae61',
+          0.85: '#f46d43',
+          1.0: '#d73027'
+        }
+      });
+    }
+    heatLayer.addTo(map);
+  } else {
+    if (heatLayer) map.removeLayer(heatLayer);
+  }
+}
+window.toggleHeatmap = toggleHeatmap;
+
+// ═══════════════════════════════════════════════════════
+// BUSCA AUTOMÁTICA DE CONCORRENTES — Google Places API
+// ═══════════════════════════════════════════════════════
+
+let concorrentesAutoLayer = L.layerGroup();
+let concorrentesAutoAtivo = false;
+let ultimaBuscaPos = null;
+
+const SEGMENTO_TIPOS = {
+  academia: { tipo: 'gym', label: 'Academia', cor: '#ef4444', emoji: '🏋️' },
+  farmacia: { tipo: 'pharmacy', label: 'Farmácia', cor: '#10b981', emoji: '💊' },
+  varejo:   { tipo: 'store', label: 'Loja', cor: '#3b82f6', emoji: '🏪' },
+  admin:    { tipo: 'gym', label: 'Academia', cor: '#ef4444', emoji: '🏋️' }
+};
+
+async function buscarConcorrentesAuto(lat, lng, forcar = false) {
+  if (!concorrentesAutoAtivo) return;
+
+  const posKey = `${lat.toFixed(3)}_${lng.toFixed(3)}`;
+  if (!forcar && ultimaBuscaPos === posKey) return;
+  ultimaBuscaPos = posKey;
+
+  const segmento = clienteAtivo?.segmento || 'academia';
+  const config = SEGMENTO_TIPOS[segmento] || SEGMENTO_TIPOS.academia;
+  const GMAPS_KEY = 'AIzaSyBxf8WQy6U7eiO_QYQ6KMxPANrFElcQy_Y';
+
+  // Raio atual do slider (em km → metros)
+  // Pega raio do slider (pode ser .raio-val, texto "2 km", ou input range)
+  const raioTxt = document.querySelector('.raio-val')?.textContent
+    || document.querySelector('[class*=raio] output')?.textContent || '2';
+  const raioKm = parseFloat(raioTxt) || 2;
+  const raioMetros = Math.min(raioKm * 1000, 5000);
+
+  // Mapeia segmento para tipo Places API (New)
+  const tipoPlaces = {
+    gym: 'gym', pharmacy: 'pharmacy', store: 'store',
+    academia: 'gym', farmacia: 'pharmacy', varejo: 'store', admin: 'gym'
+  };
+  const includedType = tipoPlaces[config.tipo] || tipoPlaces[segmento] || 'gym';
+
+  const label = document.querySelector('#cb-concorrentes-auto + .cb-label');
+  if (label) label.textContent = '📍 Buscando concorrentes...';
+
+  try {
+    // Google Places API (New) — aceita CORS do browser diretamente
+    // Tenta chamada direta primeiro (funciona no GitHub Pages)
+    let data = null;
+    try {
+      const resp = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': GMAPS_KEY,
+          'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.location,places.regularOpeningHours,places.businessStatus'
+        },
+        body: JSON.stringify({
+          includedTypes: [includedType],
+          maxResultCount: 20,
+          locationRestriction: { circle: { center: { latitude: lat, longitude: lng }, radius: raioMetros } },
+          languageCode: 'pt-BR'
+        }),
+        signal: AbortSignal.timeout(8000)
+      });
+      data = await resp.json();
+      if (data.error) throw new Error(data.error.message);
+    } catch(e1) {
+      // Fallback: proxy via allorigins
+      try {
+        const body = JSON.stringify({
+          includedTypes: [includedType], maxResultCount: 20,
+          locationRestriction: { circle: { center: { latitude: lat, longitude: lng }, radius: raioMetros } },
+          languageCode: 'pt-BR'
+        });
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://places.googleapis.com/v1/places:searchNearby')}`;
+        const resp2 = await fetch(proxyUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': GMAPS_KEY,
+            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.location,places.regularOpeningHours,places.businessStatus'
+          },
+          body,
+          signal: AbortSignal.timeout(10000)
+        });
+        data = await resp2.json();
+      } catch(e2) { throw new Error('API indisponível'); }
+    }
+    if (!data || data.error) throw new Error(data?.error?.message || 'Sem dados');
+
+    const places = data.places || [];
+    concorrentesAutoLayer.clearLayers();
+
+    places.forEach(place => {
+      const plat = place.location?.latitude;
+      const plng = place.location?.longitude;
+      if (!plat || !plng) return;
+
+      const nome = place.displayName?.text || 'Concorrente';
+      const end  = place.formattedAddress || '';
+      const rat  = place.rating ? `⭐ ${place.rating}` : '';
+      const aberto = place.regularOpeningHours?.openNow ? '🟢 Aberto agora' : '';
+      const status = place.businessStatus === 'OPERATIONAL' ? '' : '⚠️ Fechado/Temporário';
+      const nomeShort = nome.length > 22 ? nome.substring(0,22)+'…' : nome;
+
+      const icon = L.divIcon({
+        className: '',
+        iconSize: [0,0],
+        html: `<div style="
+          background:${config.cor};color:#fff;
+          border:2px solid rgba(255,255,255,.8);border-radius:7px;
+          padding:4px 8px;font-size:10px;font-weight:700;
+          white-space:nowrap;font-family:Inter,sans-serif;
+          box-shadow:0 2px 10px rgba(0,0,0,.35);
+          cursor:pointer
+        ">${config.emoji} ${nomeShort}</div>`
+      });
+
+      L.marker([plat, plng], {icon})
+        .bindPopup(`
+          <div style="font-family:Inter,sans-serif;min-width:180px;max-width:240px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">${nome}</div>
+            <div style="font-size:10px;color:#64748b;margin-bottom:6px;line-height:1.4">${end}</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+              ${rat ? `<span>${rat}</span>` : ''}
+              ${aberto ? `<span style="color:#16a34a">${aberto}</span>` : ''}
+              ${status ? `<span style="color:#dc2626">${status}</span>` : ''}
+            </div>
+            <div style="margin-top:6px;font-size:10px;font-weight:700;color:${config.cor};
+              background:${config.cor}18;padding:2px 8px;border-radius:4px;display:inline-block">
+              ${config.label}
+            </div>
+          </div>
+        `)
+        .addTo(concorrentesAutoLayer);
+    });
+
+    concorrentesAutoLayer.addTo(map);
+    if (label) label.textContent = `📍 Concorrentes (${places.length} encontrados)`;
+
+  } catch(e) {
+    console.warn('Places API (New) falhou, usando Overpass:', e.message);
+    buscarConcorrentesOverpass(lat, lng);
+  }
+}
+
+async function buscarConcorrentesOverpass(lat, lng) {
+  const delta = 0.05;
+  const bbox = `${lat-delta},${lng-delta},${lat+delta},${lng+delta}`;
+  const query = `[out:json][timeout:10];(node["leisure"="fitness_centre"](${bbox});node["amenity"="gym"](${bbox});way["leisure"="fitness_centre"](${bbox}););out center;`;
+
+  try {
+    const r = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`, {signal: AbortSignal.timeout(8000)});
+    const d = await r.json();
+    concorrentesAutoLayer.clearLayers();
+
+    (d.elements || []).forEach(el => {
+      const plat = el.lat || el.center?.lat;
+      const plng = el.lon || el.center?.lon;
+      const nome = el.tags?.name || 'Academia';
+      if (!plat || !plng) return;
+
+      const icon = L.divIcon({
+        className:'', iconSize:[0,0],
+        html:`<div style="background:#ef4444;color:#fff;border:2px solid #fff;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:700;white-space:nowrap;font-family:Inter,sans-serif">🏋️ ${nome.substring(0,18)}</div>`
+      });
+      L.marker([plat, plng], {icon})
+        .bindPopup(`<strong>${nome}</strong><br><small>Concorrente — OSM</small>`)
+        .addTo(concorrentesAutoLayer);
+    });
+
+    if (d.elements?.length > 0) {
+      concorrentesAutoLayer.addTo(map);
+      const label = document.querySelector('#cb-concorrentes-auto + .cb-label');
+      if (label) label.textContent = `📍 Concorrentes (${d.elements.length} OSM)`;
+    }
+  } catch(e) { console.warn('Overpass fallback falhou:', e); }
+}
+
+function toggleConcorrentesAuto(labelEl) {
+  const cb = document.getElementById('cb-concorrentes-auto');
+  concorrentesAutoAtivo = !concorrentesAutoAtivo;
+  cb.checked = concorrentesAutoAtivo;
+
+  if (concorrentesAutoAtivo) {
+    const centro = map.getCenter();
+    buscarConcorrentesAuto(centro.lat, centro.lng, true);
+  } else {
+    concorrentesAutoLayer.clearLayers();
+    map.removeLayer(concorrentesAutoLayer);
+    const label = document.querySelector('#cb-concorrentes-auto + .cb-label');
+    if (label) label.textContent = '📍 Buscar Concorrentes (Auto)';
+  }
+}
+window.toggleConcorrentesAuto = toggleConcorrentesAuto;
+
+window.fazerLogout = fazerLogout;
+window.mostrarCadastro = mostrarCadastro;
+window.fecharCadastro = fecharCadastro;
+window.enviarSolicitacao = enviarSolicitacao;
+
+window.detectarTipoInput = detectarTipoInput;
+
+
+// ═══════════════════════════════════════════════════════════════════
+// SISTEMA DE RELATÓRIO TÉCNICO MAPXPAND
+// ═══════════════════════════════════════════════════════════════════
+
+// Busca vias principais via Overpass API (adaptado do Nova Fit)
+let topViasData = [];
+let overpassCache = {};
+
+async function buscarViasOverpass(lat, lng, raioMetros) {
+  const cacheKey = `${lat.toFixed(3)}_${lng.toFixed(3)}_${raioMetros}`;
+  if (overpassCache[cacheKey]) return overpassCache[cacheKey];
+
+  const delta = (raioMetros / 111320) + 0.01;
+  const bbox = `${lat-delta},${lng-delta},${lat+delta},${lng+delta}`;
+  const query = `[out:json][timeout:15];(way["highway"~"trunk|primary|secondary"](${bbox}););out geom;`;
+
+  const mirrors = [
+    'https://lz4.overpass-api.de/api/interpreter',
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter'
+  ];
+
+  const vmdPorTipo = { trunk:65000, motorway:65000, primary:35000, secondary:18000 };
+  const vias = [];
+
+  for (const mirror of mirrors) {
+    try {
+      const r = await fetch(mirror + '?data=' + encodeURIComponent(query), { signal: AbortSignal.timeout(12000) });
+      if (!r.ok) continue;
+      const data = await r.json();
+      if (!data.elements) continue;
+
+      data.elements.forEach(el => {
+        if (el.type !== 'way' || !el.tags) return;
+        const nome = el.tags.name;
+        if (!nome) return;
+        const vmd = vmdPorTipo[el.tags.highway] || 10000;
+        const existente = vias.find(v => v.nome === nome);
+        if (!existente) vias.push({ nome, vmd });
+        else if (vmd > existente.vmd) existente.vmd = vmd;
+      });
+
+      overpassCache[cacheKey] = vias;
+      return vias;
+    } catch(e) { continue; }
+  }
+  return vias;
+}
+
+// Formata número brasileiro
+function fmtNum(n) {
+  return new Intl.NumberFormat('pt-BR').format(Math.round(n));
+}
+
+// Abre/fecha modal
+function fecharRelatorio() {
+  document.getElementById('relatorio-modal').classList.remove('show');
+}
+
+function anexarImagem(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('rep-mapa-img');
+    const ph = document.getElementById('rep-mapa-placeholder');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    ph.style.display = 'none';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+async function exportarPDF() {
+  const btn = document.getElementById('btn-pdf');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '⌛ Gerando...';
+  btn.disabled = true;
+  try {
+    await html2pdf().set({
+      margin:0, filename:'MapXpand_Relatorio_Tecnico.pdf',
+      image:{type:'jpeg',quality:1},
+      html2canvas:{scale:3,useCORS:true,logging:false},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+    }).from(document.getElementById('rep-container')).save();
+  } catch(e) { console.error('PDF error:', e); }
+  btn.innerHTML = orig;
+  btn.disabled = false;
+}
+
+function exportarWord() {
+  const css = '<style>body{font-family:Arial,sans-serif}.ri-card{border:1pt solid #e2e8f0;padding:8pt;}</style>';
+  const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office'><head><meta charset='utf-8'>" + css + "</head><body>";
+  const blob = new Blob([header + document.getElementById('rep-container').innerHTML + '</body></html>'], {type:'application/msword'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'MapXpand_Relatorio.doc';
+  a.click();
+}
+
+// FUNÇÃO PRINCIPAL — Gerar Relatório
+async function gerarRelatorio() {
+  const btn = document.getElementById('btn-gerar-relatorio');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span style="opacity:.7">Calculando vias...</span>';
+  btn.disabled = true;
+
+  try {
+    // 1. Pega dados do estado atual da análise
+    const lat = map.getCenter().lat;
+    const lng = map.getCenter().lng;
+    const raio = parseInt(document.querySelector('#raio-slider,#raio-input,[id*=raio]')?.value || 2000);
+    const pop = parseInt(document.querySelector('#ar-pop,#pop-display,[id*=pop]')?.textContent?.replace(/\D/g,'') || 0);
+    const renda = parseInt(document.querySelector('#ar-renda,[id*=renda]')?.textContent?.replace(/\D/g,'').replace('R$','') || 0);
+    const score = parseInt(document.querySelector('#ar-score-num,[id*=score]')?.textContent || 0);
+    const enderecoAnalisado = document.querySelector('#ar-addr,[id*=addr]')?.textContent || '';
+
+    // Dados dos campos de concorrência
+    const qtdBairro = parseInt(document.getElementById('gyms-bairro')?.value || 0);
+    const qtdRede = parseInt(document.getElementById('gyms-rede')?.value || 0);
+
+    // 2. Busca IBGE
+    const ibge = extrairMunicipio(enderecoAnalisado) || getDadosIBGE(lat, lng);
+
+    // 3. Busca vias via Overpass
+    const vias = await buscarViasOverpass(lat, lng, raio);
+    const top3 = vias.sort((a,b) => b.vmd - a.vmd).slice(0, 3);
+
+    // 4. Cálculo do fluxo viário médio
+    const fluxoMedio = top3.length > 0
+      ? Math.round(top3.reduce((s,v) => s + v.vmd, 0) / top3.length * 1.15)
+      : Math.round((ibge?.pop || pop) * 0.3);
+
+    // 5. Matemática final (metodologia Nova Fit adaptada)
+    const convPop = Math.round((ibge?.pop || pop) * 0.07);
+    const convFluxo = Math.round(fluxoMedio * 0.02);
+    const satBairro = qtdBairro * 125;
+    const split = qtdRede + 1;
+    let projFinal = Math.round((convPop + convFluxo - satBairro) / split);
+    if (projFinal < 0) projFinal = 0;
+
+    // 6. Preenche o relatório
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    document.getElementById('rep-data').textContent = hoje;
+    document.getElementById('rep-estado').textContent = ibge?.uf || 'SP';
+    document.getElementById('rep-municipio').textContent = ibge?.nome || 'São Paulo';
+    document.getElementById('rep-loc-nome').textContent = enderecoAnalisado || 'Ponto Analisado';
+    document.getElementById('rep-loc-coords').textContent = `LAT: ${lat.toFixed(4)} | LNG: ${lng.toFixed(4)} | RAIO: ${raio}m | SCORE: ${score}/100`;
+
+    const popDisplay = ibge?.pop || pop;
+    document.getElementById('rep-pop-val').textContent = fmtNum(popDisplay);
+    document.getElementById('rep-pop-conv').textContent = `Conversão (7%): ${fmtNum(convPop)}`;
+    document.getElementById('rep-fluxo-val').textContent = fmtNum(fluxoMedio);
+    document.getElementById('rep-fluxo-vitrine').textContent = `Vitrine (2%): ${fmtNum(convFluxo)}`;
+
+    document.getElementById('rep-concorrentes-bairro').textContent = `${String(qtdBairro).padStart(2,'0')} Unidades`;
+    document.getElementById('rep-saturacao-bairro').textContent = `Saturação: -${fmtNum(satBairro)} Alunos`;
+    document.getElementById('rep-concorrentes-rede').textContent = `${String(qtdRede).padStart(2,'0')} Unidades`;
+    document.getElementById('rep-split-rede').textContent = `Rateio: ${split} player(s)`;
+    document.getElementById('rep-proj-val').textContent = fmtNum(projFinal);
+
+    // 7. Veredito dinâmico
+    const vBox = document.getElementById('rep-veredito-box');
+    const vTit = document.getElementById('rep-veredito-titulo');
+    const vMsg = document.getElementById('rep-veredito-msg');
+    const vParecer = document.getElementById('rep-parecer');
+
+    if (projFinal >= 1500) {
+      vBox.style.cssText = 'background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:14px 18px;text-align:center;margin-bottom:12px';
+      vTit.style.color = '#16a34a'; vTit.textContent = 'Viabilidade Aprovada ✓';
+      vMsg.innerHTML = 'EXCELENTE. Potencial supera a meta de 1.500 alunos.<br>Avançar imediatamente para negociação comercial.';
+      vMsg.style.color = '#14532d';
+      vParecer.textContent = `Score MAPXpand: ${score}/100. Região apresenta volume demográfico e fluxo suficientes. A base de ${fmtNum(popDisplay)} habitantes no raio, com concorrência gerenciável (${qtdBairro + qtdRede} players), sustenta operação rentável. Parecer FAVORÁVEL para avanço da negociação comercial do ponto.`;
+    } else if (projFinal >= 1000) {
+      vBox.style.cssText = 'background:#fffbeb;border:2px solid #d97706;border-radius:12px;padding:14px 18px;text-align:center;margin-bottom:12px';
+      vTit.style.color = '#d97706'; vTit.textContent = 'Viabilidade Condicionada';
+      vMsg.innerHTML = 'ATENÇÃO: Abaixo da meta (1.500 un).<br>Exige aluguel reduzido e pré-venda agressiva.';
+      vMsg.style.color = '#9a3412';
+      vParecer.textContent = `Score MAPXpand: ${score}/100. Potencial intermediário. A concorrência local (${qtdBairro + qtdRede} players) e densidade populacional forçam rateio. Projeto viável com incentivos imobiliários (carência/desconto no aluguel) e foco em pré-venda antes da inauguração.`;
+    } else {
+      vBox.style.cssText = 'background:#fef2f2;border:2px solid #dc2626;border-radius:12px;padding:14px 18px;text-align:center;margin-bottom:12px';
+      vTit.style.color = '#dc2626'; vTit.textContent = 'Risco Elevado — Reprovado';
+      vMsg.innerHTML = 'OPERAÇÃO DEFICITÁRIA.<br>Captação prevista não sustenta os custos fixos.';
+      vMsg.style.color = '#7f1d1d';
+      vParecer.textContent = `Score MAPXpand: ${score}/100. Saturação da concorrência combinada com fluxo insuficiente projeta operação abaixo do break-even. Comitê recomenda rejeição do ponto e busca por novos eixos na zona analítica.`;
+    }
+
+    // 8. Top vias
+    const ulVias = document.getElementById('rep-top-vias');
+    ulVias.innerHTML = top3.length > 0
+      ? top3.map((v,i) => `<li style="margin-bottom:5px;display:flex;align-items:start;gap:6px"><span style="background:#0B132B;color:#C6A664;border-radius:3px;padding:1px 5px;font-size:8px;flex-shrink:0">#${i+1}</span><div><span style="display:block">${v.nome}</span><span style="font-size:8px;font-weight:600;color:#64748b">~${fmtNum(v.vmd * 1.15)} passantes/dia</span></div></li>`).join('')
+      : '<li style="list-style:none;margin-left:-14px;color:#ef4444;font-size:9px">Nenhuma via arterial detectada. Avaliar imóveis de esquina.</li>';
+
+    // 9. Box IBGE
+    if (ibge && ibge.pop) {
+      document.getElementById('rep-ibge-box').style.display = 'block';
+      document.getElementById('rep-ibge-content').innerHTML =
+        `<strong>${ibge.nome}</strong> — ${ibge.uf} &nbsp;|&nbsp; Pop: <strong>${fmtNum(ibge.pop)}</strong> hab (Censo 2022)`;
+    }
+
+    // Abre o modal
+    document.getElementById('relatorio-modal').classList.add('show');
+
+  } catch(e) {
+    console.error('Erro ao gerar relatório:', e);
+    alert('Erro ao gerar relatório. Clique em um ponto no mapa primeiro.');
+  }
+
+  btn.innerHTML = orig;
+  btn.disabled = false;
+}
+window.gerarRelatorio = gerarRelatorio;
+window.fecharRelatorio = fecharRelatorio;
+window.anexarImagem = anexarImagem;
+window.exportarPDF = exportarPDF;
+window.exportarWord = exportarWord;
+
+
+// ═══════════════════════════════════
+// MODO PIN — adicionar pins de análise
+// ═══════════════════════════════════
+let modoPIN = false;
+let pinsLayer = L.layerGroup().addTo(map);
+let pinContador = 0;
+const COR_PINS = ['#C6A664','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899'];
+
+function toggleModoPIN() {
+  modoPIN = !modoPIN;
+  const btn = document.getElementById('btn-pin-modo');
+  if (modoPIN) {
+    btn.style.background = 'rgba(198,166,100,.12)';
+    btn.style.borderColor = '#C6A664';
+    btn.style.color = '#C6A664';
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#C6A664"/></svg>Modo PIN ativo — clique no mapa`;
+    map.getContainer().style.cursor = 'crosshair';
+  } else {
+    btn.style.background = 'transparent';
+    btn.style.borderColor = '#cbd5e1';
+    btn.style.color = '#64748b';
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#94a3b8"/></svg>Clique no mapa para adicionar pin`;
+    map.getContainer().style.cursor = '';
+  }
+}
+window.toggleModoPIN = toggleModoPIN;
+
+function removerPin(id) {
+  pinsLayer.eachLayer(l => { if (l._pinId === id) pinsLayer.removeLayer(l); });
+}
+window.removerPin = removerPin;
+
+function limparTodosPins() {
+  pinsLayer.clearLayers();
+  pinContador = 0;
+}
+window.limparTodosPins = limparTodosPins;
+
+// CLIQUE NO MAPA
+map.on('click', async e => {
+  const { lat, lng } = e.latlng;
+
+  if (modoPIN) {
+    // Adiciona pin numerado para análise
+    pinContador++;
+    const id   = pinContador;
+    const cor  = COR_PINS[(id - 1) % COR_PINS.length];
+    const label = await reverseGeocode(lat, lng);
+
+    const icon = L.divIcon({
+      className: '', iconSize: [0,0],
+      html: `<div style="
+        background:${cor};color:#fff;
+        border:2px solid #fff;border-radius:50% 50% 50% 0;
+        width:32px;height:32px;
+        display:flex;align-items:center;justify-content:center;
+        font-size:13px;font-weight:700;font-family:Inter,sans-serif;
+        box-shadow:0 3px 12px rgba(0,0,0,.35);
+        transform:rotate(-45deg);cursor:pointer
+      "><span style="transform:rotate(45deg)">${id}</span></div>`
+    });
+
+    const marker = L.marker([lat, lng], {icon});
+    marker._pinId = id;
+
+    // Gera score rápido para o popup
+    const ibge = getDadosIBGE(lat, lng);
+    const pop  = ibge?.pop ? new Intl.NumberFormat('pt-BR').format(ibge.pop) : '—';
+
+    marker.bindPopup(`
+      <div style="font-family:Inter,sans-serif;min-width:200px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="width:24px;height:24px;border-radius:50%;background:${cor};display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">${id}</div>
+          <div style="font-size:12px;font-weight:700;color:#0B132B;line-height:1.3">${label?.split(',').slice(0,2).join(',') || 'Ponto '+id}</div>
+        </div>
+        <div style="font-size:10px;color:#64748b;margin-bottom:8px">${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
+        ${ibge ? `<div style="font-size:11px;background:#f1f5f9;border-radius:6px;padding:6px 8px;margin-bottom:8px">
+          📍 ${ibge.nome}/${ibge.uf} &nbsp;·&nbsp; 👥 ${pop} hab
+        </div>` : ''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="analyse(${lat},${lng},'${(label||'').replace(/'/g,'').substring(0,40)}')"
+            style="background:#0B132B;color:#C6A664;border:none;border-radius:6px;padding:5px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">
+            📊 Analisar
+          </button>
+          <button onclick="removerPin(${id})"
+            style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">
+            🗑 Remover
+          </button>
+        </div>
+      </div>
+    `, {maxWidth: 260});
+
+    marker.addTo(pinsLayer);
+    marker.openPopup();
+    analyse(lat, lng, label);
+    return;
+  }
+
+  // Clique normal — analisa sem pin
+  const label = await reverseGeocode(lat, lng);
+  analyse(lat, lng, label);
+});
+
+function showSearchError(msg){
+  const el=document.getElementById('analysisResult');
+  el.style.display='block';
+  el.innerHTML=`<div style="background:#fff5f5;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;margin-top:10px">
+    <div style="font-size:12px;font-weight:700;color:#b91c1c;margin-bottom:5px">Endereço não encontrado</div>
+    <div style="font-size:11px;color:#64748b;line-height:1.6">${msg}</div>
+  </div>`;
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL RELATÓRIO TÉCNICO MAPXPAND
+═══════════════════════════════════════════════ -->
+<div id="relatorio-modal">
+  <div class="rel-controles no-print">
+    <button class="rel-btn" onclick="fecharRelatorio()" style="background:#fff;color:#1e293b">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 18L18 6M6 6l12 12" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/></svg>Fechar
+    </button>
+    <label class="rel-btn" style="background:#f59e0b;color:#fff">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>Anexar Mapa
+      <input type="file" id="rep-img-input" style="display:none" accept="image/*" onchange="anexarImagem(this)">
+    </label>
+    <button class="rel-btn" id="btn-pdf" onclick="exportarPDF()" style="background:#0B132B;color:#C6A664">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" stroke="#C6A664" stroke-width="2" stroke-linecap="round"/></svg>Exportar PDF
+    </button>
+    <button class="rel-btn" onclick="exportarWord()" style="background:#2563eb;color:#fff">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM6 4h7v5h5v11H6V4z"/></svg>Exportar Word
+    </button>
+  </div>
+
+  <div id="rep-container" class="a4-page">
+    <!-- HEADER -->
+    <table width="100%" style="border-bottom:5px solid #0B132B;padding-bottom:10px;margin-bottom:14px">
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <svg width="32" height="36" viewBox="0 0 46 58" fill="none">
+              <defs><linearGradient id="rpg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#E8D090"/><stop offset="50%" stop-color="#C6A664"/><stop offset="100%" stop-color="#9A7A3A"/></linearGradient></defs>
+              <path d="M23 2C14 2 7 9.2 7 17.8C7 29.6 23 46 23 46S39 29.6 39 17.8C39 9.2 32 2 23 2Z" fill="url(#rpg)"/>
+              <path d="M23 5C15.3 5 9 11.4 9 17.8C9 29 23 43 23 43S37 29 37 17.8C37 11.4 30.7 5 23 5Z" fill="#0B132B"/>
+              <circle cx="23" cy="17.5" r="11.5" fill="none" stroke="#C6A664" stroke-width="1"/>
+              <ellipse cx="23" cy="17.5" rx="11.5" ry="3.8" fill="none" stroke="#C6A664" stroke-width="0.7" opacity="0.6"/>
+              <line x1="23" y1="7.5" x2="14.5" y2="13" stroke="#C6A664" stroke-width="0.6" opacity="0.7"/>
+              <line x1="23" y1="7.5" x2="31.5" y2="13" stroke="#C6A664" stroke-width="0.6" opacity="0.7"/>
+              <line x1="14.5" y1="13" x2="12" y2="18" stroke="#C6A664" stroke-width="0.6" opacity="0.7"/>
+              <line x1="31.5" y1="13" x2="34" y2="18" stroke="#C6A664" stroke-width="0.6" opacity="0.7"/>
+              <circle cx="23" cy="7.5" r="1.4" fill="#C6A664"/>
+              <circle cx="14.5" cy="13" r="1.1" fill="#C6A664"/>
+              <circle cx="31.5" cy="13" r="1.1" fill="#C6A664"/>
+              <circle cx="12" cy="18" r="1.1" fill="#C6A664"/>
+              <circle cx="34" cy="18" r="1.1" fill="#C6A664"/>
+              <circle cx="16.5" cy="24" r="1.1" fill="#C6A664"/>
+              <circle cx="29.5" cy="24" r="1.1" fill="#C6A664"/>
+              <circle cx="23" cy="27.5" r="1.4" fill="#C6A664"/>
+            </svg>
+            <div>
+              <div style="font-size:22px;font-weight:900;letter-spacing:.14em;color:#0B132B;line-height:1">MAP<span style="color:#C6A664">X</span>PAND</div>
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#94a3b8">Relatório de Viabilidade Técnica — Comitê de Expansão</div>
+            </div>
+          </div>
+        </td>
+        <td align="right" style="font-size:10px;font-weight:700;line-height:1.6;color:#475569">
+          DATA: <span id="rep-data">--/--/----</span><br>
+          ESTADO: <span id="rep-estado">--</span><br>
+          MUNICÍPIO: <span id="rep-municipio">--</span>
+        </td>
+      </tr>
+    </table>
+
+    <!-- LOCALIZAÇÃO -->
+    <div style="margin-bottom:12px">
+      <div style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Localização Analisada</div>
+      <div class="ri-card">
+        <div id="rep-loc-nome" style="font-size:17px;font-weight:800;color:#0B132B;text-transform:uppercase">Ponto de Análise</div>
+        <div id="rep-loc-coords" style="font-size:10px;font-weight:600;color:#64748b;margin-top:2px">LAT: 0 | LNG: 0 | RAIO: 0m</div>
+      </div>
+    </div>
+
+    <!-- ÁREA DO MAPA -->
+    <div id="rep-mapa-area" style="width:100%;height:220px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:12px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center">
+      <div id="rep-mapa-placeholder" style="text-align:center;color:#94a3b8">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="margin-bottom:6px"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase">Clique em "Anexar Mapa" para inserir screenshot</div>
+      </div>
+      <img id="rep-mapa-img" style="width:100%;height:100%;object-fit:cover;display:none">
+    </div>
+
+    <!-- DADOS QUANTITATIVOS -->
+    <table width="100%" style="border-spacing:8px;margin:-8px;margin-bottom:4px">
+      <tr>
+        <td width="50%" valign="top">
+          <div class="ri-card">
+            <div style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase">População no Raio</div>
+            <div id="rep-pop-val" style="font-size:28px;font-weight:900;color:#0B132B;font-style:italic;margin:2px 0">0</div>
+            <div id="rep-pop-conv" style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase">Conversão (7%): 0</div>
+          </div>
+        </td>
+        <td width="50%" valign="top">
+          <div class="ri-card">
+            <div style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase">Fluxo Viário Médio / Dia</div>
+            <div id="rep-fluxo-val" style="font-size:28px;font-weight:900;color:#0B132B;font-style:italic;margin:2px 0">0</div>
+            <div id="rep-fluxo-vitrine" style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase">Vitrine (2%): 0</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- CONCORRÊNCIA -->
+    <table width="100%" style="border-spacing:8px;margin:-8px;margin-bottom:8px">
+      <tr>
+        <td width="50%" valign="top">
+          <div class="ri-card" style="border-left:4px solid #ef4444">
+            <div style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase">Academias de Bairro</div>
+            <div id="rep-concorrentes-bairro" style="font-size:18px;font-weight:900;color:#1e293b;margin:2px 0">00 Unidades</div>
+            <div id="rep-saturacao-bairro" style="font-size:9px;font-weight:700;color:#ef4444;text-transform:uppercase">Saturação: -0 Alunos</div>
+          </div>
+        </td>
+        <td width="50%" valign="top">
+          <div class="ri-card" style="border-left:4px solid #0B132B">
+            <div style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase">Redes Concorrentes</div>
+            <div id="rep-concorrentes-rede" style="font-size:18px;font-weight:900;color:#1e293b;margin:2px 0">00 Unidades</div>
+            <div id="rep-split-rede" style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase">Rateio: 1 player(s)</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- VEREDITO -->
+    <div id="rep-veredito-box" style="background:#fffbeb;border:2px solid #d97706;border-radius:12px;padding:14px 18px;text-align:center;margin-bottom:12px">
+      <div id="rep-veredito-titulo" style="font-size:19px;font-weight:900;color:#d97706;text-transform:uppercase;font-style:italic">Viabilidade Condicionada</div>
+      <table width="100%" style="margin-top:8px">
+        <tr>
+          <td width="45%" align="center" style="border-right:1px solid #fed7aa;padding-right:14px">
+            <div style="font-size:8px;font-weight:900;color:#9a3412;text-transform:uppercase">Projeção Final</div>
+            <div id="rep-proj-val" style="font-size:38px;font-weight:900;color:#0B132B;font-style:italic;line-height:.9">0</div>
+            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase">Alunos Ativos</div>
+          </td>
+          <td align="left" style="padding-left:14px;font-size:10px;font-weight:700;color:#9a3412;line-height:1.4">
+            <div id="rep-veredito-msg">ALERTA: Abaixo da meta.<br>Exige avaliação adicional.</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- PARECER + VIAS -->
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <div style="flex:1.3;background:#f1f5f9;padding:11px 14px;border-radius:8px">
+        <div style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase;margin-bottom:4px">Parecer Técnico</div>
+        <p id="rep-parecer" style="font-size:9px;color:#475569;line-height:1.5;margin:0;text-align:justify">Análise pendente.</p>
+      </div>
+      <div style="flex:1;background:#f8fafc;border:1px dashed #cbd5e1;padding:11px 14px;border-radius:8px">
+        <div style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase;margin-bottom:6px">Top Vias — Implantação</div>
+        <ul id="rep-top-vias" style="margin:0;padding-left:14px;font-size:9px;font-weight:700;color:#0B132B;line-height:1.6">
+          <li>Aguardando análise...</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- DADOS IBGE -->
+    <div id="rep-ibge-box" style="display:none;background:#E6F1FB;border:1px solid #B5D4F4;border-radius:8px;padding:10px 14px;margin-bottom:12px">
+      <div style="font-size:8px;font-weight:900;color:#185FA5;text-transform:uppercase;margin-bottom:4px">Dados Demográficos — IBGE Censo 2022</div>
+      <div id="rep-ibge-content" style="font-size:10px;color:#0C447C;font-weight:600"></div>
+    </div>
+
+    <!-- ASSINATURAS -->
+    <div style="margin-top:auto;padding-top:10px">
+      <table width="100%">
+        <tr>
+          <td width="45%" align="center" style="border-top:1.5px solid #1e293b;padding-top:5px;font-size:10px;font-weight:900;text-transform:uppercase">Especialista de Expansão</td>
+          <td width="10%"></td>
+          <td width="45%" align="center" style="border-top:1.5px solid #1e293b;padding-top:5px;font-size:10px;font-weight:900;text-transform:uppercase">Comitê de Expansão</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
