@@ -420,22 +420,53 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   <div id="sidebar-head" style="justify-content:space-between">
     <!-- Logo -->
     <div style="display:flex;align-items:center;gap:10px">
-      <svg width="36" height="40" viewBox="0 0 46 58" fill="none">
-        <defs><linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#E8D090"/>
-          <stop offset="50%" stop-color="#C6A664"/>
-          <stop offset="100%" stop-color="#9A7A3A"/>
-        </linearGradient></defs>
-        <path d="M23 2C14 2 7 9.2 7 17.8C7 29.6 23 46 23 46C23 46 39 29.6 39 17.8C39 9.2 32 2 23 2Z" fill="url(#pg)"/>
-        <path d="M23 5C15.3 5 9 11.4 9 17.8C9 29 23 43 23 43C23 43 37 29 37 17.8C37 11.4 30.7 5 23 5Z" fill="#0B132B"/>
-        <circle cx="23" cy="17.5" r="11.5" fill="none" stroke="#C6A664" stroke-width="1"/>
-        <g stroke="#C6A664" stroke-width="0.6" opacity="0.7" fill="none">
-          <line x1="23" y1="7.5" x2="14.5" y2="13"/><line x1="23" y1="7.5" x2="31.5" y2="13"/>
-          <line x1="14.5" y1="13" x2="12" y2="18"/><line x1="31.5" y1="13" x2="34" y2="18"/>
-          <circle cx="23" cy="7.5" r="1.4" fill="#C6A664"/>
-          <circle cx="14.5" cy="13" r="1.1" fill="#C6A664"/>
-          <circle cx="31.5" cy="13" r="1.1" fill="#C6A664"/>
-          <circle cx="23" cy="27.5" r="1.4" fill="#C6A664"/>
+      <svg width="38" height="46" viewBox="0 0 60 72" fill="none">
+        <defs>
+          <linearGradient id="gPinS" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#F2DC8C"/>
+            <stop offset="40%" stop-color="#C6A664"/>
+            <stop offset="100%" stop-color="#8A6A2A"/>
+          </linearGradient>
+          <clipPath id="gcS"><circle cx="30" cy="22" r="13.4"/></clipPath>
+        </defs>
+        <!-- Pin outer gold -->
+        <path d="M30 2C16.8 2 6 12.8 6 24C6 42 30 70 30 70C30 70 54 42 54 24C54 12.8 43.2 2 30 2Z" fill="url(#gPinS)"/>
+        <!-- Pin inner navy -->
+        <path d="M30 5.5C20 5.5 9.5 15 9.5 24C9.5 41 30 66 30 66C30 66 50.5 41 50.5 24C50.5 15 40 5.5 30 5.5Z" fill="#0B132B"/>
+        <!-- Globe boundary circle -->
+        <circle cx="30" cy="22" r="13.5" fill="none" stroke="url(#gPinS)" stroke-width="1.1"/>
+        <!-- Geodesic mesh lines -->
+        <g clip-path="url(#gcS)" stroke="#C6A664" stroke-width="0.65" opacity="0.85" fill="none">
+          <line x1="30" y1="8.5" x2="22" y2="12"/><line x1="30" y1="8.5" x2="30.5" y2="11"/><line x1="30" y1="8.5" x2="38.5" y2="12.5"/>
+          <line x1="22" y1="12" x2="30.5" y2="11"/><line x1="22" y1="12" x2="17.5" y2="18"/><line x1="22" y1="12" x2="24.5" y2="16.5"/>
+          <line x1="30.5" y1="11" x2="38.5" y2="12.5"/><line x1="30.5" y1="11" x2="24.5" y2="16.5"/><line x1="30.5" y1="11" x2="32" y2="15.5"/>
+          <line x1="38.5" y1="12.5" x2="32" y2="15.5"/><line x1="38.5" y1="12.5" x2="40" y2="19"/>
+          <line x1="17.5" y1="18" x2="24.5" y2="16.5"/><line x1="17.5" y1="18" x2="16.5" y2="23"/><line x1="17.5" y1="18" x2="23" y2="21.5"/>
+          <line x1="24.5" y1="16.5" x2="32" y2="15.5"/><line x1="24.5" y1="16.5" x2="23" y2="21.5"/><line x1="24.5" y1="16.5" x2="31" y2="21"/>
+          <line x1="32" y1="15.5" x2="40" y2="19"/><line x1="32" y1="15.5" x2="31" y2="21"/><line x1="32" y1="15.5" x2="39" y2="22.5"/>
+          <line x1="40" y1="19" x2="39" y2="22.5"/><line x1="40" y1="19" x2="43.5" y2="22"/>
+          <line x1="16.5" y1="23" x2="23" y2="21.5"/><line x1="16.5" y1="23" x2="20" y2="28"/>
+          <line x1="23" y1="21.5" x2="31" y2="21"/><line x1="23" y1="21.5" x2="20" y2="28"/><line x1="23" y1="21.5" x2="27.5" y2="27"/>
+          <line x1="31" y1="21" x2="39" y2="22.5"/><line x1="31" y1="21" x2="27.5" y2="27"/><line x1="31" y1="21" x2="34.5" y2="27"/>
+          <line x1="39" y1="22.5" x2="43.5" y2="22"/><line x1="39" y1="22.5" x2="34.5" y2="27"/><line x1="39" y1="22.5" x2="40" y2="27.5"/>
+          <line x1="43.5" y1="22" x2="40" y2="27.5"/>
+          <line x1="20" y1="28" x2="27.5" y2="27"/><line x1="20" y1="28" x2="23" y2="33"/>
+          <line x1="27.5" y1="27" x2="34.5" y2="27"/><line x1="27.5" y1="27" x2="23" y2="33"/><line x1="27.5" y1="27" x2="31" y2="33.5"/>
+          <line x1="34.5" y1="27" x2="40" y2="27.5"/><line x1="34.5" y1="27" x2="31" y2="33.5"/><line x1="34.5" y1="27" x2="37" y2="31.5"/>
+          <line x1="40" y1="27.5" x2="37" y2="31.5"/>
+          <line x1="23" y1="33" x2="31" y2="33.5"/><line x1="23" y1="33" x2="30" y2="35.5"/>
+          <line x1="31" y1="33.5" x2="37" y2="31.5"/><line x1="31" y1="33.5" x2="30" y2="35.5"/>
+          <line x1="37" y1="31.5" x2="30" y2="35.5"/>
+        </g>
+        <!-- Geodesic nodes -->
+        <g clip-path="url(#gcS)" fill="#C6A664">
+          <circle cx="30" cy="8.5" r="1.6"/>
+          <circle cx="22" cy="12" r="1.2"/><circle cx="30.5" cy="11" r="1.2"/><circle cx="38.5" cy="12.5" r="1.2"/>
+          <circle cx="17.5" cy="18" r="1.1"/><circle cx="24.5" cy="16.5" r="1.1"/><circle cx="32" cy="15.5" r="1.1"/><circle cx="40" cy="19" r="1.1"/>
+          <circle cx="16.5" cy="23" r="1.1"/><circle cx="23" cy="21.5" r="1.1"/><circle cx="31" cy="21" r="1.1"/><circle cx="39" cy="22.5" r="1.1"/><circle cx="43.5" cy="22" r="1.1"/>
+          <circle cx="20" cy="28" r="1.1"/><circle cx="27.5" cy="27" r="1.1"/><circle cx="34.5" cy="27" r="1.1"/><circle cx="40" cy="27.5" r="1.1"/>
+          <circle cx="23" cy="33" r="1.1"/><circle cx="31" cy="33.5" r="1.1"/><circle cx="37" cy="31.5" r="1.1"/>
+          <circle cx="30" cy="35.5" r="1.6"/>
         </g>
       </svg>
       <div class="logo-text-wrap">
@@ -463,9 +494,17 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   <div id="sidebar-body">
 <!-- ANALISAR PONTO -->
     <div class="s-section" style="padding:10px 14px">
-      <div class="s-label" style="margin-bottom:5px">
-        <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="#94a3b8" stroke-width="1.5"/><path d="M10.5 10.5L13 13" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Analisar Ponto
+      <div class="s-label" style="margin-bottom:5px;justify-content:space-between">
+        <span style="display:flex;align-items:center;gap:7px">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="#94a3b8" stroke-width="1.5"/><path d="M10.5 10.5L13 13" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Analisar Ponto
+        </span>
+        <button onclick="zerarAnalise()" title="Zerar configurações de busca"
+          style="display:flex;align-items:center;gap:4px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:7px;padding:3px 8px;font-size:9px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;letter-spacing:.04em;transition:background .15s"
+          onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 1 5.5 8.3" stroke="#b91c1c" stroke-width="2.5" stroke-linecap="round"/><path d="M3 5v7h7" stroke="#b91c1c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          ZERAR
+        </button>
       </div>
 
       <!-- BUSCADOR UNIVERSAL -->
@@ -501,6 +540,73 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 
       </div>
       <div id="analysisResult"></div>
+    </div>
+
+    <!-- ═══ FILTROS DE ANÁLISE ═══ -->
+    <div class="s-section" id="sec-filtros" style="padding:10px 14px">
+      <div class="s-label" style="margin-bottom:8px;justify-content:space-between">
+        <span style="display:flex;align-items:center;gap:7px">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M2 4h12M4 8h8M6 12h4" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Filtros de Análise
+        </span>
+        <span id="filtro-ativo-badge" style="display:none;font-size:9px;font-weight:700;color:#0B132B;background:#fef3c7;border:1px solid #fde68a;padding:2px 7px;border-radius:20px;max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
+      </div>
+
+      <!-- Botões de ação -->
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button onclick="abrirSalvarFiltro()"
+          style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:#0B132B;color:#C6A664;border:1px solid rgba(198,166,100,.35);border-radius:8px;padding:7px 6px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;letter-spacing:.03em;transition:background .15s"
+          onmouseover="this.style.background='#162445'" onmouseout="this.style.background='#0B132B'">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="#C6A664" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17 21 17 13 7 13 7 21" stroke="#C6A664" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 3 7 8 15 8" stroke="#C6A664" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Salvar Filtro
+        </button>
+        <button onclick="novaAnalise()"
+          style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:#f8fafc;color:#475569;border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 6px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;letter-spacing:.03em;transition:background .15s"
+          onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#475569" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke="#475569" stroke-width="2" stroke-linecap="round"/></svg>
+          Nova Análise
+        </button>
+      </div>
+
+      <!-- Lista de filtros salvos -->
+      <div id="lista-filtros-salvos" style="display:flex;flex-direction:column;gap:5px">
+        <!-- Preenchido dinamicamente -->
+        <div id="filtros-vazio" style="font-size:10px;color:#94a3b8;text-align:center;padding:8px 0;font-style:italic">
+          Nenhum filtro salvo ainda
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal salvar filtro -->
+    <div id="modal-salvar-filtro" style="display:none;position:fixed;inset:0;z-index:7000;background:rgba(11,19,43,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;font-family:Inter,sans-serif">
+      <div style="background:#fff;border-radius:16px;padding:24px;width:100%;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+        <div style="font-size:14px;font-weight:800;color:#0B132B;margin-bottom:4px">Salvar como Filtro</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:16px">Dê um nome para esta configuração de análise</div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:10px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:5px">Nome do Filtro</label>
+          <input id="filtro-nome-input" type="text" placeholder="Ex: Zona Sul SP — Academia"
+            style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:12px;font-family:Inter,sans-serif;outline:none;color:#1e293b;box-sizing:border-box;transition:border-color .2s"
+            onfocus="this.style.borderColor='#C6A664'" onblur="this.style.borderColor='#e2e8f0'"
+            onkeydown="if(event.key==='Enter')confirmarSalvarFiltro()"/>
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="font-size:10px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:5px">Segmento / Mercado (opcional)</label>
+          <input id="filtro-segmento-input" type="text" placeholder="Ex: Academias, Farmácias, Franquias..."
+            style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:12px;font-family:Inter,sans-serif;outline:none;color:#1e293b;box-sizing:border-box;transition:border-color .2s"
+            onfocus="this.style.borderColor='#C6A664'" onblur="this.style.borderColor='#e2e8f0'"
+            onkeydown="if(event.key==='Enter')confirmarSalvarFiltro()"/>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="fecharModalSalvarFiltro()"
+            style="flex:1;padding:10px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;color:#64748b">
+            Cancelar
+          </button>
+          <button onclick="confirmarSalvarFiltro()"
+            style="flex:2;padding:10px;background:linear-gradient(135deg,#C6A664,#9A7A3A);border:none;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;font-family:Inter,sans-serif;color:#0B132B;letter-spacing:.04em">
+            💾 Salvar
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- MAPA DE INTELIGÊNCIA -->
@@ -670,28 +776,57 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   ">
     <!-- Logo -->
     <div style="text-align:center;margin-bottom:32px">
-      <svg width="48" height="54" viewBox="0 0 46 58" fill="none" style="margin-bottom:12px">
-        <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#E8D090"/><stop offset="50%" stop-color="#C6A664"/><stop offset="100%" stop-color="#9A7A3A"/>
-        </linearGradient></defs>
-        <path d="M23 2C14 2 7 9.2 7 17.8C7 29.6 23 46 23 46S39 29.6 39 17.8C39 9.2 32 2 23 2Z" fill="url(#lg)"/>
-        <path d="M23 5C15.3 5 9 11.4 9 17.8C9 29 23 43 23 43S37 29 37 17.8C37 11.4 30.7 5 23 5Z" fill="#0B132B"/>
-        <circle cx="23" cy="17.5" r="11.5" fill="none" stroke="#C6A664" stroke-width="1"/>
-        <ellipse cx="23" cy="17.5" rx="11.5" ry="3.8" fill="none" stroke="#C6A664" stroke-width="0.7" opacity="0.6"/>
-        <g stroke="#C6A664" stroke-width="0.6" opacity="0.7" fill="none">
-          <line x1="23" y1="7.5" x2="14.5" y2="13"/><line x1="23" y1="7.5" x2="31.5" y2="13"/>
-          <line x1="14.5" y1="13" x2="12" y2="18"/><line x1="31.5" y1="13" x2="34" y2="18"/>
-          <line x1="14.5" y1="13" x2="23" y2="17.5"/><line x1="31.5" y1="13" x2="23" y2="17.5"/>
-          <line x1="12" y1="18" x2="16.5" y2="24"/><line x1="34" y1="18" x2="29.5" y2="24"/>
-          <line x1="16.5" y1="24" x2="23" y2="27.5"/><line x1="29.5" y1="24" x2="23" y2="27.5"/>
-          <circle cx="23" cy="7.5" r="1.4" fill="#C6A664"/>
-          <circle cx="14.5" cy="13" r="1.1" fill="#C6A664"/>
-          <circle cx="31.5" cy="13" r="1.1" fill="#C6A664"/>
-          <circle cx="23" cy="27.5" r="1.4" fill="#C6A664"/>
+      <svg width="82" height="98" viewBox="0 0 60 72" fill="none" style="margin-bottom:14px;filter:drop-shadow(0 6px 18px rgba(198,166,100,0.22))">
+        <defs>
+          <linearGradient id="gPinL" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#F4E09A"/>
+            <stop offset="40%" stop-color="#C6A664"/>
+            <stop offset="100%" stop-color="#7A5C22"/>
+          </linearGradient>
+          <clipPath id="gcL"><circle cx="30" cy="22" r="13.4"/></clipPath>
+        </defs>
+        <!-- Pin outer gold -->
+        <path d="M30 2C16.8 2 6 12.8 6 24C6 42 30 70 30 70C30 70 54 42 54 24C54 12.8 43.2 2 30 2Z" fill="url(#gPinL)"/>
+        <!-- Pin inner navy -->
+        <path d="M30 5.5C20 5.5 9.5 15 9.5 24C9.5 41 30 66 30 66C30 66 50.5 41 50.5 24C50.5 15 40 5.5 30 5.5Z" fill="#0B132B"/>
+        <!-- Globe boundary circle -->
+        <circle cx="30" cy="22" r="13.5" fill="none" stroke="url(#gPinL)" stroke-width="1.2"/>
+        <!-- Geodesic mesh lines -->
+        <g clip-path="url(#gcL)" stroke="#C6A664" stroke-width="0.65" opacity="0.9" fill="none">
+          <line x1="30" y1="8.5" x2="22" y2="12"/><line x1="30" y1="8.5" x2="30.5" y2="11"/><line x1="30" y1="8.5" x2="38.5" y2="12.5"/>
+          <line x1="22" y1="12" x2="30.5" y2="11"/><line x1="22" y1="12" x2="17.5" y2="18"/><line x1="22" y1="12" x2="24.5" y2="16.5"/>
+          <line x1="30.5" y1="11" x2="38.5" y2="12.5"/><line x1="30.5" y1="11" x2="24.5" y2="16.5"/><line x1="30.5" y1="11" x2="32" y2="15.5"/>
+          <line x1="38.5" y1="12.5" x2="32" y2="15.5"/><line x1="38.5" y1="12.5" x2="40" y2="19"/>
+          <line x1="17.5" y1="18" x2="24.5" y2="16.5"/><line x1="17.5" y1="18" x2="16.5" y2="23"/><line x1="17.5" y1="18" x2="23" y2="21.5"/>
+          <line x1="24.5" y1="16.5" x2="32" y2="15.5"/><line x1="24.5" y1="16.5" x2="23" y2="21.5"/><line x1="24.5" y1="16.5" x2="31" y2="21"/>
+          <line x1="32" y1="15.5" x2="40" y2="19"/><line x1="32" y1="15.5" x2="31" y2="21"/><line x1="32" y1="15.5" x2="39" y2="22.5"/>
+          <line x1="40" y1="19" x2="39" y2="22.5"/><line x1="40" y1="19" x2="43.5" y2="22"/>
+          <line x1="16.5" y1="23" x2="23" y2="21.5"/><line x1="16.5" y1="23" x2="20" y2="28"/>
+          <line x1="23" y1="21.5" x2="31" y2="21"/><line x1="23" y1="21.5" x2="20" y2="28"/><line x1="23" y1="21.5" x2="27.5" y2="27"/>
+          <line x1="31" y1="21" x2="39" y2="22.5"/><line x1="31" y1="21" x2="27.5" y2="27"/><line x1="31" y1="21" x2="34.5" y2="27"/>
+          <line x1="39" y1="22.5" x2="43.5" y2="22"/><line x1="39" y1="22.5" x2="34.5" y2="27"/><line x1="39" y1="22.5" x2="40" y2="27.5"/>
+          <line x1="43.5" y1="22" x2="40" y2="27.5"/>
+          <line x1="20" y1="28" x2="27.5" y2="27"/><line x1="20" y1="28" x2="23" y2="33"/>
+          <line x1="27.5" y1="27" x2="34.5" y2="27"/><line x1="27.5" y1="27" x2="23" y2="33"/><line x1="27.5" y1="27" x2="31" y2="33.5"/>
+          <line x1="34.5" y1="27" x2="40" y2="27.5"/><line x1="34.5" y1="27" x2="31" y2="33.5"/><line x1="34.5" y1="27" x2="37" y2="31.5"/>
+          <line x1="40" y1="27.5" x2="37" y2="31.5"/>
+          <line x1="23" y1="33" x2="31" y2="33.5"/><line x1="23" y1="33" x2="30" y2="35.5"/>
+          <line x1="31" y1="33.5" x2="37" y2="31.5"/><line x1="31" y1="33.5" x2="30" y2="35.5"/>
+          <line x1="37" y1="31.5" x2="30" y2="35.5"/>
+        </g>
+        <!-- Geodesic nodes -->
+        <g clip-path="url(#gcL)" fill="#C6A664">
+          <circle cx="30" cy="8.5" r="1.7"/>
+          <circle cx="22" cy="12" r="1.25"/><circle cx="30.5" cy="11" r="1.25"/><circle cx="38.5" cy="12.5" r="1.25"/>
+          <circle cx="17.5" cy="18" r="1.15"/><circle cx="24.5" cy="16.5" r="1.15"/><circle cx="32" cy="15.5" r="1.15"/><circle cx="40" cy="19" r="1.15"/>
+          <circle cx="16.5" cy="23" r="1.15"/><circle cx="23" cy="21.5" r="1.15"/><circle cx="31" cy="21" r="1.15"/><circle cx="39" cy="22.5" r="1.15"/><circle cx="43.5" cy="22" r="1.15"/>
+          <circle cx="20" cy="28" r="1.15"/><circle cx="27.5" cy="27" r="1.15"/><circle cx="34.5" cy="27" r="1.15"/><circle cx="40" cy="27.5" r="1.15"/>
+          <circle cx="23" cy="33" r="1.15"/><circle cx="31" cy="33.5" r="1.15"/><circle cx="37" cy="31.5" r="1.15"/>
+          <circle cx="30" cy="35.5" r="1.7"/>
         </g>
       </svg>
-      <div style="font-size:22px;font-weight:800;letter-spacing:.18em;color:#fff">MAP<span style="color:#C6A664">X</span>PAND</div>
-      <div style="font-size:10px;letter-spacing:.2em;color:#94a3b8;text-transform:uppercase;margin-top:4px">Inteligência Imobiliária</div>
+      <div style="font-size:24px;font-weight:800;letter-spacing:.2em;color:#fff;line-height:1">MAP<span style="color:#C6A664">X</span>PAND</div>
+      <div style="font-size:10px;letter-spacing:.22em;color:rgba(198,166,100,.65);text-transform:uppercase;margin-top:6px">Inteligência Imobiliária</div>
     </div>
 
     <!-- Formulário -->
@@ -2390,6 +2525,313 @@ window.enviarSolicitacao = enviarSolicitacao;
 
 window.detectarTipoInput = detectarTipoInput;
 
+// ══════════════════════════════════════════════════════
+// ── FILTROS DE ANÁLISE — MapXpand ─────────────────────
+// ══════════════════════════════════════════════════════
+
+const FILTROS_KEY = 'mapxpand_filtros_v2';
+
+function _getFiltros() {
+  try { return JSON.parse(localStorage.getItem(FILTROS_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function _setFiltros(arr) {
+  localStorage.setItem(FILTROS_KEY, JSON.stringify(arr));
+}
+
+// ── Captura o estado atual da análise ──────────────────
+function capturarEstadoAtual() {
+  const raioIdx = parseInt(document.getElementById('raioSlider')?.value ?? 2);
+  const raioLabel = document.getElementById('raioVal')?.textContent || '1,5 km';
+  return {
+    searchQuery:  document.getElementById('universal-input')?.value || '',
+    raioIdx:      raioIdx,
+    raioLabel:    raioLabel,
+    layers: {
+      dfinefit:  document.getElementById('cb-dfinefit')?.checked  ?? true,
+      raio:      document.getElementById('cb-raio')?.checked      ?? true,
+      expansion: layerState?.expansion ?? true,
+      cannibal:  layerState?.cannibal  ?? false,
+      competitor:layerState?.competitor?? false,
+      heatmap:   document.getElementById('cb-heatmap')?.checked   ?? false,
+      concAuto:  document.getElementById('cb-concorrentes-auto')?.checked ?? false,
+    },
+    mapCenter: (typeof map !== 'undefined') ? [map.getCenter().lat, map.getCenter().lng] : null,
+    mapZoom:   (typeof map !== 'undefined') ? map.getZoom() : null,
+    lastLat:   window._lastAnalysisLat || null,
+    lastLng:   window._lastAnalysisLng || null,
+  };
+}
+
+// ── Renderiza a lista de filtros na sidebar ────────────
+function renderFiltros() {
+  const lista = document.getElementById('lista-filtros-salvos');
+  const vazio = document.getElementById('filtros-vazio');
+  if (!lista) return;
+  const filtros = _getFiltros();
+
+  // Limpa itens antigos (mantém o placeholder vazio)
+  Array.from(lista.querySelectorAll('.filtro-item')).forEach(el => el.remove());
+
+  if (filtros.length === 0) {
+    if (vazio) vazio.style.display = 'block';
+    return;
+  }
+  if (vazio) vazio.style.display = 'none';
+
+  filtros.forEach((f, idx) => {
+    const el = document.createElement('div');
+    el.className = 'filtro-item';
+    el.style.cssText = `
+      display:flex;align-items:center;gap:7px;
+      background:#f8fafc;border:1.5px solid #e2e8f0;
+      border-radius:9px;padding:8px 10px;cursor:pointer;
+      transition:border-color .15s,background .15s;
+    `;
+    el.onmouseover = () => { el.style.borderColor='#C6A664'; el.style.background='#fffdf5'; };
+    el.onmouseout  = () => { el.style.borderColor='#e2e8f0'; el.style.background='#f8fafc'; };
+    el.innerHTML = `
+      <div onclick="carregarFiltro(${f.id})" style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:700;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.nome}</div>
+        <div style="font-size:9px;color:#94a3b8;margin-top:1px;display:flex;gap:5px;flex-wrap:wrap">
+          ${f.segmento ? `<span style="color:#C6A664;font-weight:600">${f.segmento}</span>` : ''}
+          <span>📍 ${f.estado.raioLabel}</span>
+          <span style="color:#94a3b8">${f.criadoEm}</span>
+        </div>
+        ${f.estado.searchQuery ? `<div style="font-size:9px;color:#64748b;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🔍 ${f.estado.searchQuery}</div>` : ''}
+      </div>
+      <button onclick="event.stopPropagation();deletarFiltro(${f.id})" title="Remover filtro"
+        style="flex-shrink:0;background:none;border:none;cursor:pointer;color:#fca5a5;padding:3px;border-radius:5px;font-size:13px;line-height:1;transition:color .15s"
+        onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#fca5a5'">×</button>
+    `;
+    lista.appendChild(el);
+  });
+}
+
+// ── Abre o modal de salvar filtro ──────────────────────
+function abrirSalvarFiltro() {
+  const modal = document.getElementById('modal-salvar-filtro');
+  if (!modal) return;
+  const inp = document.getElementById('filtro-nome-input');
+  const seg = document.getElementById('filtro-segmento-input');
+  if (inp) inp.value = '';
+  if (seg) seg.value = '';
+  modal.style.display = 'flex';
+  setTimeout(() => { if(inp) inp.focus(); }, 100);
+}
+function fecharModalSalvarFiltro() {
+  const modal = document.getElementById('modal-salvar-filtro');
+  if (modal) modal.style.display = 'none';
+}
+function confirmarSalvarFiltro() {
+  const nome = (document.getElementById('filtro-nome-input')?.value || '').trim();
+  if (!nome) {
+    const inp = document.getElementById('filtro-nome-input');
+    if (inp) { inp.style.borderColor='#ef4444'; inp.focus(); setTimeout(()=>inp.style.borderColor='#e2e8f0',1500); }
+    return;
+  }
+  const segmento = (document.getElementById('filtro-segmento-input')?.value || '').trim();
+  const filtros = _getFiltros();
+  filtros.push({
+    id:       Date.now(),
+    nome:     nome,
+    segmento: segmento,
+    criadoEm: new Date().toLocaleDateString('pt-BR'),
+    estado:   capturarEstadoAtual(),
+  });
+  _setFiltros(filtros);
+  fecharModalSalvarFiltro();
+  renderFiltros();
+  // Feedback visual no badge
+  const badge = document.getElementById('filtro-ativo-badge');
+  if (badge) { badge.textContent = nome; badge.style.display = 'inline-block'; }
+  _mostrarToast(`✅ Filtro "${nome}" salvo!`);
+}
+
+// ── Carrega um filtro salvo ────────────────────────────
+function carregarFiltro(id) {
+  const filtros = _getFiltros();
+  const f = filtros.find(x => x.id === id);
+  if (!f) return;
+  const e = f.estado;
+
+  // Restaura busca
+  const inp = document.getElementById('universal-input');
+  if (inp) inp.value = e.searchQuery || '';
+
+  // Restaura raio
+  const slider = document.getElementById('raioSlider');
+  if (slider && e.raioIdx !== undefined) {
+    slider.value = e.raioIdx;
+    if (typeof updateRaio === 'function') updateRaio(e.raioIdx);
+  }
+
+  // Restaura camadas
+  if (e.layers) {
+    ['dfinefit','expansion','cannibal','competitor'].forEach(id => {
+      if (e.layers[id] !== undefined && layerState[id] !== e.layers[id]) {
+        if (typeof toggleLayer === 'function') toggleLayer(id);
+      }
+    });
+    // Raio de captação
+    const cbRaio = document.getElementById('cb-raio');
+    if (cbRaio && cbRaio.checked !== (e.layers.raio ?? true)) cbRaio.click();
+  }
+
+  // Restaura posição do mapa
+  if (e.mapCenter && typeof map !== 'undefined') {
+    map.setView(e.mapCenter, e.mapZoom || 13);
+  }
+
+  // Atualiza badge do filtro ativo
+  const badge = document.getElementById('filtro-ativo-badge');
+  if (badge) { badge.textContent = f.nome; badge.style.display = 'inline-block'; }
+
+  _mostrarToast(`📂 Filtro "${f.nome}" carregado`);
+}
+
+// ── Deleta um filtro ──────────────────────────────────
+function deletarFiltro(id) {
+  let filtros = _getFiltros();
+  const f = filtros.find(x => x.id === id);
+  if (!f) return;
+  if (!confirm(`Remover o filtro "${f.nome}"?`)) return;
+  filtros = filtros.filter(x => x.id !== id);
+  _setFiltros(filtros);
+  renderFiltros();
+}
+
+// ── Nova análise (zera tudo + limpa filtro ativo) ─────
+function novaAnalise() {
+  zerarAnalise();
+  const badge = document.getElementById('filtro-ativo-badge');
+  if (badge) { badge.textContent = ''; badge.style.display = 'none'; }
+}
+
+// ── Zera todas as configurações de busca ──────────────
+function zerarAnalise() {
+  // 1. Inputs e feedbacks
+  const inp = document.getElementById('universal-input');
+  if (inp) inp.value = '';
+  ['search-error','input-tipo-tag'].forEach(id=>{ const el=document.getElementById(id); if(el)el.style.display='none'; });
+  const icon = document.getElementById('input-tipo-icon');
+  if (icon) icon.textContent = '📍';
+  const ar = document.getElementById('analysisResult');
+  if (ar) { ar.innerHTML=''; ar.style.display='none'; }
+
+  // 2. Remove TODAS as camadas do mapa
+  if (typeof map !== 'undefined') {
+    // Marcador de busca
+    if (window.searchMarker) { try { if(typeof layers!=='undefined'&&layers.search) layers.search.removeLayer(window.searchMarker); } catch(e){} window.searchMarker=null; }
+    // Raio de análise
+    if (window._raioAnalise) { try { map.removeLayer(window._raioAnalise); } catch(e){} window._raioAnalise=null; }
+    // Todas as layer groups
+    if (typeof layers !== 'undefined') {
+      ['dfinefit','expansion','cannibal','competitor','search'].forEach(id => {
+        try { if(layers[id]&&map.hasLayer(layers[id])) map.removeLayer(layers[id]); } catch(e){}
+      });
+    }
+    // Concorrentes auto
+    if (typeof concorrentesAutoLayer !== 'undefined') {
+      try { concorrentesAutoLayer.clearLayers(); map.removeLayer(concorrentesAutoLayer); } catch(e){}
+    }
+    // Score / heatmap
+    if (typeof scoreLayer !== 'undefined' && scoreLayer) { try { map.removeLayer(scoreLayer); } catch(e){} }
+    if (typeof scoreMapLayer !== 'undefined' && scoreMapLayer) { try { map.removeLayer(scoreMapLayer); } catch(e){} }
+    // Círculos de captação
+    if (typeof captacaoCircles !== 'undefined') {
+      captacaoCircles.forEach(c=>{ try{map.removeLayer(c);}catch(e){} });
+      captacaoCircles.length=0;
+    }
+    // Zonas canibalização extras
+    if (window._zonasCanibal) {
+      window._zonasCanibal.forEach(c=>{ try{map.removeLayer(c);}catch(e){} });
+      window._zonasCanibal=[];
+    }
+    // Pins e rede markers
+    if (typeof pinsLayer!=='undefined'&&pinsLayer) { try{pinsLayer.clearLayers();}catch(e){} }
+    if (typeof redeMarkers!=='undefined'&&redeMarkers&&redeMarkers.length) {
+      redeMarkers.forEach(m=>{ try{map.removeLayer(m);}catch(e){} });
+      redeMarkers.length=0;
+    }
+  }
+
+  // 3. Reseta layerState
+  if (typeof layerState !== 'undefined') {
+    layerState.dfinefit=false; layerState.expansion=false;
+    layerState.cannibal=false; layerState.competitor=false;
+  }
+
+  // 4. Sincroniza UI
+  ['cb-dfinefit','cb-raio','cb-heatmap','cb-concorrentes-auto'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.checked=false;
+  });
+  const chkExp=document.getElementById('chk-expansion'); if(chkExp) chkExp.classList.remove('on');
+  const chkCanib=document.getElementById('chk-cannibal'); if(chkCanib) chkCanib.classList.remove('on');
+  const balao=document.getElementById('balao-espirais'); if(balao) balao.style.display='none';
+  if (typeof espiraisAtivo!=='undefined') window.espiraisAtivo=false;
+
+  // 5. Reset raio
+  const slider=document.getElementById('raioSlider');
+  if(slider){ slider.value=2; if(typeof updateRaio==='function') updateRaio(2); }
+
+  // 6. Limpa coordenadas
+  window._lastAnalysisLat=null; window._lastAnalysisLng=null;
+
+  // 7. Fecha modais
+  ['modal-concorrencia','relatorio-modal','modal-canib'].forEach(id=>{
+    const m=document.getElementById(id);
+    if(m){ m.style.display='none'; m.classList&&m.classList.remove('show'); }
+  });
+
+  // 8. Centraliza mapa
+  if (typeof map!=='undefined') map.setView([-23.55,-46.63],11);
+
+  _mostrarToast('🔄 Mapa zerado. Pronto para nova análise!');
+}
+
+// ── Toast de feedback ─────────────────────────────────
+function _mostrarToast(msg) {
+  let t = document.getElementById('_mx_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_mx_toast';
+    t.style.cssText = `
+      position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
+      background:#0B132B;color:#fff;font-size:11px;font-weight:600;font-family:Inter,sans-serif;
+      padding:9px 18px;border-radius:24px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);
+      border:1px solid rgba(198,166,100,.3);opacity:0;transition:opacity .25s,transform .25s;
+      white-space:nowrap;pointer-events:none;
+    `;
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(10px)';
+  }, 2800);
+}
+
+// Expõe globalmente
+window.zerarAnalise        = zerarAnalise;
+window.novaAnalise         = novaAnalise;
+window.abrirSalvarFiltro   = abrirSalvarFiltro;
+window.fecharModalSalvarFiltro = fecharModalSalvarFiltro;
+window.confirmarSalvarFiltro   = confirmarSalvarFiltro;
+window.carregarFiltro      = carregarFiltro;
+window.deletarFiltro       = deletarFiltro;
+window.renderFiltros       = renderFiltros;
+
+// Inicializa ao carregar
+document.addEventListener('DOMContentLoaded', () => {
+  renderFiltros();
+});
+// Fallback se DOMContentLoaded já disparou
+if (document.readyState !== 'loading') renderFiltros();
+
 
 // ═══════════════════════════════════════════════════════════════════
 // SISTEMA DE RELATÓRIO TÉCNICO MAPXPAND
@@ -3067,24 +3509,46 @@ function showSearchError(msg){
       <tr>
         <td>
           <div style="display:flex;align-items:center;gap:10px">
-            <svg width="32" height="36" viewBox="0 0 46 58" fill="none">
-              <defs><linearGradient id="rpg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#E8D090"/><stop offset="50%" stop-color="#C6A664"/><stop offset="100%" stop-color="#9A7A3A"/></linearGradient></defs>
-              <path d="M23 2C14 2 7 9.2 7 17.8C7 29.6 23 46 23 46S39 29.6 39 17.8C39 9.2 32 2 23 2Z" fill="url(#rpg)"/>
-              <path d="M23 5C15.3 5 9 11.4 9 17.8C9 29 23 43 23 43S37 29 37 17.8C37 11.4 30.7 5 23 5Z" fill="#0B132B"/>
-              <circle cx="23" cy="17.5" r="11.5" fill="none" stroke="#C6A664" stroke-width="1"/>
-              <ellipse cx="23" cy="17.5" rx="11.5" ry="3.8" fill="none" stroke="#C6A664" stroke-width="0.7" opacity="0.6"/>
-              <line x1="23" y1="7.5" x2="14.5" y2="13" stroke="#C6A664" stroke-width="0.6" opacity="0.7"/>
-              <line x1="23" y1="7.5" x2="31.5" y2="13" stroke="#C6A664" stroke-width="0.6" opacity="0.7"/>
-              <line x1="14.5" y1="13" x2="12" y2="18" stroke="#C6A664" stroke-width="0.6" opacity="0.7"/>
-              <line x1="31.5" y1="13" x2="34" y2="18" stroke="#C6A664" stroke-width="0.6" opacity="0.7"/>
-              <circle cx="23" cy="7.5" r="1.4" fill="#C6A664"/>
-              <circle cx="14.5" cy="13" r="1.1" fill="#C6A664"/>
-              <circle cx="31.5" cy="13" r="1.1" fill="#C6A664"/>
-              <circle cx="12" cy="18" r="1.1" fill="#C6A664"/>
-              <circle cx="34" cy="18" r="1.1" fill="#C6A664"/>
-              <circle cx="16.5" cy="24" r="1.1" fill="#C6A664"/>
-              <circle cx="29.5" cy="24" r="1.1" fill="#C6A664"/>
-              <circle cx="23" cy="27.5" r="1.4" fill="#C6A664"/>
+            <svg width="32" height="38" viewBox="0 0 60 72" fill="none">
+              <defs>
+                <linearGradient id="gPinR" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#F2DC8C"/><stop offset="40%" stop-color="#C6A664"/><stop offset="100%" stop-color="#8A6A2A"/>
+                </linearGradient>
+                <clipPath id="gcR"><circle cx="30" cy="22" r="13.4"/></clipPath>
+              </defs>
+              <path d="M30 2C16.8 2 6 12.8 6 24C6 42 30 70 30 70C30 70 54 42 54 24C54 12.8 43.2 2 30 2Z" fill="url(#gPinR)"/>
+              <path d="M30 5.5C20 5.5 9.5 15 9.5 24C9.5 41 30 66 30 66C30 66 50.5 41 50.5 24C50.5 15 40 5.5 30 5.5Z" fill="#0B132B"/>
+              <circle cx="30" cy="22" r="13.5" fill="none" stroke="url(#gPinR)" stroke-width="1.1"/>
+              <g clip-path="url(#gcR)" stroke="#C6A664" stroke-width="0.65" opacity="0.85" fill="none">
+                <line x1="30" y1="8.5" x2="22" y2="12"/><line x1="30" y1="8.5" x2="30.5" y2="11"/><line x1="30" y1="8.5" x2="38.5" y2="12.5"/>
+                <line x1="22" y1="12" x2="30.5" y2="11"/><line x1="22" y1="12" x2="17.5" y2="18"/><line x1="22" y1="12" x2="24.5" y2="16.5"/>
+                <line x1="30.5" y1="11" x2="38.5" y2="12.5"/><line x1="30.5" y1="11" x2="24.5" y2="16.5"/><line x1="30.5" y1="11" x2="32" y2="15.5"/>
+                <line x1="38.5" y1="12.5" x2="32" y2="15.5"/><line x1="38.5" y1="12.5" x2="40" y2="19"/>
+                <line x1="17.5" y1="18" x2="24.5" y2="16.5"/><line x1="17.5" y1="18" x2="16.5" y2="23"/><line x1="17.5" y1="18" x2="23" y2="21.5"/>
+                <line x1="24.5" y1="16.5" x2="32" y2="15.5"/><line x1="24.5" y1="16.5" x2="23" y2="21.5"/><line x1="24.5" y1="16.5" x2="31" y2="21"/>
+                <line x1="32" y1="15.5" x2="40" y2="19"/><line x1="32" y1="15.5" x2="31" y2="21"/><line x1="32" y1="15.5" x2="39" y2="22.5"/>
+                <line x1="40" y1="19" x2="39" y2="22.5"/><line x1="40" y1="19" x2="43.5" y2="22"/>
+                <line x1="16.5" y1="23" x2="23" y2="21.5"/><line x1="16.5" y1="23" x2="20" y2="28"/>
+                <line x1="23" y1="21.5" x2="31" y2="21"/><line x1="23" y1="21.5" x2="20" y2="28"/><line x1="23" y1="21.5" x2="27.5" y2="27"/>
+                <line x1="31" y1="21" x2="39" y2="22.5"/><line x1="31" y1="21" x2="27.5" y2="27"/><line x1="31" y1="21" x2="34.5" y2="27"/>
+                <line x1="39" y1="22.5" x2="43.5" y2="22"/><line x1="39" y1="22.5" x2="34.5" y2="27"/><line x1="39" y1="22.5" x2="40" y2="27.5"/>
+                <line x1="43.5" y1="22" x2="40" y2="27.5"/>
+                <line x1="20" y1="28" x2="27.5" y2="27"/><line x1="20" y1="28" x2="23" y2="33"/>
+                <line x1="27.5" y1="27" x2="34.5" y2="27"/><line x1="27.5" y1="27" x2="23" y2="33"/><line x1="27.5" y1="27" x2="31" y2="33.5"/>
+                <line x1="34.5" y1="27" x2="40" y2="27.5"/><line x1="34.5" y1="27" x2="31" y2="33.5"/><line x1="34.5" y1="27" x2="37" y2="31.5"/>
+                <line x1="40" y1="27.5" x2="37" y2="31.5"/>
+                <line x1="23" y1="33" x2="31" y2="33.5"/><line x1="23" y1="33" x2="30" y2="35.5"/>
+                <line x1="31" y1="33.5" x2="37" y2="31.5"/><line x1="31" y1="33.5" x2="30" y2="35.5"/>
+                <line x1="37" y1="31.5" x2="30" y2="35.5"/>
+              </g>
+              <g clip-path="url(#gcR)" fill="#C6A664">
+                <circle cx="30" cy="8.5" r="1.6"/><circle cx="22" cy="12" r="1.1"/><circle cx="30.5" cy="11" r="1.1"/><circle cx="38.5" cy="12.5" r="1.1"/>
+                <circle cx="17.5" cy="18" r="1.1"/><circle cx="24.5" cy="16.5" r="1.1"/><circle cx="32" cy="15.5" r="1.1"/><circle cx="40" cy="19" r="1.1"/>
+                <circle cx="16.5" cy="23" r="1.1"/><circle cx="23" cy="21.5" r="1.1"/><circle cx="31" cy="21" r="1.1"/><circle cx="39" cy="22.5" r="1.1"/>
+                <circle cx="20" cy="28" r="1.1"/><circle cx="27.5" cy="27" r="1.1"/><circle cx="34.5" cy="27" r="1.1"/><circle cx="40" cy="27.5" r="1.1"/>
+                <circle cx="23" cy="33" r="1.1"/><circle cx="31" cy="33.5" r="1.1"/><circle cx="37" cy="31.5" r="1.1"/>
+                <circle cx="30" cy="35.5" r="1.6"/>
+              </g>
             </svg>
             <div>
               <div style="font-size:22px;font-weight:900;letter-spacing:.14em;color:#0B132B;line-height:1">MAP<span style="color:#C6A664">X</span>PAND</div>
