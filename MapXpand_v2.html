@@ -1045,7 +1045,19 @@ function toggleLayer(id){
   if(chk)chk.classList.toggle('on',layerState[id]);
   if(cb)cb.checked=layerState[id];
   layerState[id]?map.addLayer(layers[id]):map.removeLayer(layers[id]);
-  if(id==='dfinefit')renderCaptacao(parseFloat(document.querySelector('input[type=range]').value));
+  if(id==='dfinefit'){
+    renderCaptacao(parseFloat(document.querySelector('input[type=range]').value));
+    // Ao ativar D.Finefit, centraliza mapa nas unidades do cliente (se disponível)
+    if(layerState[id] && window._clienteBounds){
+      try{ map.fitBounds(window._clienteBounds); }catch(e){}
+    }
+    // Restaura zonas de canibalização
+    if(window._zonasCanibal){
+      window._zonasCanibal.forEach(c=>{
+        try{ layerState[id]?map.addLayer(c):map.removeLayer(c); }catch(e){}
+      });
+    }
+  }
 }
 window.toggleLayer=toggleLayer;
 
@@ -1347,6 +1359,30 @@ async function geocodeEndereco(query) {
   }
 }
 
+async function geocodePOI(query) {
+  // Usa Places Text Search via proxy para encontrar POIs com precisão máxima
+  try {
+    const q = /brasil/i.test(query) ? query : query + ', Brasil';
+    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(q)}&language=pt-BR&region=br&key=${GMAPS_KEY}`;
+    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+    const r = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+    if (!r.ok) return null;
+    const raw = await r.json();
+    const d = JSON.parse(raw.contents);
+    if (d.status !== 'OK' || !d.results.length) return null;
+    const res = d.results[0];
+    return {
+      lat: res.geometry.location.lat.toString(),
+      lon: res.geometry.location.lng.toString(),
+      display_name: res.name + (res.formatted_address ? ' — ' + res.formatted_address : ''),
+      type: res.types[0] || 'establishment'
+    };
+  } catch(e) {
+    console.warn('Places POI geocoding erro:', e);
+    return null;
+  }
+}
+
 async function geocodeEnderecoAll(query) {
   const result = await geocodeEndereco(query);
   return result ? [result] : null;
@@ -1525,7 +1561,13 @@ function parsearInputUniversal(texto) {
   if (/^\d{5}-?\d{3}$/.test(t.replace(/\s/g,'')))
     return { tipo:'endereco', query: t + ' São Paulo Brasil' };
 
-  // 7. Endereço genérico — expande abreviações antes de geocodificar
+  // 7. POI — shopping, supermercado, hospital, academia, etc.
+  const rePOI = /\b(shopping|supermercado|hipermercado|hypermarket|mall|center norte|boulevard|outlet|galeria|hospital|clínica|clinica|ubs|upa|escola|colégio|colegio|universidade|faculdade|academia|farmácia|farmacia|drogaria|aeroporto|estação|estacao|terminal|teatro|museu|estádio|estadio|ginásio|ginasio|parque\s+\w|zoológico|zoologico)\b/i;
+  if (rePOI.test(t)) {
+    return { tipo:'poi', query: expandirAbreviacoes(t) };
+  }
+
+  // 8. Endereço genérico — expande abreviações antes de geocodificar
   return { tipo:'endereco', query: expandirAbreviacoes(t) };
 }
 
@@ -1586,6 +1628,18 @@ async function buscarUniversal() {
     lat = parsed.lat;
     lng = parsed.lng;
     label = await reverseGeocode(lat, lng);
+  } else if (parsed.tipo === 'poi') {
+    // POI: tenta Places Text Search primeiro (mais preciso para shoppings, hospitais, etc.)
+    let result = await geocodePOI(parsed.query);
+    if (!result) result = await geocodeEndereco(parsed.query + ', Brasil'); // fallback
+    if (!result) {
+      reset();
+      showSearchError('Local não encontrado. Tente adicionar a cidade (ex: "Shopping X, São Paulo") ou cole as coordenadas.');
+      return;
+    }
+    lat   = parseFloat(result.lat);
+    lng   = parseFloat(result.lon);
+    label = result.display_name;
   } else {
     // Geocodifica via Google Maps API
     const result = await geocodeEndereco(parsed.query);
@@ -1770,25 +1824,27 @@ function inicializarParaCliente(cliente) {
     }
   } catch(e){}
 
-  // Desenha zonas de canibalização ao redor das unidades
-  if (window._zonasCanibal) window._zonasCanibal.forEach(c => map.removeLayer(c));
+  // ── Dispara modal de boas-vindas PRIMEIRO — mapa limpo antes de qualquer desenho ──
+  // O próprio mostrarBoasVindas chama zerarAnalise() internamente
+  if (typeof mostrarBoasVindas === 'function') mostrarBoasVindas();
+
+  // Carrega unidades do cliente na LayerGroup (off-screen enquanto modal estiver aberto)
+  // As unidades ficam prontas para exibição quando o usuário ativar a camada D.Finefit
+  if (window._zonasCanibal) window._zonasCanibal.forEach(c => { try { map.removeLayer(c); } catch(e){} });
   window._zonasCanibal = [];
 
-  // Carrega unidades do cliente no mapa
   if (cliente.unidades && cliente.unidades.length > 0) {
-    // Zonas de canibalização (usa raio configurado pelo usuário)
+    layers.dfinefit.clearLayers();
     const raioCanib = (window.canibRaioAtual || 1.25) * 1000;
     cliente.unidades.forEach(u => {
+      // Zona canibalização — adicionada ao map mas ficará oculta (map.removeLayer já foi chamado em zerarAnalise)
       const c = L.circle([u.lat, u.lng], {
         radius: raioCanib,
         color:'#dc2626', fillColor:'#ef4444',
         fillOpacity:.07, weight:1, dashArray:'4,4'
-      }).addTo(map);
+      });
       window._zonasCanibal.push(c);
-    });
-    // Markers das unidades
-    layers.dfinefit.clearLayers();
-    cliente.unidades.forEach(u => {
+      // Marker — adicionado à LayerGroup (que está off-screen)
       const icon = L.divIcon({
         className: '', iconSize:[0,0],
         html: `<div style="background:#0B132B;color:#C6A664;border:2px solid #C6A664;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;white-space:nowrap;font-family:Inter,sans-serif">${u.name.split('—')[0].trim()}</div>`
@@ -1798,23 +1854,12 @@ function inicializarParaCliente(cliente) {
         .addTo(layers.dfinefit);
     });
 
-    // Centraliza mapa nas unidades do cliente
-    if (cliente.unidades.length > 0) {
-      const lats = cliente.unidades.map(u => u.lat);
-      const lngs = cliente.unidades.map(u => u.lng);
-      const bounds = [[Math.min(...lats)-0.05, Math.min(...lngs)-0.05], [Math.max(...lats)+0.05, Math.max(...lngs)+0.05]];
-      map.fitBounds(bounds);
-    }
+    // Guarda bounds para uso posterior (ao ativar camada D.Finefit)
+    const lats = cliente.unidades.map(u => u.lat);
+    const lngs = cliente.unidades.map(u => u.lng);
+    window._clienteBounds = [[Math.min(...lats)-0.05, Math.min(...lngs)-0.05],
+                              [Math.max(...lats)+0.05, Math.max(...lngs)+0.05]];
   }
-
-  // Badge do plano no sidebar
-  const planoEl = document.getElementById('plano-badge');
-  // plano-badge removido
-
-  // ── Dispara modal de boas-vindas / início de sessão ──
-  setTimeout(() => {
-    if (typeof mostrarBoasVindas === 'function') mostrarBoasVindas();
-  }, 200);
 }
 
 function fazerLogout() {
