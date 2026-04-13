@@ -2304,8 +2304,8 @@ window.fecharScoreMap = fecharScoreMap;
 function abrirPainelScore(e) {
   if (e) e.preventDefault();
   if (scoreAtivo) { fecharScoreMap(); return; }
-  // Pré-seleciona o segmento ativo: clienteAtivo > tela inicial > fallback academia
-  const segAtivo = clienteAtivo?.segmento || window._segmentoKey || 'academia';
+  // Pré-seleciona o segmento ativo: clienteAtivo > tela inicial (mapeado) > fallback academia
+  const segAtivo = clienteAtivo?.segmento || window._segmentoScoreKey || 'academia';
   const sel = document.getElementById('sp-segmento');
   if(sel){ sel.value = segAtivo; atualizarCampoConsumo(segAtivo); }
   document.getElementById('painel-score').style.display = 'block';
@@ -5413,12 +5413,26 @@ function bvConfirmarSegmento() {
   window._segmentoAtual = label;
   window._segmentoKey   = bvSegmentoSelecionado || 'custom';
 
+  // Mapeamento: chaves da tela inicial → chaves do painel Score
+  const BV_TO_SCORE = {
+    academias:   'academia',
+    farmacias:   'farmacia',
+    alimentacao: 'alimentacao',
+    varejo:      'varejo',
+    clinicas:    'clinicas',
+    franquias:   'franquias',
+    educacao:    'varejo',
+    servicos:    'varejo'
+  };
+  const scoreKey = BV_TO_SCORE[window._segmentoKey] || window._segmentoKey || 'academia';
+
   // Propaga para clienteAtivo e para o select do painel Score
-  if (clienteAtivo) clienteAtivo.segmento = window._segmentoKey;
+  if (clienteAtivo) clienteAtivo.segmento = scoreKey;
+  window._segmentoScoreKey = scoreKey;
   const spSel = document.getElementById('sp-segmento');
-  if (spSel && window._segmentoKey !== 'custom') {
-    spSel.value = window._segmentoKey;
-    if (typeof atualizarCampoConsumo === 'function') atualizarCampoConsumo(window._segmentoKey);
+  if (spSel) {
+    spSel.value = scoreKey;
+    if (typeof atualizarCampoConsumo === 'function') atualizarCampoConsumo(scoreKey);
   }
 
   // Atualiza badge na sidebar
