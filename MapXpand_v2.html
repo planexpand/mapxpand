@@ -1657,8 +1657,8 @@ async function buscarUniversal() {
   } else if (parsed.tipo === 'poi') {
     // POI: tenta Places Text Search primeiro (mais preciso para shoppings, hospitais, etc.)
     let result = await geocodePOI(parsed.query);
-    if (!result) result = await geocodeEndereco(parsed.query + ', Brasil'); // fallback Google Geocoding
-    if (!result) result = await geocodeNominatim(parsed.query);              // fallback Nominatim OSM
+    if (!result) result = await geocodeNominatim(parsed.query);              // fallback Nominatim OSM (mais preciso p/ POIs nomeados)
+    if (!result) result = await geocodeEndereco(parsed.query + ', Brasil'); // último recurso: Google Geocoding
     if (!result) {
       reset();
       showSearchError('Local não encontrado. Tente adicionar a cidade (ex: "Shopping X, São Paulo") ou cole as coordenadas.');
