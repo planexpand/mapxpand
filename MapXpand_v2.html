@@ -1101,7 +1101,16 @@ function concorrIcon(cor='#ef4444'){
 function competitorIcon(nome){ return concorrIcon('#f97316'); }
 
 function searchIcon(){
-  return mkIcon(`<div style="width:14px;height:14px;border-radius:50%;background:#0B132B;border:2.5px solid #fff;box-shadow:0 0 0 4px rgba(11,19,43,.2)"></div>`,14,14,7,7);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48">
+    <filter id="shadow" x="-30%" y="-10%" width="160%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.35)"/>
+    </filter>
+    <path d="M18 0C8.06 0 0 8.06 0 18c0 13.5 18 30 18 30s18-16.5 18-30C36 8.06 27.94 0 18 0z"
+          fill="#E63946" filter="url(#shadow)"/>
+    <circle cx="18" cy="18" r="8" fill="#fff" opacity="0.95"/>
+    <circle cx="18" cy="18" r="5" fill="#E63946"/>
+  </svg>`;
+  return mkIcon(svg, 36, 48, 18, 48);
 }
 
 function octagon(lat,lng,km){
@@ -1685,7 +1694,7 @@ async function buscarUniversal() {
 
   // Determina zoom: mais preciso = mais zoom
   const isExato = /\d/.test(texto.split(',')[0]); // tem número no início
-  const zoom = parsed.tipo === 'coord' ? 17 : isExato ? 17 : 15;
+  const zoom = parsed.tipo === 'coord' ? 17 : parsed.tipo === 'poi' ? 16 : isExato ? 17 : 15;
 
   map.flyTo([lat, lng], zoom, { animate:true, duration:1 });
   analyse(lat, lng, label);
