@@ -1388,6 +1388,30 @@ async function geocodeEnderecoAll(query) {
   return result ? [result] : null;
 }
 
+// Fallback via Nominatim (OpenStreetMap) — sem chave de API
+async function geocodeNominatim(query) {
+  try {
+    const q = /brasil/i.test(query) ? query : query + ', Brasil';
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=br&accept-language=pt-BR`;
+    const r = await fetch(url, {
+      signal: AbortSignal.timeout(8000),
+      headers: { 'User-Agent': 'MapXpand/2.0 (planexpand.com.br)' }
+    });
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (!d.length) return null;
+    return {
+      lat: d[0].lat,
+      lon: d[0].lon,
+      display_name: d[0].display_name,
+      type: d[0].type || 'address'
+    };
+  } catch(e) {
+    console.warn('Nominatim fallback erro:', e);
+    return null;
+  }
+}
+
 async function reverseGeocode(lat, lng) {
   try {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=pt-BR&key=${GMAPS_KEY}`;
@@ -1562,13 +1586,15 @@ function parsearInputUniversal(texto) {
     return { tipo:'endereco', query: t + ' São Paulo Brasil' };
 
   // 7. POI — shopping, supermercado, hospital, academia, etc.
+  // Expande abreviações ANTES de testar, para que "shop." → "Shopping " seja detectado
+  const tExp = expandirAbreviacoes(t);
   const rePOI = /\b(shopping|supermercado|hipermercado|hypermarket|mall|center norte|boulevard|outlet|galeria|hospital|clínica|clinica|ubs|upa|escola|colégio|colegio|universidade|faculdade|academia|farmácia|farmacia|drogaria|aeroporto|estação|estacao|terminal|teatro|museu|estádio|estadio|ginásio|ginasio|parque\s+\w|zoológico|zoologico)\b/i;
-  if (rePOI.test(t)) {
-    return { tipo:'poi', query: expandirAbreviacoes(t) };
+  if (rePOI.test(tExp)) {
+    return { tipo:'poi', query: tExp };
   }
 
-  // 8. Endereço genérico — expande abreviações antes de geocodificar
-  return { tipo:'endereco', query: expandirAbreviacoes(t) };
+  // 8. Endereço genérico — abreviações já expandidas
+  return { tipo:'endereco', query: tExp };
 }
 
 async function resolverLinkCurto(url) {
@@ -1631,7 +1657,8 @@ async function buscarUniversal() {
   } else if (parsed.tipo === 'poi') {
     // POI: tenta Places Text Search primeiro (mais preciso para shoppings, hospitais, etc.)
     let result = await geocodePOI(parsed.query);
-    if (!result) result = await geocodeEndereco(parsed.query + ', Brasil'); // fallback
+    if (!result) result = await geocodeEndereco(parsed.query + ', Brasil'); // fallback Google Geocoding
+    if (!result) result = await geocodeNominatim(parsed.query);              // fallback Nominatim OSM
     if (!result) {
       reset();
       showSearchError('Local não encontrado. Tente adicionar a cidade (ex: "Shopping X, São Paulo") ou cole as coordenadas.');
@@ -1641,8 +1668,9 @@ async function buscarUniversal() {
     lng   = parseFloat(result.lon);
     label = result.display_name;
   } else {
-    // Geocodifica via Google Maps API
-    const result = await geocodeEndereco(parsed.query);
+    // Geocodifica via Google Maps API com fallback Nominatim
+    let result = await geocodeEndereco(parsed.query);
+    if (!result) result = await geocodeNominatim(parsed.query); // fallback OSM
     if (!result) {
       reset();
       showSearchError('Endereço não encontrado. Tente outro formato ou clique no mapa.');
