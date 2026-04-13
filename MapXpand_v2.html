@@ -1210,13 +1210,15 @@ function analyse(lat,lng,label){
   }).addTo(map);
 
   const pt={lat,lng};
-  // Unidades da rede do cliente logado
-  const unidadesRede = clienteAtivo?.unidades?.length > 0
-    ? clienteAtivo.unidades
-    : DFINEFIT;
+  // Prioridade: 1) Rede buscada no painel, 2) cliente ativo, 3) DFINEFIT
+  const unidadesRede = (window.redeUnidades?.length > 0)
+    ? window.redeUnidades
+    : (clienteAtivo?.unidades?.length > 0)
+        ? clienteAtivo.unidades
+        : DFINEFIT;
   const dOwn=Math.min(...unidadesRede.map(u=>dist(pt,u)));
-  // Canibalização: raio fixo de 1.25km por unidade
-  const RAIO_CANIB_KM = 1.25;
+  // Canibalização: usa o raio configurado pelo usuário (padrão 1,25km)
+  const RAIO_CANIB_KM = window.canibRaioAtual || 1.25;
   const emZonaCanib = unidadesRede.some(u => dist(pt,u) < RAIO_CANIB_KM);
   const dComp=Math.min(...COMPETITORS.map(c=>dist(pt,c)));
   const mt=TARGETS.find(t=>dist(pt,t)<=2.2);
@@ -2983,6 +2985,8 @@ function zerarAnalise() {
       redeMarkers.forEach(m=>{ try{map.removeLayer(m);}catch(e){} });
       redeMarkers.length=0;
     }
+    // Limpa unidades da rede vinculadas à canibalização
+    if (typeof window !== 'undefined') window.redeUnidades = [];
   }
 
   // 3. Reseta layerState
@@ -4081,7 +4085,7 @@ function showSearchError(msg){
       </button>
 
       <!-- Campos de senha — ocultos por padrão -->
-      <div id="senha-campos" style="display:none;margin-top:10px;display:flex;flex-direction:column;gap:8px;animation:fadeSlideDown .2s ease">
+      <div id="senha-campos" style="display:none;margin-top:10px;flex-direction:column;gap:8px;animation:fadeSlideDown .2s ease">
         <div>
           <label style="font-size:10px;font-weight:600;color:#64748b;display:block;margin-bottom:3px">Senha atual</label>
           <div style="position:relative">
@@ -4275,6 +4279,7 @@ function showSearchError(msg){
 // ── PAINEL REDE EM EXPANSÃO ──────────────────────────────
 const GKEY = 'AIzaSyBxf8WQy6U7eiO_QYQ6KMxPANrFElcQy_Y';
 let redeMarkers = [];
+window.redeUnidades = []; // Unidades buscadas via Google Places (vinculadas à canibalização)
 
 const ESTADO_COORDS = {
   '': {lat:-14.235,lng:-51.925,zoom:4},
@@ -4456,12 +4461,42 @@ async function buscarRedeNoMapa(){
   document.getElementById('rede-count-badge').textContent=`${lugares.length} unidade${lugares.length>1?'s':''}`;
   document.getElementById('rede-resultado').style.display='block';
   btn.disabled=false; btn.style.opacity='1';
+
+  // ── Salva unidades para uso nas Zonas de Canibalização ──
+  window.redeUnidades = lugares.map(p=>({
+    lat: p.geometry?.location?.lat,
+    lng: p.geometry?.location?.lng,
+    name: p.name
+  })).filter(u=>u.lat && u.lng);
+
+  // Se as zonas de canibalização estiverem ativas, redesenha com a nova rede
+  if(layerState['cannibal'] && window.redeUnidades.length > 0){
+    layers.cannibal.clearLayers();
+    if(window._zonasCanibal){ window._zonasCanibal.forEach(c=>{try{map.removeLayer(c);}catch(e){}});}
+    window._zonasCanibal = [];
+    window.redeUnidades.forEach(u=>{
+      L.circle([u.lat,u.lng],{
+        radius: (window.canibRaioAtual || 1.25) * 1000,
+        color:'#dc2626', fillColor:'#ef4444',
+        fillOpacity:.10, weight:1.5, dashArray:'6,5',
+        interactive: false
+      }).addTo(layers.cannibal);
+    });
+    if(!map.hasLayer(layers.cannibal)) map.addLayer(layers.cannibal);
+  }
 }
 window.buscarRedeNoMapa=buscarRedeNoMapa;
 
 function limparRedeNoMapa(showMsg=true){
   redeMarkers.forEach(m=>map.removeLayer(m));
   redeMarkers=[];
+  // Limpa referência de unidades salvas e remove zonas de canibalização da rede
+  window.redeUnidades = [];
+  if(layerState['cannibal']){
+    layers.cannibal.clearLayers();
+    if(window._zonasCanibal){ window._zonasCanibal.forEach(c=>{try{map.removeLayer(c);}catch(e){}});}
+    window._zonasCanibal=[];
+  }
   document.getElementById('rede-resultado').style.display='none';
   document.getElementById('rede-lista').innerHTML='';
   if(showMsg){
@@ -5134,10 +5169,12 @@ function confirmarCanibRaio(){
   if(window._zonasCanibal){ window._zonasCanibal.forEach(c=>{ try{map.removeLayer(c);}catch(e){} }); }
   window._zonasCanibal=[];
 
-  // Usa unidades do cliente ativo; se não houver, usa DFINEFIT
-  const unidades = (window.clienteAtivo?.unidades?.length > 0)
-    ? window.clienteAtivo.unidades
-    : DFINEFIT;
+  // Prioridade: 1) Rede buscada no painel "Rede em Expansão", 2) cliente ativo, 3) DFINEFIT
+  const unidades = (window.redeUnidades?.length > 0)
+    ? window.redeUnidades
+    : (window.clienteAtivo?.unidades?.length > 0)
+        ? window.clienteAtivo.unidades
+        : DFINEFIT;
 
   unidades.forEach(u=>{
     L.circle([u.lat,u.lng],{
