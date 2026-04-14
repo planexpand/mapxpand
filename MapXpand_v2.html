@@ -1173,7 +1173,9 @@ function analyse(lat,lng,label){
   searchMarker=L.marker([lat,lng],{icon:searchIcon(),zIndexOffset:1000}).addTo(layers.search);
   // Clique no pin vermelho: reabre análise sem criar novo pin
   searchMarker.on('click', function(e) {
-    L.DomEvent.stopPropagation(e);
+    e.originalEvent && e.originalEvent.stopPropagation();
+    window._searchMarkerClicked = true;
+    setTimeout(() => { window._searchMarkerClicked = false; }, 100);
     // Mostra resultado na sidebar e rola até ele
     const el = document.getElementById('analysisResult');
     if (el) {
@@ -3704,6 +3706,9 @@ window.limparTodosPins = limparTodosPins;
 
 // CLIQUE NO MAPA
 map.on('click', async e => {
+  // Ignora clique se foi no pin vermelho de análise
+  if (window._searchMarkerClicked) return;
+
   const { lat, lng } = e.latlng;
 
   // Sempre cria pin ao clicar no mapa
