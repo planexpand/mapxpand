@@ -5419,10 +5419,10 @@ function bvConfirmarSegmento() {
     farmacias:   'farmacia',
     alimentacao: 'alimentacao',
     varejo:      'varejo',
-    clinicas:    'clinicas',
-    franquias:   'franquias',
-    educacao:    'varejo',
-    servicos:    'varejo'
+    clinicas:    'saude',      // "Clínicas & Estética" → Saúde & Clínicas
+    franquias:   'varejo',     // mais próximo disponível
+    educacao:    'educacao',   // corresponde direto
+    servicos:    'banco'       // Escritórios & Serviços → Serviços Financeiros
   };
   const scoreKey = BV_TO_SCORE[window._segmentoKey] || window._segmentoKey || 'academia';
 
