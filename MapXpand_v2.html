@@ -1171,6 +1171,12 @@ function analyse(lat,lng,label){
   // Garante que layers.search está no mapa (pode ter sido removido pelo zerarAnalise)
   if(!map.hasLayer(layers.search)) layers.search.addTo(map);
   searchMarker=L.marker([lat,lng],{icon:searchIcon(),zIndexOffset:1000}).addTo(layers.search);
+  // Clique no pin vermelho: exibe painel de análise sem criar novo pin
+  searchMarker.on('click', function(e) {
+    L.DomEvent.stopPropagation(e);
+    const el = document.getElementById('analysisResult');
+    if (el) el.style.display = 'block';
+  });
   // Salva posição do pin para uso em busca de concorrentes
   window._lastAnalysisLat = lat;
   window._lastAnalysisLng = lng;
@@ -3713,9 +3719,9 @@ map.on('click', async e => {
           <div style="font-size:12px;font-weight:700;color:#0B132B;line-height:1.3">${label?.split(',').slice(0,2).join(',') || 'Ponto '+id}</div>
         </div>
         <div style="font-size:10px;color:#64748b;margin-bottom:8px">${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
-        ${ibge ? `<div style="font-size:11px;background:#ffffff;border-radius:6px;padding:6px 8px;margin-bottom:8px">
-          📍 ${ibge.nome}/${ibge.uf} &nbsp;·&nbsp; 👥 ${pop} hab
-        </div>` : ''}
+        <div style="font-size:11px;background:#ffffff;border-radius:6px;padding:6px 8px;margin-bottom:8px">
+          📍 ${window._lastGeoCity || (ibge ? `${ibge.nome}/${ibge.uf}` : '—')} &nbsp;·&nbsp; 👥 ${pop} hab
+        </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button onclick="analisarPin(${id})"
             style="background:#0B132B;color:#C6A664;border:none;border-radius:6px;padding:5px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">
