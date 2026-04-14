@@ -1124,19 +1124,7 @@ DFINEFIT.forEach(u=>{
     </div>`,popOpts).addTo(layers.dfinefit);
 });
 
-// TARGETS
-TARGETS.forEach(t=>{
-  const p=t.id<=5;
-  L.polygon(octagon(t.lat,t.lng,2),{
-    color:'#22c55e',weight:p?2.5:1.5,dashArray:'8 10',
-    fillColor:'#22c55e',fillOpacity:p?0.18:0.08
-  }).bindPopup(`<div class="pop-inner">
-    <span class="pop-badge" style="background:#dcfce7;color:#15803d;border:0.5px solid #bbf7d0">ALVO #${t.id}${p?' · PRIORITÁRIO':''}</span>
-    <div class="pop-name">${t.name}</div>
-    <div class="pop-sub">${t.why}</div>
-  </div>`,popOpts).addTo(layers.expansion);
-  L.marker([t.lat,t.lng],{icon:targetIcon(t.id,p),interactive:false}).addTo(layers.expansion);
-});
+// TARGETS removidos — eram dados demo SmartFit, não fazem parte da plataforma genérica
 
 // COMPETITORS
 COMPETITORS.forEach(c=>{
@@ -1211,13 +1199,11 @@ function analyse(lat,lng,label){
   const RAIO_CANIB_KM = window.canibRaioAtual || 1.25;
   const emZonaCanib = unidadesRede.some(u => dist(pt,u) < RAIO_CANIB_KM);
   const dComp=Math.min(...COMPETITORS.map(c=>dist(pt,c)));
-  const mt=TARGETS.find(t=>dist(pt,t)<=2.2);
   let score=50;
   if(emZonaCanib)score-=50;
   else if(dOwn>=2&&dOwn<=5)score+=35;
   if(dComp<1.3)score-=40;
   else if(dComp>4)score+=15;
-  if(mt)score+=mt.id<=5?40:25;
   score=Math.max(5,Math.min(100,score));
   const isG=score>80,isA=score>55;
   const hBg=isG?'linear-gradient(135deg,#166534,#15803d)':isA?'linear-gradient(135deg,#92400e,#b45309)':'linear-gradient(135deg,#991b1b,#b91c1c)';
@@ -1260,9 +1246,8 @@ function renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,
       <div class="ar-row" style="font-size:9px;color:#64748b"><span>Via</span><span>${viaTop}</span></div>
       <div class="ar-row"><span>Dist. unidade própria</span><strong>${dOwn.toFixed(2)} km</strong></div>
       <div class="ar-row"><span>Dist. concorrente</span><strong>${dComp.toFixed(2)} km</strong></div>
-      ${mt?`<div class="ar-row"><span>Alvo mapeado</span><strong style="color:#15803d">#${mt.id} — ${mt.name}</strong></div>`:''}
       <span class="ar-tag ${tc}">${ttxt}</span>
-      ${ibge?`<div style="margin-top:6px;font-size:9px;color:#64748b">📍 Fonte: IBGE Censo 2022 — ${ibge.nome}/${ibge.uf}</div>`:''}
+      <div style="margin-top:6px;font-size:9px;color:#64748b">📍 Fonte: IBGE Censo 2022 — ${window._lastGeoCity || (ibge?`${ibge.nome}/${ibge.uf}`:'')}</div>
     </div>
   </div>`;
 }
@@ -1469,7 +1454,14 @@ async function reverseGeocode(lat, lng) {
     const r = await fetchWithTimeout(url, {}, 6000);
     if (!r.ok) return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
     const d = await r.json();
-    if (d.status === 'OK' && d.results.length) return d.results[0].formatted_address;
+    if (d.status === 'OK' && d.results.length) {
+      // Extrai cidade e estado dos componentes do endereço
+      const comps = d.results[0].address_components || [];
+      const cidade = comps.find(c => c.types.includes('administrative_area_level_2'))?.long_name || '';
+      const estado = comps.find(c => c.types.includes('administrative_area_level_1'))?.short_name || '';
+      if (cidade) window._lastGeoCity = `${cidade}/${estado}`;
+      return d.results[0].formatted_address;
+    }
     return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
   } catch(e) {
     return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
