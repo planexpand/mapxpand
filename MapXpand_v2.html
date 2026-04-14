@@ -1700,6 +1700,68 @@ function resultadoRelevante(result, query) {
   return palavras.some(w => display.includes(w));
 }
 
+// ── Open-Meteo Geocoding — gratuito, sem chave, sem cadastro ──
+async function geocodeOpenMeteo(query) {
+  try {
+    const q = query.replace(/,?\s*brasil$/i,'').trim();
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=pt&format=json`;
+    const r = await fetchWithTimeout(url, {}, 6000);
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (!d.results?.length) return null;
+    const br = d.results.find(i => i.country_code === 'BR') || d.results[0];
+    if (!br) return null;
+    return {
+      lat: br.latitude.toString(),
+      lon: br.longitude.toString(),
+      display_name: `${br.name}${br.admin2 ? ', '+br.admin2 : ''}${br.admin1 ? ' — '+br.admin1 : ''}, Brasil`,
+      type: 'locality'
+    };
+  } catch(e) { console.warn('Open-Meteo geocoding erro:', e.message); return null; }
+}
+
+// ── Geoapify Geocoding — gratuito 3.000/dia (cadastro grátis em geoapify.com) ──
+const GEOAPIFY_KEY = '15354b247bdf4f55a353282cdd5b5e12'; // Geoapify — 3.000 chamadas/dia
+async function geocodeGeoapify(query) {
+  if (!GEOAPIFY_KEY) return null;
+  try {
+    const q = /brasil/i.test(query) ? query : query + ', Brasil';
+    const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(q)}&filter=countrycode:br&lang=pt&limit=1&apiKey=${GEOAPIFY_KEY}`;
+    const r = await fetchWithTimeout(url, {}, 7000);
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (!d.features?.length) return null;
+    const f = d.features[0];
+    return {
+      lat: f.geometry.coordinates[1].toString(),
+      lon: f.geometry.coordinates[0].toString(),
+      display_name: f.properties.formatted || query,
+      type: f.properties.result_type || 'address'
+    };
+  } catch(e) { console.warn('Geoapify geocoding erro:', e.message); return null; }
+}
+
+// ── OpenCage Geocoding — gratuito 2.500/dia (cadastro grátis em opencagedata.com) ──
+const OPENCAGE_KEY = 'bc2fb7edee614f7bafcd3d90ac009b5a'; // OpenCage — 2.500 chamadas/dia
+async function geocodeOpenCage(query) {
+  if (!OPENCAGE_KEY) return null;
+  try {
+    const q = /brasil/i.test(query) ? query : query + ', Brazil';
+    const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(q)}&key=${OPENCAGE_KEY}&language=pt&countrycode=br&limit=1&no_annotations=1`;
+    const r = await fetchWithTimeout(url, {}, 7000);
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (!d.results?.length) return null;
+    const res = d.results[0];
+    return {
+      lat: res.geometry.lat.toString(),
+      lon: res.geometry.lng.toString(),
+      display_name: res.formatted || query,
+      type: res.components?._type || 'address'
+    };
+  } catch(e) { console.warn('OpenCage geocoding erro:', e.message); return null; }
+}
+
 // Fallback via Nominatim (OpenStreetMap) — sem chave de API
 async function geocodeNominatim(query) {
   try {
@@ -1981,8 +2043,10 @@ async function buscarUniversal() {
   } else if (parsed.tipo === 'poi') {
     // POI: tenta Places Text Search primeiro (mais preciso para shoppings, hospitais, etc.)
     let result = await geocodePOI(parsed.query);
-    if (!result) result = await geocodeNominatim(parsed.query);              // fallback Nominatim OSM (mais preciso p/ POIs nomeados)
-    if (!result) result = await geocodeEndereco(parsed.query + ', Brasil'); // último recurso: Google Geocoding
+    if (!result) result = await geocodeNominatim(parsed.query);              // fallback 1: Nominatim OSM
+    if (!result) result = await geocodeGeoapify(parsed.query);              // fallback 2: Geoapify (se chave configurada)
+    if (!result) result = await geocodeOpenMeteo(parsed.query);             // fallback 3: Open-Meteo (sem chave)
+    if (!result) result = await geocodeEndereco(parsed.query + ', Brasil'); // fallback 4: Google Geocoding
     if (!result) {
       reset();
       showSearchError('Local não encontrado. Tente adicionar a cidade (ex: "Shopping X, São Paulo") ou cole as coordenadas.');
@@ -1992,9 +2056,12 @@ async function buscarUniversal() {
     lng   = parseFloat(result.lon);
     label = result.display_name;
   } else {
-    // Geocodifica via Google Maps API com fallback Nominatim
+    // Geocodifica via Google → Nominatim → OpenCage → Geoapify → Open-Meteo
     let result = await geocodeEndereco(parsed.query);
-    if (!result) result = await geocodeNominatim(parsed.query); // fallback OSM
+    if (!result) result = await geocodeNominatim(parsed.query);   // fallback 1: OSM
+    if (!result) result = await geocodeOpenCage(parsed.query);    // fallback 2: OpenCage (se chave configurada)
+    if (!result) result = await geocodeGeoapify(parsed.query);    // fallback 3: Geoapify (se chave configurada)
+    if (!result) result = await geocodeOpenMeteo(parsed.query);   // fallback 4: Open-Meteo (sem chave)
     if (!result) {
       reset();
       showSearchError('Endereço não encontrado. Tente outro formato ou clique no mapa.');
