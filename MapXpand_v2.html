@@ -234,6 +234,42 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .leaflet-control-attribution{background:rgba(255,255,255,.85)!important;color:#94a3b8!important;font-size:9px!important;border-radius:6px!important}
 .leaflet-control-attribution a{color:#0B132B!important}
 
+/* ── Botão Localizar Usuário ─────────────────────────── */
+.locate-btn{
+  width:30px;height:30px;background:#fff;border:1px solid #e2e8f0;
+  border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.08);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .15s,box-shadow .15s;
+  margin-bottom:6px;
+}
+.locate-btn:hover{background:#f0f9ff;box-shadow:0 4px 14px rgba(0,0,0,.13);}
+.locate-btn.active{background:#e0f2fe;border-color:#0ea5e9;}
+.locate-btn.loading svg{animation:locate-spin .7s linear infinite;}
+@keyframes locate-spin{to{transform:rotate(360deg);}}
+
+/* Ponto pulsante de localização */
+.user-location-dot{
+  width:16px;height:16px;border-radius:50%;
+  background:#2563eb;border:2.5px solid #fff;
+  box-shadow:0 0 0 0 rgba(37,99,235,.5);
+  animation:location-pulse 1.8s ease-out infinite;
+  position:relative;
+}
+.user-location-dot::after{
+  content:'';position:absolute;inset:-6px;border-radius:50%;
+  background:rgba(37,99,235,.18);
+  animation:location-pulse-ring 1.8s ease-out infinite;
+}
+@keyframes location-pulse{
+  0%{box-shadow:0 0 0 0 rgba(37,99,235,.5);}
+  70%{box-shadow:0 0 0 10px rgba(37,99,235,0);}
+  100%{box-shadow:0 0 0 0 rgba(37,99,235,0);}
+}
+@keyframes location-pulse-ring{
+  0%{transform:scale(.8);opacity:.8;}
+  100%{transform:scale(2);opacity:0;}
+}
+
 /* ── RELATÓRIO MAPXPAND ─────────────────────────────── */
 #relatorio-modal{display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.75);overflow-y:auto;padding:20px}
 #relatorio-modal.show{display:block}
@@ -1003,6 +1039,114 @@ function painelIBGE(lat, lng) {
 // MAP — Google Maps tiles (igual imagem original)
 const map=L.map('map',{zoomControl:false,center:[-23.651,-46.700],zoom:12});
 L.control.zoom({position:'bottomright'}).addTo(map);
+
+// ── BOTÃO LOCALIZAR USUÁRIO — estilo Google Maps ─────────────
+let _userLocMarker = null;
+let _locAtivo = false;
+
+const LocateControl = L.Control.extend({
+  options: { position: 'bottomright' },
+  onAdd: function() {
+    const btn = L.DomUtil.create('div', 'locate-btn');
+    btn.id = 'btn-locate';
+    btn.title = 'Minha localização';
+    btn.innerHTML = _svgLocate('idle');
+    L.DomEvent.on(btn, 'click', L.DomEvent.stopPropagation);
+    L.DomEvent.on(btn, 'click', L.DomEvent.preventDefault);
+    L.DomEvent.on(btn, 'click', () => localizarUsuario(btn));
+    return btn;
+  }
+});
+new LocateControl().addTo(map);
+
+function _svgLocate(estado) {
+  if (estado === 'loading') {
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
+  } else if (estado === 'active') {
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" fill="#2563eb"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="2 2"/></svg>`;
+  } else {
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="#475569" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="#475569" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#475569" stroke-width="1.5"/></svg>`;
+  }
+}
+
+function localizarUsuario(btn) {
+  if (!navigator.geolocation) {
+    alert('Geolocalização não suportada neste navegador.');
+    return;
+  }
+
+  // Se já está ativo → apenas re-centraliza
+  if (_locAtivo && _userLocMarker) {
+    const pos = _userLocMarker.getLatLng();
+    map.setView(pos, 16, { animate: true });
+    return;
+  }
+
+  // Estado: carregando
+  btn.classList.add('loading');
+  btn.innerHTML = _svgLocate('loading');
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const acc = pos.coords.accuracy;
+
+      // Remove marcador anterior
+      if (_userLocMarker) { map.removeLayer(_userLocMarker); _userLocMarker = null; }
+
+      // Cria marcador pulsante
+      const dotIcon = L.divIcon({
+        className: '',
+        html: '<div class="user-location-dot"></div>',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+      });
+      _userLocMarker = L.marker([lat, lng], { icon: dotIcon, zIndexOffset: 2000 })
+        .addTo(map)
+        .bindPopup(`
+          <div style="font-family:Inter,sans-serif;font-size:11px;min-width:160px">
+            <div style="font-weight:700;color:#0B132B;margin-bottom:4px">📍 Sua localização</div>
+            <div style="color:#64748b">Precisão: ±${Math.round(acc)}m</div>
+            <div style="color:#64748b;font-size:9px;margin-top:2px">${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
+          </div>`);
+
+      // Círculo de precisão
+      L.circle([lat, lng], {
+        radius: acc,
+        color: '#2563eb',
+        fillColor: '#2563eb',
+        fillOpacity: 0.06,
+        weight: 1.5,
+        dashArray: '4 4'
+      }).addTo(map);
+
+      // Centraliza e abre popup
+      map.setView([lat, lng], 16, { animate: true });
+      setTimeout(() => _userLocMarker?.openPopup(), 600);
+
+      // Estado: ativo
+      _locAtivo = true;
+      btn.classList.remove('loading');
+      btn.classList.add('active');
+      btn.innerHTML = _svgLocate('active');
+    },
+    err => {
+      btn.classList.remove('loading');
+      btn.innerHTML = _svgLocate('idle');
+      _locAtivo = false;
+
+      const msgs = {
+        1: 'Permissão de localização negada. Habilite o GPS nas configurações do navegador.',
+        2: 'Não foi possível determinar sua posição.',
+        3: 'Tempo esgotado ao buscar localização.'
+      };
+      alert(msgs[err.code] || 'Erro ao obter localização.');
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+  );
+}
+window.localizarUsuario = localizarUsuario;
 // Tiles CartoDB Voyager — visual limpo, sem restrição de Referer
 const tileLayers = {
   ruas:      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
@@ -1171,7 +1315,7 @@ function updateRaio(idx){
     // Re-renderiza o painel com a população atualizada
     const el = document.getElementById('analysisResult');
     if (el && el.style.display !== 'none') {
-      el.innerHTML = renderAnalise(score, hBg||`linear-gradient(135deg,#166534,#15803d)`, stxt||'Ideal para rede', tc||'green', ttxt||'', endLabel, dOwn, dComp, null, val, popFmt, ibge, viaTop||'Calculando...', vmd||'–');
+      el.innerHTML = renderAnalise(score, hBg||`linear-gradient(135deg,#166534,#15803d)`, stxt||'Ideal para rede', tc||'green', ttxt||'', endLabel, dOwn, dComp, null, val, popFmt, ibge, viaTop||'Calculando...', vmd||'–', _ultimaAnalise?.bdc||null);
     }
 
     // Atualiza também o elemento de pop na sidebar se visível
@@ -1193,6 +1337,58 @@ function dist(a,b){
   const x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
+
+// ═══════════════════════════════════════════════════════════════
+// BIGDATACLOUD — Enriquecimento de bairro e localidade
+// ═══════════════════════════════════════════════════════════════
+const BDC_KEY = 'bdc_40c6cf5fa3b044778f848e8610cfa436';
+
+async function buscarDadosBDC(lat, lng) {
+  try {
+    const url = `https://api.bigdatacloud.net/data/reverse-geocode?latitude=${lat}&longitude=${lng}&localityLanguage=pt&key=${BDC_KEY}`;
+    const r = await fetchWithTimeout(url, {}, 6000);
+    const d = await r.json();
+
+    // Extrai o bairro a partir do localityInfo
+    const infos = d.localityInfo?.informational || [];
+    const admins = d.localityInfo?.administrative || [];
+    const vizinhanca = infos.find(i =>
+      ['neighbourhood','quarter','suburb','village','hamlet'].includes(i.description)
+    );
+    // Tenta pegar subprefeitura / distrito do array administrative
+    const distrito = admins.find(i =>
+      ['district','subdistrict','municipality'].includes(i.description?.toLowerCase())
+    );
+
+    return {
+      bairro:     vizinhanca?.name || d.locality || '',
+      distrito:   distrito?.name  || '',
+      cidade:     d.city || d.locality || '',
+      estado:     d.principalSubdivision || '',
+      siglaEstado:d.principalSubdivisionCode?.replace(/[A-Z]+-/,'') || '',
+      cep:        d.postcode || '',
+      pais:       d.countryName || 'Brasil',
+      raw:        d
+    };
+  } catch(e) {
+    console.warn('BigDataCloud indisponível:', e.message);
+    return null;
+  }
+}
+
+// Auto-localização ao carregar (ipapi.co — sem chave)
+async function autoLocalizarUsuario() {
+  try {
+    const r = await fetch('https://ipapi.co/json/');
+    const d = await r.json();
+    if (d.latitude && d.longitude && typeof map !== 'undefined') {
+      map.setView([d.latitude, d.longitude], 13);
+      window._cidadeUsuario = `${d.city || ''}${d.region_code ? ' — '+d.region_code : ''}`;
+    }
+  } catch(e) { /* silencioso */ }
+}
+// Executa após mapa pronto
+setTimeout(autoLocalizarUsuario, 1200);
 
 // MOTOR DE ANÁLISE
 let searchMarker=null;
@@ -1289,17 +1485,33 @@ function analyse(lat,lng,label){
   const el=document.getElementById('analysisResult');
   el.style.display='block';
   // Salva dados para o relatório
-  _ultimaAnalise = { score, label, raioKm, popNoRaio, popFmt, ibge, dOwn, dComp, lat, lng, hBg, stxt, tc, ttxt };
-  el.innerHTML=renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,ibge,'Calculando...','–');
+  _ultimaAnalise = { score, label, raioKm, popNoRaio, popFmt, ibge, dOwn, dComp, lat, lng, hBg, stxt, tc, ttxt, bdc: null };
+  el.innerHTML=renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,ibge,'Calculando...','–',null);
 
   // Busca fluxo das vias próximas via Overpass
   buscarFluxoVias(lat,lng,raioM).then(({viaTop,vmd})=>{
     if(_ultimaAnalise) { _ultimaAnalise.viaTop=viaTop; _ultimaAnalise.vmd=vmd; }
-    el.innerHTML=renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,ibge,viaTop,vmd);
+    const bdcAtual = _ultimaAnalise?.bdc || null;
+    el.innerHTML=renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,ibge,viaTop,vmd,bdcAtual);
+  });
+
+  // Enriquece com BigDataCloud em paralelo (bairro, CEP, distrito)
+  buscarDadosBDC(lat, lng).then(bdc => {
+    if (!bdc) return;
+    if (_ultimaAnalise) _ultimaAnalise.bdc = bdc;
+    // Atualiza painel se ainda visível
+    const elAtual = document.getElementById('analysisResult');
+    if (elAtual && elAtual.style.display !== 'none' && _ultimaAnalise) {
+      const a = _ultimaAnalise;
+      elAtual.innerHTML = renderAnalise(a.score,a.hBg,a.stxt,a.tc,a.ttxt,a.label,a.dOwn,a.dComp,null,a.raioKm,a.popFmt,a.ibge,a.viaTop||'Calculando...',a.vmd||'–',bdc);
+    }
   });
 }
 
-function renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,ibge,viaTop,vmd){
+function renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,ibge,viaTop,vmd,bdc){
+  const bairroLabel = bdc?.bairro ? `<div class="ar-row" style="font-size:10px"><span>🏘️ Bairro</span><strong style="color:#C6A664">${bdc.bairro}${bdc.distrito?' — '+bdc.distrito:''}</strong></div>` : '';
+  const cepLabel    = bdc?.cep    ? `<div class="ar-row" style="font-size:10px"><span>📮 CEP</span><strong>${bdc.cep}</strong></div>` : '';
+  const bdcFonte    = bdc ? `📍 BigDataCloud + IBGE Censo 2022 — ${bdc.cidade||window._lastGeoCity||(ibge?`${ibge.nome}/${ibge.uf}`:'')}` : `📍 Fonte: IBGE Censo 2022 — ${window._lastGeoCity||(ibge?`${ibge.nome}/${ibge.uf}`:'')}`;
   return `<div class="ar-card" style="margin-top:10px">
     <div class="ar-head" style="background:${hBg}">
       <div><div class="ar-score-num">${score}%</div><div class="ar-score-label">Índice de viabilidade</div></div>
@@ -1307,6 +1519,8 @@ function renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,
     </div>
     <div class="ar-body">
       <div class="ar-addr" title="${label}">${(label||'').split(',').slice(0,2).join(',')}</div>
+      ${bairroLabel}
+      ${cepLabel}
       <div class="ar-row"><span>Raio analisado</span><strong>${raioKm} km</strong></div>
       <div class="ar-row"><span>👥 Hab. no raio (est.)</span><strong>${popFmt}</strong></div>
       <div class="ar-row"><span>🚗 Fluxo via principal</span><strong>${vmd}</strong></div>
@@ -1314,7 +1528,7 @@ function renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,
       ${dOwn!==null?`<div class="ar-row"><span>Dist. unidade própria</span><strong>${dOwn.toFixed(2)} km</strong></div>`:''}
       ${dComp!==null?`<div class="ar-row"><span>Dist. concorrente</span><strong>${dComp.toFixed(2)} km</strong></div>`:''}
       <span class="ar-tag ${tc}">${ttxt}</span>
-      <div style="margin-top:6px;font-size:9px;color:#64748b">📍 Fonte: IBGE Censo 2022 — ${window._lastGeoCity || (ibge?`${ibge.nome}/${ibge.uf}`:'')}</div>
+      <div style="margin-top:6px;font-size:9px;color:#64748b">${bdcFonte}</div>
     </div>
   </div>`;
 }
@@ -2411,12 +2625,141 @@ let concorrentesAutoAtivo = false;
 let ultimaBuscaPos = null;
 
 const SEGMENTO_TIPOS = {
-  academia: { tipo: 'gym', label: 'Academia', cor: '#ef4444', emoji: '🏋️' },
-  farmacia: { tipo: 'pharmacy', label: 'Farmácia', cor: '#10b981', emoji: '💊' },
-  varejo:   { tipo: 'store', label: 'Loja', cor: '#3b82f6', emoji: '🏪' },
-  admin:    { tipo: 'gym', label: 'Academia', cor: '#ef4444', emoji: '🏋️' }
+  academia:    { tipo: 'gym',      label: 'Academia', cor: '#ef4444', emoji: '🏋️' },
+  farmacia:    { tipo: 'pharmacy', label: 'Farmácia', cor: '#10b981', emoji: '💊' },
+  varejo:      { tipo: 'store',    label: 'Loja',     cor: '#3b82f6', emoji: '🏪' },
+  alimentacao: { tipo: 'restaurant', label: 'Restaurante', cor: '#f59e0b', emoji: '🍽' },
+  beleza:      { tipo: 'beauty_salon', label: 'Salão', cor: '#ec4899', emoji: '💅' },
+  educacao:    { tipo: 'school',   label: 'Escola',   cor: '#8b5cf6', emoji: '📚' },
+  saude:       { tipo: 'hospital', label: 'Clínica',  cor: '#06b6d4', emoji: '🏥' },
+  pet:         { tipo: 'pet_store',label: 'Pet Shop', cor: '#84cc16', emoji: '🐾' },
+  banco:       { tipo: 'bank',     label: 'Banco',    cor: '#0ea5e9', emoji: '🏦' },
+  supermercado:{ tipo: 'supermarket', label: 'Supermercado', cor: '#22c55e', emoji: '🛒' },
+  hotel:       { tipo: 'lodging',  label: 'Hotel',    cor: '#a78bfa', emoji: '🏨' },
+  auto:        { tipo: 'car_repair', label: 'Oficina', cor: '#64748b', emoji: '🔧' },
+  admin:       { tipo: 'gym',      label: 'Academia', cor: '#ef4444', emoji: '🏋️' }
 };
 
+// ── CONFIG DE CONCORRÊNCIA POR SEGMENTO ─────────────────────────
+const SEGMENTO_CONCORRENCIA = {
+  academia:    {
+    emoji1:'🏋️', label1:'Academias independentes / bairro',
+    hint1:'Smart Fit, Bodytech, Bio Ritmo, redes locais',
+    emoji2:'🏢', label2:'Redes nacionais / grandes operadores',
+    hint2:'Centros de bairro, estúdios boutique, crossfit',
+    labelBairro:'Academias de Bairro', labelRede:'Redes Concorrentes',
+    convPop:0.07, convFluxo:0.02, capturaBairro:125,
+    unidade:'Alunos Ativos', metaMin:1500, metaMed:1000
+  },
+  farmacia:    {
+    emoji1:'💊', label1:'Farmácias independentes / bairro',
+    hint1:'Drogarias locais, manipulação, farmácias populares',
+    emoji2:'🏢', label2:'Redes nacionais / grandes redes',
+    hint2:'Drogasil, Raia, Pacheco, Ultrafarma, São João',
+    labelBairro:'Farmácias de Bairro', labelRede:'Redes Farmacêuticas',
+    convPop:0.15, convFluxo:0.03, capturaBairro:300,
+    unidade:'Clientes/Mês', metaMin:2000, metaMed:1500
+  },
+  alimentacao: {
+    emoji1:'🍽', label1:'Restaurantes independentes / bairro',
+    hint1:'Lanchonetes locais, restaurantes por kg, padarias',
+    emoji2:'🏢', label2:'Redes nacionais / fast food',
+    hint2:"McDonald's, Subway, Burger King, Bob's, redes regionais",
+    labelBairro:'Restaurantes Locais', labelRede:'Redes de Alimentação',
+    convPop:0.10, convFluxo:0.03, capturaBairro:200,
+    unidade:'Refeições/Mês', metaMin:3000, metaMed:2000
+  },
+  varejo:      {
+    emoji1:'🏪', label1:'Lojas independentes / bairro',
+    hint1:'Lojas locais, multimarcas, atacarejo de bairro',
+    emoji2:'🏢', label2:'Redes nacionais / grandes varejistas',
+    hint2:'Magazine Luiza, Americanas, Hering, Renner, Riachuelo',
+    labelBairro:'Lojas de Bairro', labelRede:'Redes Varejistas',
+    convPop:0.08, convFluxo:0.025, capturaBairro:150,
+    unidade:'Clientes/Mês', metaMin:1200, metaMed:800
+  },
+  beleza:      {
+    emoji1:'💇', label1:'Salões independentes / bairro',
+    hint1:'Salões locais, barbearias, estúdios de sobrancelha',
+    emoji2:'🏢', label2:'Redes nacionais / franquias de beleza',
+    hint2:'O Boticário, Studio W, Jacques Janine, Espaço Laser',
+    labelBairro:'Salões de Bairro', labelRede:'Redes de Beleza',
+    convPop:0.06, convFluxo:0.015, capturaBairro:80,
+    unidade:'Atendimentos/Mês', metaMin:600, metaMed:400
+  },
+  educacao:    {
+    emoji1:'🎓', label1:'Escolas / cursos independentes',
+    hint1:'Escolas livres, cursinhos locais, centros de idiomas',
+    emoji2:'🏢', label2:'Redes nacionais / grandes grupos',
+    hint2:'Wizard, CCAA, Pearson, Cogna, Kroton, Anhanguera',
+    labelBairro:'Cursos Independentes', labelRede:'Redes de Ensino',
+    convPop:0.05, convFluxo:0.01, capturaBairro:100,
+    unidade:'Alunos Matriculados', metaMin:300, metaMed:200
+  },
+  saude:       {
+    emoji1:'🏥', label1:'Clínicas independentes / bairro',
+    hint1:'Clínicas locais, consultórios, UBS, prontos-socorros',
+    emoji2:'🏢', label2:'Redes nacionais / grandes operadoras',
+    hint2:'Hapvida, NotreDame, Unimed, Dasa, Fleury, Prevent Senior',
+    labelBairro:'Clínicas de Bairro', labelRede:'Redes de Saúde',
+    convPop:0.08, convFluxo:0.015, capturaBairro:120,
+    unidade:'Pacientes/Mês', metaMin:800, metaMed:500
+  },
+  pet:         {
+    emoji1:'🐾', label1:'Pet shops independentes / bairro',
+    hint1:'Clínicas veterinárias locais, banho & tosa, rações',
+    emoji2:'🏢', label2:'Redes nacionais / grandes pet stores',
+    hint2:'Petz, Cobasi, Petlove, redes regionais de pet',
+    labelBairro:'Pet Shops Locais', labelRede:'Redes Pet',
+    convPop:0.12, convFluxo:0.02, capturaBairro:100,
+    unidade:'Atendimentos/Mês', metaMin:600, metaMed:400
+  },
+  banco:       {
+    emoji1:'🏧', label1:'Correspondentes bancários / fintech locais',
+    hint1:'Casas lotéricas, cooperativas, bancos comunitários',
+    emoji2:'🏢', label2:'Bancos nacionais / grandes operadoras',
+    hint2:'Bradesco, Itaú, Caixa, BB, Santander, Nubank',
+    labelBairro:'Correspondentes Locais', labelRede:'Grandes Bancos',
+    convPop:0.20, convFluxo:0.03, capturaBairro:200,
+    unidade:'Operações/Mês', metaMin:1000, metaMed:700
+  },
+  supermercado:{
+    emoji1:'🏬', label1:'Mercados de bairro / independentes',
+    hint1:'Mercadinhos locais, quitandas, minimercados',
+    emoji2:'🏢', label2:'Redes nacionais / hipermercados',
+    hint2:'Carrefour, Extra, Pão de Açúcar, Assaí, Atacadão',
+    labelBairro:'Mercados de Bairro', labelRede:'Grandes Redes',
+    convPop:0.25, convFluxo:0.05, capturaBairro:500,
+    unidade:'Compras/Mês', metaMin:5000, metaMed:3500
+  },
+  hotel:       {
+    emoji1:'🏩', label1:'Pousadas / hotéis independentes',
+    hint1:'Pousadas locais, hotéis boutique, flat service',
+    emoji2:'🏢', label2:'Redes hoteleiras nacionais / internacionais',
+    hint2:'Accor, Atlantica, Blue Tree, Intercity, Ibis',
+    labelBairro:'Hospedagens Locais', labelRede:'Redes Hoteleiras',
+    convPop:0.03, convFluxo:0.005, capturaBairro:50,
+    unidade:'Diárias/Mês', metaMin:300, metaMed:200
+  },
+  auto:        {
+    emoji1:'🔧', label1:'Oficinas independentes / bairro',
+    hint1:'Mecânicas locais, borracharias, lava-jatos',
+    emoji2:'🏢', label2:'Redes nacionais / concessionárias',
+    hint2:'Midas, Rodocentro, Heliar, redes de funilaria',
+    labelBairro:'Oficinas Locais', labelRede:'Redes Automotivas',
+    convPop:0.05, convFluxo:0.015, capturaBairro:80,
+    unidade:'Atendimentos/Mês', metaMin:500, metaMed:350
+  },
+  admin:       {
+    emoji1:'🏋️', label1:'Academias independentes / bairro',
+    hint1:'Smart Fit, Bodytech, Bio Ritmo, redes locais',
+    emoji2:'🏢', label2:'Redes nacionais / grandes operadores',
+    hint2:'Centros de bairro, estúdios boutique, crossfit',
+    labelBairro:'Academias de Bairro', labelRede:'Redes Concorrentes',
+    convPop:0.07, convFluxo:0.02, capturaBairro:125,
+    unidade:'Alunos Ativos', metaMin:1500, metaMed:1000
+  }
+};
 
 // ── CONCORRENTES TEMPO REAL (fix) ───────
 async function buscarConcorrentesAuto(lat, lng, forcar=false) {
@@ -3224,23 +3567,27 @@ async function gerarRelatorio() {
       alert('Analise um ponto no mapa antes de gerar o relatório.');
       btn.innerHTML = orig; btn.disabled = false; return;
     }
-    const { score, label: enderecoAnalisado, raioKm, popNoRaio, ibge, lat, lng, viaTop, vmd } = _ultimaAnalise;
+    const { score, label: enderecoAnalisado, raioKm, popNoRaio, ibge, lat, lng, viaTop, vmd, bdc } = _ultimaAnalise;
     const raio = raioKm * 1000;
 
     // Dados dos campos de concorrência (do modal)
     const qtdBairro = parseInt(document.getElementById('gyms-bairro')?.value || 0);
     const qtdRede = parseInt(document.getElementById('gyms-rede')?.value || 0);
 
+    // Parâmetros do segmento ativo
+    const segId = clienteAtivo?.segmento || window._segmentoScoreKey || 'academia';
+    const segCfg = SEGMENTO_CONCORRENCIA[segId] || SEGMENTO_CONCORRENCIA.academia;
+
     // Fluxo viário — extrai número do vmd formatado ou estima
     const vmdNum = parseInt((vmd||'0').replace(/\D/g,'')) || Math.round((ibge?.pop || popNoRaio || 50000) * 0.3);
 
-    // Metodologia: população no raio × taxa de conversão fitness
+    // Metodologia: população no raio × taxa de conversão do segmento
     const popRaio = popNoRaio || 0;
-    const convPop = Math.round(popRaio * 0.07);       // 7% da pop no raio pratica fitness
-    const convFluxo = Math.round(vmdNum * 0.02);       // 2% de conversão do fluxo viário
-    const satBairro = qtdBairro * 125;                 // 125 alunos por academia de bairro
-    const split = Math.max(qtdRede, 0) + 1;            // divide entre nossa unidade + redes grandes
-    let projFinal = Math.round((convPop + convFluxo - satBairro) / split);
+    const convPop    = Math.round(popRaio * segCfg.convPop);
+    const convFluxo  = Math.round(vmdNum  * segCfg.convFluxo);
+    const satBairro  = qtdBairro * segCfg.capturaBairro;
+    const split      = Math.max(qtdRede, 0) + 1;
+    let projFinal    = Math.round((convPop + convFluxo - satBairro) / split);
     if (projFinal < 0) projFinal = 0;
 
     // Busca vias para o relatório (já temos o vmd da análise)
@@ -3249,19 +3596,31 @@ async function gerarRelatorio() {
     // 6. Preenche o relatório
     const hoje = new Date().toLocaleDateString('pt-BR');
     document.getElementById('rep-data').textContent = hoje;
-    document.getElementById('rep-estado').textContent = ibge?.uf || 'SP';
-    document.getElementById('rep-municipio').textContent = ibge?.nome || 'São Paulo';
-    document.getElementById('rep-loc-nome').textContent = enderecoAnalisado || 'Ponto Analisado';
-    document.getElementById('rep-loc-coords').textContent = `LAT: ${lat.toFixed(4)} | LNG: ${lng.toFixed(4)} | RAIO: ${raio}m | SCORE: ${score}/100`;
+    // Prioriza dados do BigDataCloud, fallback para IBGE
+    document.getElementById('rep-estado').textContent = bdc?.siglaEstado || bdc?.estado || ibge?.uf || 'SP';
+    document.getElementById('rep-municipio').textContent = bdc?.cidade || ibge?.nome || 'São Paulo';
+    document.getElementById('rep-loc-nome').textContent = bdc?.bairro ? `${bdc.bairro} — ${bdc.cidade}` : (enderecoAnalisado || 'Ponto Analisado');
+    document.getElementById('rep-loc-coords').textContent = `LAT: ${lat.toFixed(4)} | LNG: ${lng.toFixed(4)} | RAIO: ${raio}m | SCORE: ${score}/100${bdc?.cep ? ' | CEP: '+bdc.cep : ''}`;
 
     const popDisplay = ibge?.pop || pop;
+    // Atualiza labels dinâmicos do relatório pelo segmento
+    const repLabelB = document.getElementById('rep-label-bairro');
+    const repLabelR = document.getElementById('rep-label-rede');
+    const repUnid   = document.getElementById('rep-unidade-label');
+    if (repLabelB) repLabelB.textContent = segCfg.labelBairro;
+    if (repLabelR) repLabelR.textContent = segCfg.labelRede;
+    if (repUnid)   repUnid.textContent   = segCfg.unidade;
+
+    const pctPop    = (segCfg.convPop * 100).toFixed(0);
+    const pctFluxo  = (segCfg.convFluxo * 100).toFixed(1);
+
     document.getElementById('rep-pop-val').textContent = fmtNum(popDisplay);
-    document.getElementById('rep-pop-conv').textContent = `Conversão (7%): ${fmtNum(convPop)}`;
+    document.getElementById('rep-pop-conv').textContent = `Conversão (${pctPop}%): ${fmtNum(convPop)}`;
     document.getElementById('rep-fluxo-val').textContent = fmtNum(fluxoMedio);
-    document.getElementById('rep-fluxo-vitrine').textContent = `Vitrine (2%): ${fmtNum(convFluxo)}`;
+    document.getElementById('rep-fluxo-vitrine').textContent = `Vitrine (${pctFluxo}%): ${fmtNum(convFluxo)}`;
 
     document.getElementById('rep-concorrentes-bairro').textContent = `${String(qtdBairro).padStart(2,'0')} Unidades`;
-    document.getElementById('rep-saturacao-bairro').textContent = `Saturação: -${fmtNum(satBairro)} Alunos`;
+    document.getElementById('rep-saturacao-bairro').textContent = `Saturação: -${fmtNum(satBairro)} ${segCfg.unidade}`;
     document.getElementById('rep-concorrentes-rede').textContent = `${String(qtdRede).padStart(2,'0')} Unidades`;
     document.getElementById('rep-split-rede').textContent = `Rateio: ${split} player(s)`;
     document.getElementById('rep-proj-val').textContent = fmtNum(projFinal);
@@ -3272,24 +3631,25 @@ async function gerarRelatorio() {
     const vMsg = document.getElementById('rep-veredito-msg');
     const vParecer = document.getElementById('rep-parecer');
 
-    if (projFinal >= 1500) {
+    const totalPlayers = qtdBairro + qtdRede;
+    if (projFinal >= segCfg.metaMin) {
       vBox.style.cssText = 'background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:14px 18px;text-align:center;margin-bottom:12px';
       vTit.style.color = '#16a34a'; vTit.textContent = 'Viabilidade Aprovada ✓';
-      vMsg.innerHTML = 'EXCELENTE. Potencial supera a meta de 1.500 alunos.<br>Avançar imediatamente para negociação comercial.';
+      vMsg.innerHTML = `EXCELENTE. Potencial supera a meta de ${fmtNum(segCfg.metaMin)} ${segCfg.unidade}.<br>Avançar imediatamente para negociação comercial.`;
       vMsg.style.color = '#14532d';
-      vParecer.textContent = `Score MAPXpand: ${score}/100. Região apresenta volume demográfico e fluxo suficientes. A base de ${fmtNum(popDisplay)} habitantes no raio, com concorrência gerenciável (${qtdBairro + qtdRede} players), sustenta operação rentável. Parecer FAVORÁVEL para avanço da negociação comercial do ponto.`;
-    } else if (projFinal >= 1000) {
+      vParecer.textContent = `Score MAPXpand: ${score}/100. Segmento: ${segCfg.unidade}. Região apresenta volume demográfico e fluxo suficientes. A base de ${fmtNum(popDisplay)} habitantes no raio, com concorrência gerenciável (${totalPlayers} player${totalPlayers !== 1 ? 's' : ''}), sustenta operação rentável. Parecer FAVORÁVEL para avanço da negociação comercial do ponto.`;
+    } else if (projFinal >= segCfg.metaMed) {
       vBox.style.cssText = 'background:#fffbeb;border:2px solid #d97706;border-radius:12px;padding:14px 18px;text-align:center;margin-bottom:12px';
       vTit.style.color = '#d97706'; vTit.textContent = 'Viabilidade Condicionada';
-      vMsg.innerHTML = 'ATENÇÃO: Abaixo da meta (1.500 un).<br>Exige aluguel reduzido e pré-venda agressiva.';
+      vMsg.innerHTML = `ATENÇÃO: Abaixo da meta (${fmtNum(segCfg.metaMin)} ${segCfg.unidade}).<br>Exige aluguel reduzido e ações comerciais agressivas.`;
       vMsg.style.color = '#9a3412';
-      vParecer.textContent = `Score MAPXpand: ${score}/100. Potencial intermediário. A concorrência local (${qtdBairro + qtdRede} players) e densidade populacional forçam rateio. Projeto viável com incentivos imobiliários (carência/desconto no aluguel) e foco em pré-venda antes da inauguração.`;
+      vParecer.textContent = `Score MAPXpand: ${score}/100. Segmento: ${segCfg.unidade}. Potencial intermediário. A concorrência local (${totalPlayers} player${totalPlayers !== 1 ? 's' : ''}) e densidade populacional forçam rateio. Projeto viável com incentivos imobiliários (carência/desconto no aluguel) e foco em pré-venda antes da inauguração.`;
     } else {
       vBox.style.cssText = 'background:#fef2f2;border:2px solid #dc2626;border-radius:12px;padding:14px 18px;text-align:center;margin-bottom:12px';
       vTit.style.color = '#dc2626'; vTit.textContent = 'Risco Elevado — Reprovado';
-      vMsg.innerHTML = 'OPERAÇÃO DEFICITÁRIA.<br>Captação prevista não sustenta os custos fixos.';
+      vMsg.innerHTML = `OPERAÇÃO DEFICITÁRIA.<br>Projeção de ${fmtNum(projFinal)} ${segCfg.unidade} não sustenta os custos fixos.`;
       vMsg.style.color = '#7f1d1d';
-      vParecer.textContent = `Score MAPXpand: ${score}/100. Saturação da concorrência combinada com fluxo insuficiente projeta operação abaixo do break-even. Comitê recomenda rejeição do ponto e busca por novos eixos na zona analítica.`;
+      vParecer.textContent = `Score MAPXpand: ${score}/100. Segmento: ${segCfg.unidade}. Saturação da concorrência (${totalPlayers} player${totalPlayers !== 1 ? 's' : ''}) combinada com fluxo insuficiente projeta operação abaixo do break-even. Comitê recomenda rejeição do ponto e busca por novos eixos na zona analítica.`;
     }
 
     // 8. Top vias
@@ -3298,11 +3658,20 @@ async function gerarRelatorio() {
       ? top3.map((v,i) => `<li style="margin-bottom:5px;display:flex;align-items:start;gap:6px"><span style="background:#0B132B;color:#C6A664;border-radius:3px;padding:1px 5px;font-size:8px;flex-shrink:0">#${i+1}</span><div><span style="display:block">${v.nome}</span><span style="font-size:8px;font-weight:600;color:#64748b">~${fmtNum(v.vmd * 1.15)} passantes/dia</span></div></li>`).join('')
       : '<li style="list-style:none;margin-left:-14px;color:#ef4444;font-size:9px">Nenhuma via arterial detectada. Avaliar imóveis de esquina.</li>';
 
-    // 9. Box IBGE
+    // 9. Box IBGE + BigDataCloud
+    const ibgeBox = document.getElementById('rep-ibge-box');
+    const ibgeContent = document.getElementById('rep-ibge-content');
     if (ibge && ibge.pop) {
-      document.getElementById('rep-ibge-box').style.display = 'block';
-      document.getElementById('rep-ibge-content').innerHTML =
-        `<strong>${ibge.nome}</strong> — ${ibge.uf} &nbsp;|&nbsp; Pop: <strong>${fmtNum(ibge.pop)}</strong> hab (Censo 2022)`;
+      ibgeBox.style.display = 'block';
+      const bdcExtra = bdc?.bairro
+        ? `&nbsp;|&nbsp; 🏘️ Bairro: <strong>${bdc.bairro}</strong>${bdc.cep ? `&nbsp;|&nbsp; CEP: <strong>${bdc.cep}</strong>` : ''}`
+        : '';
+      ibgeContent.innerHTML =
+        `<strong>${ibge.nome}</strong> — ${ibge.uf} &nbsp;|&nbsp; Pop: <strong>${fmtNum(ibge.pop)}</strong> hab (Censo 2022)${bdcExtra}`;
+    } else if (bdc) {
+      ibgeBox.style.display = 'block';
+      ibgeContent.innerHTML =
+        `<strong>${bdc.cidade}</strong> — ${bdc.siglaEstado||bdc.estado}${bdc.bairro ? ` &nbsp;|&nbsp; 🏘️ <strong>${bdc.bairro}</strong>` : ''}${bdc.cep ? ` &nbsp;|&nbsp; CEP: <strong>${bdc.cep}</strong>` : ''} &nbsp;|&nbsp; <em style="color:#64748b">Fonte: BigDataCloud</em>`;
     }
 
     // Abre o modal
@@ -3318,9 +3687,25 @@ async function gerarRelatorio() {
 }
 window.gerarRelatorio = gerarRelatorio;
 
+// ── Atualiza labels/hints do modal conforme o segmento ──────────
+function atualizarModalConcorrencia() {
+  const segId = clienteAtivo?.segmento || window._segmentoScoreKey || 'academia';
+  const cfg = SEGMENTO_CONCORRENCIA[segId] || SEGMENTO_CONCORRENCIA.academia;
+  const lb  = document.getElementById('modal-label-bairro');
+  const hb  = document.getElementById('modal-hint-bairro');
+  const lr  = document.getElementById('modal-label-rede');
+  const hr  = document.getElementById('modal-hint-rede');
+  if (lb) lb.textContent = cfg.emoji1 + ' ' + cfg.label1;
+  if (hb) hb.textContent = cfg.hint1;
+  if (lr) lr.textContent = cfg.emoji2 + ' ' + cfg.label2;
+  if (hr) hr.textContent = cfg.hint2;
+}
+window.atualizarModalConcorrencia = atualizarModalConcorrencia;
+
 function abrirModalConcorrencia() {
   document.getElementById('gyms-bairro').value = 0;
   document.getElementById('gyms-rede').value = 0;
+  atualizarModalConcorrencia();
   atualizarTotalModal();
   document.getElementById('modal-concorrencia').style.display = 'flex';
 }
@@ -3407,6 +3792,8 @@ function abrirModalConcorrenciaPin(pinId) {
   // Sempre começa zerado — usuário informa manualmente
   document.getElementById('gyms-bairro').value = 0;
   document.getElementById('gyms-rede').value   = 0;
+  atualizarModalConcorrencia();
+  atualizarTotalModal();
   document.getElementById('modal-concorrencia').style.display = 'flex';
 }
 
@@ -3944,14 +4331,14 @@ function showSearchError(msg){
       <tr>
         <td width="50%" valign="top">
           <div class="ri-card" style="border-left:4px solid #ef4444">
-            <div style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase">Academias de Bairro</div>
+            <div id="rep-label-bairro" style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase">Concorrentes Locais</div>
             <div id="rep-concorrentes-bairro" style="font-size:18px;font-weight:900;color:#1e293b;margin:2px 0">00 Unidades</div>
-            <div id="rep-saturacao-bairro" style="font-size:9px;font-weight:700;color:#ef4444;text-transform:uppercase">Saturação: -0 Alunos</div>
+            <div id="rep-saturacao-bairro" style="font-size:9px;font-weight:700;color:#ef4444;text-transform:uppercase">Saturação: -0</div>
           </div>
         </td>
         <td width="50%" valign="top">
           <div class="ri-card" style="border-left:4px solid #0B132B">
-            <div style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase">Redes Concorrentes</div>
+            <div id="rep-label-rede" style="font-size:8px;font-weight:900;color:#64748b;text-transform:uppercase">Redes Concorrentes</div>
             <div id="rep-concorrentes-rede" style="font-size:18px;font-weight:900;color:#1e293b;margin:2px 0">00 Unidades</div>
             <div id="rep-split-rede" style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase">Rateio: 1 player(s)</div>
           </div>
@@ -3967,7 +4354,7 @@ function showSearchError(msg){
           <td width="45%" align="center" style="border-right:1px solid #fed7aa;padding-right:14px">
             <div style="font-size:8px;font-weight:900;color:#9a3412;text-transform:uppercase">Projeção Final</div>
             <div id="rep-proj-val" style="font-size:38px;font-weight:900;color:#0B132B;font-style:italic;line-height:.9">0</div>
-            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase">Alunos Ativos</div>
+            <div id="rep-unidade-label" style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase">Alunos Ativos</div>
           </td>
           <td align="left" style="padding-left:14px;font-size:10px;font-weight:700;color:#9a3412;line-height:1.4">
             <div id="rep-veredito-msg">ALERTA: Abaixo da meta.<br>Exige avaliação adicional.</div>
@@ -4057,9 +4444,9 @@ function showSearchError(msg){
         <span style="font-size:11px;color:#0369a1;line-height:1.5">Informe a concorrência que você observou <strong>dentro do raio analisado</strong>. Esses dados completam o score e aparecem no relatório final.</span>
       </div>
 
-      <!-- Campo 1: Academias de bairro -->
+      <!-- Campo 1: Concorrentes locais / bairro -->
       <div style="margin-bottom:14px">
-        <label style="display:block;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">🏋️ Academias independentes / bairro</label>
+        <label id="modal-label-bairro" style="display:block;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">🏋️ Academias independentes / bairro</label>
         <div style="display:flex;align-items:center;gap:10px">
           <button onclick="ajustarGym('bairro',-1)" style="width:34px;height:34px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:18px;cursor:pointer;color:#475569;display:flex;align-items:center;justify-content:center">−</button>
           <input type="number" id="gyms-bairro" min="0" value="0" oninput="atualizarTotalModal()"
@@ -4067,12 +4454,12 @@ function showSearchError(msg){
             onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e2e8f0'">
           <button onclick="ajustarGym('bairro',+1)" style="width:34px;height:34px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:18px;cursor:pointer;color:#475569;display:flex;align-items:center;justify-content:center">+</button>
         </div>
-        <div style="font-size:10px;color:#94a3b8;margin-top:4px">Smart Fit, Bodytech, Bio Ritmo, redes locais</div>
+        <div id="modal-hint-bairro" style="font-size:10px;color:#94a3b8;margin-top:4px">Smart Fit, Bodytech, Bio Ritmo, redes locais</div>
       </div>
 
-      <!-- Campo 2: Redes grandes -->
+      <!-- Campo 2: Redes grandes / nacionais -->
       <div style="margin-bottom:22px">
-        <label style="display:block;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">🏢 Redes nacionais / grandes operadores</label>
+        <label id="modal-label-rede" style="display:block;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">🏢 Redes nacionais / grandes operadores</label>
         <div style="display:flex;align-items:center;gap:10px">
           <button onclick="ajustarGym('rede',-1)" style="width:34px;height:34px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:18px;cursor:pointer;color:#475569;display:flex;align-items:center;justify-content:center">−</button>
           <input type="number" id="gyms-rede" min="0" value="0" oninput="atualizarTotalModal()"
@@ -4080,7 +4467,7 @@ function showSearchError(msg){
             onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e2e8f0'">
           <button onclick="ajustarGym('rede',+1)" style="width:34px;height:34px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:18px;cursor:pointer;color:#475569;display:flex;align-items:center;justify-content:center">+</button>
         </div>
-        <div style="font-size:10px;color:#94a3b8;margin-top:4px">Centros de bairro, estúdios boutique, crossfit</div>
+        <div id="modal-hint-rede" style="font-size:10px;color:#94a3b8;margin-top:4px">Centros de bairro, estúdios boutique, crossfit</div>
       </div>
 
       <!-- Resumo rápido -->
