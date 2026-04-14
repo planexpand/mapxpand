@@ -1148,6 +1148,36 @@ function updateRaio(idx){
   const label = val % 1 === 0 ? val+' km' : val.toString().replace('.',',')+' km';
   document.getElementById('raioVal').textContent = label;
   renderCaptacao(val);
+
+  // Atualiza o círculo de análise no mapa
+  if (window._raioAnalise && _ultimaAnalise) {
+    window._raioAnalise.setRadius(val * 1000);
+  }
+
+  // Recalcula população proporcional ao novo raio
+  if (_ultimaAnalise) {
+    const { lat, lng, score, label: endLabel, hBg, stxt, tc, ttxt, dOwn, dComp, ibge, viaTop, vmd } = _ultimaAnalise;
+    const areaKm2 = Math.PI * val * val;
+    const dens = calcularDensidadeLocal(lat, lng);
+    const fator = Math.min(0.85, 0.55 + val * 0.12);
+    const popNoRaio = Math.round(dens * areaKm2 * fator);
+    const popFmt = new Intl.NumberFormat('pt-BR').format(popNoRaio);
+
+    // Atualiza _ultimaAnalise com novos valores
+    _ultimaAnalise.raioKm = val;
+    _ultimaAnalise.popNoRaio = popNoRaio;
+    _ultimaAnalise.popFmt = popFmt;
+
+    // Re-renderiza o painel com a população atualizada
+    const el = document.getElementById('analysisResult');
+    if (el && el.style.display !== 'none') {
+      el.innerHTML = renderAnalise(score, hBg||`linear-gradient(135deg,#166534,#15803d)`, stxt||'Ideal para rede', tc||'green', ttxt||'', endLabel, dOwn, dComp, null, val, popFmt, ibge, viaTop||'Calculando...', vmd||'–');
+    }
+
+    // Atualiza também o elemento de pop na sidebar se visível
+    const popEl = document.getElementById('ar-pop-val');
+    if (popEl) popEl.textContent = popFmt + ' hab';
+  }
 }
 window.updateRaio = updateRaio;
 
@@ -1194,11 +1224,14 @@ function analyse(lat,lng,label){
             <span style="font-size:24px;font-weight:800;color:#fff">${score}%</span>
             <span style="font-size:11px;color:#fff;font-weight:600">${txt}</span>
           </div>
-          <div style="font-size:10px;color:#64748b;line-height:1.8">
+          <div style="font-size:10px;color:#64748b;line-height:1.8;margin-bottom:8px">
             👥 Pop. estimada: <strong>${popFmt} hab</strong><br>
             🏠 Dist. rede: <strong>${dOwn?.toFixed(2)||'—'} km</strong><br>
             ⚔️ Dist. concorrente: <strong>${dComp?.toFixed(2)||'—'} km</strong>
           </div>
+          <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">
+            📄 Gerar Relatório
+          </button>
         </div>`, { maxWidth: 230 }).openPopup();
     }
   });
@@ -1219,28 +1252,31 @@ function analyse(lat,lng,label){
   }).addTo(map);
 
   const pt={lat,lng};
-  // Prioridade: 1) Rede buscada no painel, 2) cliente ativo, 3) DFINEFIT
+  // Usa rede real se disponível — sem fallback para dados demo
   const unidadesRede = (window.redeUnidades?.length > 0)
     ? window.redeUnidades
     : (clienteAtivo?.unidades?.length > 0)
         ? clienteAtivo.unidades
-        : DFINEFIT;
-  const dOwn=Math.min(...unidadesRede.map(u=>dist(pt,u)));
+        : [];
+  const temRede = unidadesRede.length > 0;
+  const dOwn = temRede ? Math.min(...unidadesRede.map(u=>dist(pt,u))) : null;
   // Canibalização: usa o raio configurado pelo usuário (padrão 1,25km)
   const RAIO_CANIB_KM = window.canibRaioAtual || 1.25;
-  const emZonaCanib = unidadesRede.some(u => dist(pt,u) < RAIO_CANIB_KM);
-  const dComp=Math.min(...COMPETITORS.map(c=>dist(pt,c)));
+  const emZonaCanib = temRede && unidadesRede.some(u => dist(pt,u) < RAIO_CANIB_KM);
+  // Concorrentes: apenas os buscados pelo usuário via painel, não dados demo
+  const temConc = window._concorrentesLatLng?.length > 0;
+  const dComp = temConc ? Math.min(...window._concorrentesLatLng.map(c=>dist(pt,c))) : null;
   let score=50;
   if(emZonaCanib)score-=50;
-  else if(dOwn>=2&&dOwn<=5)score+=35;
-  if(dComp<1.3)score-=40;
-  else if(dComp>4)score+=15;
+  else if(dOwn!==null&&dOwn>=2&&dOwn<=5)score+=35;
+  if(dComp!==null&&dComp<1.3)score-=40;
+  else if(dComp!==null&&dComp>4)score+=15;
   score=Math.max(5,Math.min(100,score));
   const isG=score>80,isA=score>55;
   const hBg=isG?'linear-gradient(135deg,#166534,#15803d)':isA?'linear-gradient(135deg,#92400e,#b45309)':'linear-gradient(135deg,#991b1b,#b91c1c)';
   const stxt=isG?'Ideal para rede':isA?'Ponto viável':'Área saturada';
   const tc=isG?'green':isA?'amber':'red';
-  const ttxt=emZonaCanib?'⚠️ Risco de canibalização (< 1,25km)':dOwn>=2&&dOwn<=5?'✅ Posição estratégica ideal':'Fora do corredor principal';
+  const ttxt=emZonaCanib?'⚠️ Risco de canibalização (< 1,25km)':(dOwn!==null&&dOwn>=2&&dOwn<=5)?'✅ Posição estratégica ideal':'';
 
   const ibge=getDadosIBGE(lat,lng);
   const areaRaioKm2=Math.PI*raioKm*raioKm;
@@ -1253,7 +1289,7 @@ function analyse(lat,lng,label){
   const el=document.getElementById('analysisResult');
   el.style.display='block';
   // Salva dados para o relatório
-  _ultimaAnalise = { score, label, raioKm, popNoRaio, popFmt, ibge, dOwn, dComp, lat, lng };
+  _ultimaAnalise = { score, label, raioKm, popNoRaio, popFmt, ibge, dOwn, dComp, lat, lng, hBg, stxt, tc, ttxt };
   el.innerHTML=renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,ibge,'Calculando...','–');
 
   // Busca fluxo das vias próximas via Overpass
@@ -1275,8 +1311,8 @@ function renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,
       <div class="ar-row"><span>👥 Hab. no raio (est.)</span><strong>${popFmt}</strong></div>
       <div class="ar-row"><span>🚗 Fluxo via principal</span><strong>${vmd}</strong></div>
       <div class="ar-row" style="font-size:9px;color:#64748b"><span>Via</span><span>${viaTop}</span></div>
-      <div class="ar-row"><span>Dist. unidade própria</span><strong>${dOwn.toFixed(2)} km</strong></div>
-      <div class="ar-row"><span>Dist. concorrente</span><strong>${dComp.toFixed(2)} km</strong></div>
+      ${dOwn!==null?`<div class="ar-row"><span>Dist. unidade própria</span><strong>${dOwn.toFixed(2)} km</strong></div>`:''}
+      ${dComp!==null?`<div class="ar-row"><span>Dist. concorrente</span><strong>${dComp.toFixed(2)} km</strong></div>`:''}
       <span class="ar-tag ${tc}">${ttxt}</span>
       <div style="margin-top:6px;font-size:9px;color:#64748b">📍 Fonte: IBGE Censo 2022 — ${window._lastGeoCity || (ibge?`${ibge.nome}/${ibge.uf}`:'')}</div>
     </div>
