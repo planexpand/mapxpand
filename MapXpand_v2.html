@@ -1730,7 +1730,7 @@ let searchMarker=null;
 // Função central: reconstrói o popup do pin a partir do estado atual de _ultimaAnalise
 // Chamada sempre que sidebar é atualizada — garante popup e sidebar 100% sincronizados
 function _sincPopup() {
-  if (!window.searchMarker || !_ultimaAnalise) return;
+  if (!searchMarker || !_ultimaAnalise) return;
   const a = _ultimaAnalise;
   const popupHtml = a.semDados
     ? `<div style="font-family:Inter,sans-serif;min-width:200px;padding:2px">
@@ -1756,10 +1756,10 @@ function _sincPopup() {
         </div>
         <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">📄 Gerar Relatório</button>
        </div>`;
-  if (window.searchMarker.getPopup()) {
-    window.searchMarker.getPopup().setContent(popupHtml);
+  if (searchMarker.getPopup()) {
+    searchMarker.getPopup().setContent(popupHtml);
   } else {
-    window.searchMarker.bindPopup(popupHtml, { maxWidth:260, className:'map-popup' });
+    searchMarker.bindPopup(popupHtml, { maxWidth:260, className:'map-popup' });
   }
 }
 
@@ -1768,6 +1768,7 @@ function analyse(lat,lng,label){
   // Garante que layers.search está no mapa (pode ter sido removido pelo zerarAnalise)
   if(!map.hasLayer(layers.search)) layers.search.addTo(map);
   searchMarker=L.marker([lat,lng],{icon:searchIcon(),zIndexOffset:1000}).addTo(layers.search);
+  window.searchMarker = searchMarker; // mantém window.searchMarker em sincronia com o let
   // Clique no pin vermelho: reabre análise sem criar novo pin
   searchMarker.on('click', function(e) {
     e.originalEvent && e.originalEvent.stopPropagation();
@@ -6619,7 +6620,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.4 · 15/04/2026';
+const MAPXPAND_VERSION = 'v2.5 · 15/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
