@@ -915,6 +915,19 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
       <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.25);margin-top:8px">
         Sem conta? <span onclick="mostrarCadastro()" style="color:rgba(198,166,100,.7);cursor:pointer;text-decoration:underline">Solicitar acesso</span>
       </div>
+
+      <!-- Badge de versão — dentro do card escuro, canto inferior direito -->
+      <div id="login-version-badge" style="
+        text-align:right;
+        margin-top:14px;
+        font-family:Inter,sans-serif;
+        font-size:9px;
+        font-weight:500;
+        letter-spacing:0.07em;
+        color:rgba(198,166,100,0.45);
+        pointer-events:none;
+        user-select:none;
+      "></div>
     </div>
   </div>
 
@@ -1556,40 +1569,8 @@ function updateRaio(idx){
     const popEl = document.getElementById('ar-pop-val');
     if (popEl) popEl.textContent = popFmt + ' hab';
 
-    // Re-gera o popup do pino no mapa com os dados atualizados
-    if (window.searchMarker) {
-      const novoHtml = _ultimaAnalise?.semDados ? `
-        <div style="font-family:Inter,sans-serif;min-width:200px;padding:2px">
-          <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:8px;line-height:1.3">${(endLabel||'').split(',').slice(0,2).join(',')}</div>
-          <div style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1e293b,#334155);border-radius:8px;padding:9px 11px;margin-bottom:8px">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,.5)" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="rgba(255,255,255,.6)" stroke-width="2" stroke-linecap="round"/></svg>
-            <div><div style="font-size:11px;font-weight:700;color:#fff">Dados insuficientes</div><div style="font-size:9px;color:rgba(255,255,255,.55)">Configure para calcular a viabilidade</div></div>
-          </div>
-          <div style="font-size:10px;color:#64748b;margin-bottom:10px">👥 Pop. estimada: <strong>${popFmt} hab</strong></div>
-          <button onclick="abrirPainelRede(event)" style="width:100%;background:#f0f4ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:5px">+ Cadastrar Rede em Expansão</button>
-          <button onclick="abrirPainelConcorrentes(event)" style="width:100%;background:#fffbeb;color:#b45309;border:1px solid #fde68a;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">+ Buscar Concorrentes</button>
-        </div>` : `
-        <div style="font-family:Inter,sans-serif;min-width:190px;padding:2px">
-          <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:6px;line-height:1.3">${(endLabel||'').split(',').slice(0,2).join(',')}</div>
-          <div style="display:flex;align-items:center;gap:8px;background:${score>=80?'#15803d':score>=55?'#b45309':'#b91c1c'};border-radius:8px;padding:7px 10px;margin-bottom:8px">
-            <span style="font-size:18px;font-weight:900;color:#fff">${score}%</span>
-            <span style="font-size:11px;color:#fff;font-weight:600">${score>=80?'Ideal para rede':score>=55?'Ponto viável':'Área saturada'}</span>
-          </div>
-          <div style="font-size:10px;color:#64748b;line-height:1.8;margin-bottom:8px">
-            👥 Pop. estimada: <strong>${popFmt} hab</strong><br>
-            🏠 Dist. rede: <strong>${dOwn!=null?dOwn.toFixed(2)+' km':'— km'}</strong><br>
-            ⚔️ Dist. concorrente: <strong>${dComp!=null?dComp.toFixed(2)+' km':'— km'}</strong>
-          </div>
-          <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">📄 Gerar Relatório</button>
-        </div>`;
-      // setContent atualiza o conteúdo sem fechar/recriar o popup (aberto ou fechado)
-      // bindPopup só é chamado se o popup ainda não existe
-      if (window.searchMarker.getPopup()) {
-        window.searchMarker.getPopup().setContent(novoHtml);
-      } else {
-        window.searchMarker.bindPopup(novoHtml, { maxWidth:260, className:'map-popup' });
-      }
-    }
+    // Sincroniza popup com a nova população — única fonte de verdade
+    _sincPopup();
   }
 }
 window.updateRaio = updateRaio;
@@ -1745,6 +1726,43 @@ setTimeout(autoLocalizarUsuario, 1200);
 
 // MOTOR DE ANÁLISE
 let searchMarker=null;
+
+// Função central: reconstrói o popup do pin a partir do estado atual de _ultimaAnalise
+// Chamada sempre que sidebar é atualizada — garante popup e sidebar 100% sincronizados
+function _sincPopup() {
+  if (!window.searchMarker || !_ultimaAnalise) return;
+  const a = _ultimaAnalise;
+  const popupHtml = a.semDados
+    ? `<div style="font-family:Inter,sans-serif;min-width:200px;padding:2px">
+        <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:8px;line-height:1.3">${(a.label||'').split(',').slice(0,2).join(',')}</div>
+        <div style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1e293b,#334155);border-radius:8px;padding:9px 11px;margin-bottom:8px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,.5)" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="rgba(255,255,255,.6)" stroke-width="2" stroke-linecap="round"/></svg>
+          <div><div style="font-size:11px;font-weight:700;color:#fff">Dados insuficientes</div><div style="font-size:9px;color:rgba(255,255,255,.55)">Configure para calcular a viabilidade</div></div>
+        </div>
+        <div style="font-size:10px;color:#64748b;margin-bottom:10px">👥 Pop. estimada: <strong>${a.popFmt} hab</strong></div>
+        <button onclick="abrirPainelRede(event)" style="width:100%;background:#f0f4ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:5px">+ Cadastrar Rede em Expansão</button>
+        <button onclick="abrirPainelConcorrentes(event)" style="width:100%;background:#fffbeb;color:#b45309;border:1px solid #fde68a;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">+ Buscar Concorrentes</button>
+       </div>`
+    : `<div style="font-family:Inter,sans-serif;min-width:190px;padding:2px">
+        <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:6px;line-height:1.3">${(a.label||'').split(',').slice(0,2).join(',')}</div>
+        <div style="display:flex;align-items:center;gap:8px;background:${a.score>=80?'#15803d':a.score>=55?'#b45309':'#b91c1c'};border-radius:8px;padding:7px 10px;margin-bottom:8px">
+          <span style="font-size:18px;font-weight:900;color:#fff">${a.score}%</span>
+          <span style="font-size:11px;color:#fff;font-weight:600">${a.score>=80?'Ideal para rede':a.score>=55?'Ponto viável':'Área saturada'}</span>
+        </div>
+        <div style="font-size:10px;color:#64748b;line-height:1.8;margin-bottom:8px">
+          👥 Pop. estimada: <strong>${a.popFmt} hab</strong><br>
+          🏠 Dist. rede: <strong>${a.dOwn!=null?a.dOwn.toFixed(2)+' km':'—'}</strong><br>
+          ⚔️ Dist. concorrente: <strong>${a.dComp!=null?a.dComp.toFixed(2)+' km':'—'}</strong>
+        </div>
+        <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">📄 Gerar Relatório</button>
+       </div>`;
+  if (window.searchMarker.getPopup()) {
+    window.searchMarker.getPopup().setContent(popupHtml);
+  } else {
+    window.searchMarker.bindPopup(popupHtml, { maxWidth:260, className:'map-popup' });
+  }
+}
+
 function analyse(lat,lng,label){
   if(searchMarker){layers.search.removeLayer(searchMarker);searchMarker=null;}
   // Garante que layers.search está no mapa (pode ter sido removido pelo zerarAnalise)
@@ -1761,43 +1779,10 @@ function analyse(lat,lng,label){
       el.style.display = 'block';
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-    // Abre popup resumido no próprio pin
+    // Abre popup — conteúdo já foi atualizado por _sincPopup(), apenas abre
     if (_ultimaAnalise) {
-      const { score, label, popFmt, dOwn, dComp, semDados } = _ultimaAnalise;
-      const popupHtml = semDados ? `
-        <div style="font-family:Inter,sans-serif;min-width:200px;padding:2px">
-          <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:8px;line-height:1.3">${(label||'').split(',').slice(0,2).join(',')}</div>
-          <div style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1e293b,#334155);border-radius:8px;padding:9px 11px;margin-bottom:8px">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,.5)" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="rgba(255,255,255,.6)" stroke-width="2" stroke-linecap="round"/></svg>
-            <div>
-              <div style="font-size:11px;font-weight:700;color:#fff">Dados insuficientes</div>
-              <div style="font-size:9px;color:rgba(255,255,255,.55)">Configure para calcular a viabilidade</div>
-            </div>
-          </div>
-          <div style="font-size:10px;color:#64748b;margin-bottom:10px">👥 Pop. estimada: <strong>${popFmt} hab</strong></div>
-          <button onclick="abrirPainelRede(event)" style="width:100%;background:#f0f4ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:5px">
-            + Cadastrar Rede em Expansão
-          </button>
-          <button onclick="abrirPainelConcorrentes(event)" style="width:100%;background:#fffbeb;color:#b45309;border:1px solid #fde68a;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">
-            + Buscar Concorrentes
-          </button>
-        </div>` : `
-        <div style="font-family:Inter,sans-serif;min-width:190px;padding:2px">
-          <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:6px;line-height:1.3">${(label||'').split(',').slice(0,2).join(',')}</div>
-          <div style="display:flex;align-items:center;gap:8px;background:${score>80?'#15803d':score>55?'#b45309':'#b91c1c'};border-radius:8px;padding:7px 10px;margin-bottom:8px">
-            <span style="font-size:24px;font-weight:800;color:#fff">${score}%</span>
-            <span style="font-size:11px;color:#fff;font-weight:600">${score>80?'Ideal para rede':score>55?'Ponto viável':'Área saturada'}</span>
-          </div>
-          <div style="font-size:10px;color:#64748b;line-height:1.8;margin-bottom:8px">
-            👥 Pop. estimada: <strong>${popFmt} hab</strong><br>
-            🏠 Dist. rede: <strong>${dOwn?.toFixed(2)||'—'} km</strong><br>
-            ⚔️ Dist. concorrente: <strong>${dComp?.toFixed(2)||'—'} km</strong>
-          </div>
-          <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">
-            📄 Gerar Relatório
-          </button>
-        </div>`;
-      searchMarker.bindPopup(popupHtml, { maxWidth: 240 }).openPopup();
+      _sincPopup(); // garante conteúdo mais recente antes de abrir
+      searchMarker.openPopup();
     }
   });
   // Salva posição do pin para uso em busca de concorrentes
@@ -1858,11 +1843,12 @@ function analyse(lat,lng,label){
   // Fluxo viário — busca via Overpass em background
   const el=document.getElementById('analysisResult');
   el.style.display='block';
-  // Salva dados para o relatório
+  // Salva dados para o relatório + vincula popup imediatamente (evita estado stale)
   _ultimaAnalise = { score, label, raioKm, popNoRaio, popFmt, ibge, dOwn, dComp, lat, lng, hBg, stxt, tc, ttxt, bdc: null, semDados };
   el.innerHTML = semDados
     ? renderSemDados(label, raioKm, popFmt, ibge, 'Calculando...', '–', null)
     : renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,ibge,'Calculando...','–',null);
+  _sincPopup(); // popup criado logo após sidebar — mesmos dados, zero divergência
 
   // Busca fluxo das vias próximas via Overpass
   buscarFluxoVias(lat,lng,raioM).then(({viaTop,vmd})=>{
@@ -1874,6 +1860,7 @@ function analyse(lat,lng,label){
     el.innerHTML = (_ultimaAnalise?.semDados)
       ? renderSemDados(label, raioAtual, popAtual, ibge, viaTop, vmd, bdcAtual)
       : renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioAtual,popAtual,ibge,viaTop,vmd,bdcAtual);
+    _sincPopup(); // sincroniza popup com sidebar após fluxo viário
   });
 
   // Enriquece com BigDataCloud + IBGE Agregados em paralelo
@@ -1918,39 +1905,12 @@ function analyse(lat,lng,label){
     const elAtual = document.getElementById('analysisResult');
     if (elAtual && elAtual.style.display !== 'none' && _ultimaAnalise) {
       const a = _ultimaAnalise;
-      // Após o await, o slider pode ter sido movido — usa o popFmt ATUAL do _ultimaAnalise
+      // Após o await, usa o popFmt ATUAL do _ultimaAnalise (slider pode ter sido movido)
       const popParaRender = a.popFmt || popFmtFinal;
       elAtual.innerHTML = a.semDados
         ? renderSemDados(a.label, a.raioKm, popParaRender, a.ibge, a.viaTop||'Calculando...', a.vmd||'–', bdc)
         : renderAnalise(a.score,a.hBg,a.stxt,a.tc,a.ttxt,a.label,a.dOwn,a.dComp,null,a.raioKm,popParaRender,a.ibge,a.viaTop||'Calculando...',a.vmd||'–',bdc);
-
-      // Sincroniza popup com a MESMA população da sidebar (evita divergência)
-      if (window.searchMarker) {
-        const popupHtml = a.semDados
-          ? `<div style="font-family:Inter,sans-serif;min-width:200px;padding:2px">
-              <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:8px">${(a.label||'').split(',').slice(0,2).join(',')}</div>
-              <div style="font-size:10px;color:#64748b;margin-bottom:10px">👥 Pop. estimada: <strong>${popParaRender} hab</strong></div>
-              <div style="font-size:9px;color:#64748b">Configure rede e concorrentes para calcular o score.</div>
-             </div>`
-          : `<div style="font-family:Inter,sans-serif;min-width:190px;padding:2px">
-              <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:6px">${(a.label||'').split(',').slice(0,2).join(',')}</div>
-              <div style="display:flex;align-items:center;gap:8px;background:${a.score>=80?'#15803d':a.score>=55?'#b45309':'#b91c1c'};border-radius:8px;padding:7px 10px;margin-bottom:8px">
-                <span style="font-size:18px;font-weight:900;color:#fff">${a.score}%</span>
-                <span style="font-size:11px;color:#fff;font-weight:600">${a.score>=80?'Ideal para rede':a.score>=55?'Ponto viável':'Área saturada'}</span>
-              </div>
-              <div style="font-size:10px;color:#64748b;line-height:1.8;margin-bottom:8px">
-                👥 Pop. estimada: <strong>${popParaRender} hab</strong><br>
-                🏠 Dist. rede: <strong>${a.dOwn!=null?a.dOwn.toFixed(2)+' km':'—'}</strong><br>
-                ⚔️ Dist. concorrente: <strong>${a.dComp!=null?a.dComp.toFixed(2)+' km':'—'}</strong>
-              </div>
-              <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">📄 Gerar Relatório</button>
-             </div>`;
-        if (window.searchMarker.getPopup()) {
-          window.searchMarker.getPopup().setContent(popupHtml);
-        } else {
-          window.searchMarker.bindPopup(popupHtml, { maxWidth:260, className:'map-popup' });
-        }
-      }
+      _sincPopup(); // única chamada — popup e sidebar sempre iguais
     }
   });
 }
@@ -6656,6 +6616,16 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
   </div>
 </div>
+
+<script>
+// ── BUILD VERSION — atualizado a cada deploy ──────────────
+const MAPXPAND_VERSION = 'v2.4 · 15/04/2026';
+// ─────────────────────────────────────────────────────────
+(function(){
+  const el = document.getElementById('login-version-badge');
+  if(el) el.textContent = MAPXPAND_VERSION;
+})();
+</script>
 
 </body>
 </html>
