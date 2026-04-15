@@ -1547,7 +1547,9 @@ function updateRaio(idx){
     // Re-renderiza o painel com a população atualizada
     const el = document.getElementById('analysisResult');
     if (el && el.style.display !== 'none') {
-      el.innerHTML = renderAnalise(score, hBg||`linear-gradient(135deg,#166534,#15803d)`, stxt||'Ideal para rede', tc||'green', ttxt||'', endLabel, dOwn, dComp, null, val, popFmt, ibge, viaTop||'Calculando...', vmd||'–', _ultimaAnalise?.bdc||null);
+      el.innerHTML = _ultimaAnalise?.semDados
+        ? renderSemDados(endLabel, val, popFmt, ibge, viaTop||'Calculando...', vmd||'–', _ultimaAnalise?.bdc||null)
+        : renderAnalise(score, hBg||`linear-gradient(135deg,#166534,#15803d)`, stxt||'Ideal para rede', tc||'green', ttxt||'', endLabel, dOwn, dComp, null, val, popFmt, ibge, viaTop||'Calculando...', vmd||'–', _ultimaAnalise?.bdc||null);
     }
 
     // Atualiza elemento de pop na sidebar se visível
@@ -1556,28 +1558,31 @@ function updateRaio(idx){
 
     // Re-gera o popup do pino no mapa com os dados atualizados
     if (window.searchMarker) {
-      const cor  = score >= 80 ? '#15803d' : score >= 55 ? '#b45309' : '#b91c1c';
-      const txt  = score >= 80 ? 'Ideal para rede' : score >= 55 ? 'Ponto viável' : 'Área saturada';
-      const dOwnFmt  = (dOwn  != null) ? dOwn.toFixed(2)  + ' km' : '— km';
-      const dCompFmt = (dComp != null) ? dComp.toFixed(2) + ' km' : '— km';
-      const novoHtml = `
+      const novoHtml = _ultimaAnalise?.semDados ? `
+        <div style="font-family:Inter,sans-serif;min-width:200px;padding:2px">
+          <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:8px;line-height:1.3">${(endLabel||'').split(',').slice(0,2).join(',')}</div>
+          <div style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1e293b,#334155);border-radius:8px;padding:9px 11px;margin-bottom:8px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,.5)" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="rgba(255,255,255,.6)" stroke-width="2" stroke-linecap="round"/></svg>
+            <div><div style="font-size:11px;font-weight:700;color:#fff">Dados insuficientes</div><div style="font-size:9px;color:rgba(255,255,255,.55)">Configure para calcular a viabilidade</div></div>
+          </div>
+          <div style="font-size:10px;color:#64748b;margin-bottom:10px">👥 Pop. estimada: <strong>${popFmt} hab</strong></div>
+          <button onclick="abrirPainelRede(event)" style="width:100%;background:#f0f4ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:5px">+ Cadastrar Rede em Expansão</button>
+          <button onclick="abrirPainelConcorrentes(event)" style="width:100%;background:#fffbeb;color:#b45309;border:1px solid #fde68a;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">+ Buscar Concorrentes</button>
+        </div>` : `
         <div style="font-family:Inter,sans-serif;min-width:190px;padding:2px">
           <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:6px;line-height:1.3">${(endLabel||'').split(',').slice(0,2).join(',')}</div>
-          <div style="display:flex;align-items:center;gap:8px;background:${cor};border-radius:8px;padding:7px 10px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:8px;background:${score>=80?'#15803d':score>=55?'#b45309':'#b91c1c'};border-radius:8px;padding:7px 10px;margin-bottom:8px">
             <span style="font-size:18px;font-weight:900;color:#fff">${score}%</span>
-            <span style="font-size:11px;color:#fff;font-weight:600">${txt}</span>
+            <span style="font-size:11px;color:#fff;font-weight:600">${score>=80?'Ideal para rede':score>=55?'Ponto viável':'Área saturada'}</span>
           </div>
           <div style="font-size:10px;color:#64748b;line-height:1.8;margin-bottom:8px">
             👥 Pop. estimada: <strong>${popFmt} hab</strong><br>
-            🏠 Dist. rede: <strong>${dOwnFmt}</strong><br>
-            ⚔️ Dist. concorrente: <strong>${dCompFmt}</strong>
+            🏠 Dist. rede: <strong>${dOwn!=null?dOwn.toFixed(2)+' km':'— km'}</strong><br>
+            ⚔️ Dist. concorrente: <strong>${dComp!=null?dComp.toFixed(2)+' km':'— km'}</strong>
           </div>
-          <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">
-            📄 Gerar Relatório
-          </button>
+          <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">📄 Gerar Relatório</button>
         </div>`;
-      // Atualiza popup: verifica se está aberto ANTES de chamar bindPopup
-      // (bindPopup substitui o objeto e faz isPopupOpen() retornar false)
+      // Verifica se está aberto ANTES de chamar bindPopup
       if (window.searchMarker.isPopupOpen()) {
         window.searchMarker.getPopup().setContent(novoHtml);
       } else {
