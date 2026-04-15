@@ -1547,7 +1547,7 @@ function updateRaio(idx){
     // Re-renderiza o painel com a população atualizada
     const el = document.getElementById('analysisResult');
     if (el && el.style.display !== 'none') {
-      el.innerHTML = _ultimaAnalise?.semDados
+      el.innerHTML = (_ultimaAnalise?.semDados)
         ? renderSemDados(endLabel, val, popFmt, ibge, viaTop||'Calculando...', vmd||'–', _ultimaAnalise?.bdc||null)
         : renderAnalise(score, hBg||`linear-gradient(135deg,#166534,#15803d)`, stxt||'Ideal para rede', tc||'green', ttxt||'', endLabel, dOwn, dComp, null, val, popFmt, ibge, viaTop||'Calculando...', vmd||'–', _ultimaAnalise?.bdc||null);
     }
@@ -1831,7 +1831,7 @@ function analyse(lat,lng,label){
   // Concorrentes: apenas os buscados pelo usuário via painel, não dados demo
   const temConc = window._concorrentesLatLng?.length > 0;
   const dComp = temConc ? Math.min(...window._concorrentesLatLng.map(c=>dist(pt,c))) : null;
-  // Sem dados suficientes para calcular score real
+  // Sem dados de rede e concorrentes → bloqueia exibição do score
   const semDados = !temRede && !temConc;
 
   let score=50;
@@ -1924,13 +1924,32 @@ function analyse(lat,lng,label){
         ? renderSemDados(a.label, a.raioKm, popParaRender, a.ibge, a.viaTop||'Calculando...', a.vmd||'–', bdc)
         : renderAnalise(a.score,a.hBg,a.stxt,a.tc,a.ttxt,a.label,a.dOwn,a.dComp,null,a.raioKm,popParaRender,a.ibge,a.viaTop||'Calculando...',a.vmd||'–',bdc);
 
-      // Sincroniza popup usando o MESMO popParaRender (evita divergência)
-      if (window.searchMarker && window.searchMarker.getPopup()) {
-        window.searchMarker.closePopup();
-        window.searchMarker.bindPopup(
-          _buildPopupHtml(a, popParaRender),
-          { maxWidth: 240 }
-        );
+      // Sincroniza popup com a MESMA população da sidebar (evita divergência)
+      if (window.searchMarker) {
+        const popupHtml = a.semDados
+          ? `<div style="font-family:Inter,sans-serif;min-width:200px;padding:2px">
+              <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:8px">${(a.label||'').split(',').slice(0,2).join(',')}</div>
+              <div style="font-size:10px;color:#64748b;margin-bottom:10px">👥 Pop. estimada: <strong>${popParaRender} hab</strong></div>
+              <div style="font-size:9px;color:#64748b">Configure rede e concorrentes para calcular o score.</div>
+             </div>`
+          : `<div style="font-family:Inter,sans-serif;min-width:190px;padding:2px">
+              <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:6px">${(a.label||'').split(',').slice(0,2).join(',')}</div>
+              <div style="display:flex;align-items:center;gap:8px;background:${a.score>=80?'#15803d':a.score>=55?'#b45309':'#b91c1c'};border-radius:8px;padding:7px 10px;margin-bottom:8px">
+                <span style="font-size:18px;font-weight:900;color:#fff">${a.score}%</span>
+                <span style="font-size:11px;color:#fff;font-weight:600">${a.score>=80?'Ideal para rede':a.score>=55?'Ponto viável':'Área saturada'}</span>
+              </div>
+              <div style="font-size:10px;color:#64748b;line-height:1.8;margin-bottom:8px">
+                👥 Pop. estimada: <strong>${popParaRender} hab</strong><br>
+                🏠 Dist. rede: <strong>${a.dOwn!=null?a.dOwn.toFixed(2)+' km':'—'}</strong><br>
+                ⚔️ Dist. concorrente: <strong>${a.dComp!=null?a.dComp.toFixed(2)+' km':'—'}</strong>
+              </div>
+              <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">📄 Gerar Relatório</button>
+             </div>`;
+        if (window.searchMarker.getPopup()) {
+          window.searchMarker.getPopup().setContent(popupHtml);
+        } else {
+          window.searchMarker.bindPopup(popupHtml, { maxWidth:260, className:'map-popup' });
+        }
       }
     }
   });
