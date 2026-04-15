@@ -1582,8 +1582,9 @@ function updateRaio(idx){
           </div>
           <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">📄 Gerar Relatório</button>
         </div>`;
-      // Verifica se está aberto ANTES de chamar bindPopup
-      if (window.searchMarker.isPopupOpen()) {
+      // setContent atualiza o conteúdo sem fechar/recriar o popup (aberto ou fechado)
+      // bindPopup só é chamado se o popup ainda não existe
+      if (window.searchMarker.getPopup()) {
         window.searchMarker.getPopup().setContent(novoHtml);
       } else {
         window.searchMarker.bindPopup(novoHtml, { maxWidth:260, className:'map-popup' });
@@ -1922,30 +1923,36 @@ function analyse(lat,lng,label){
         : renderAnalise(a.score,a.hBg,a.stxt,a.tc,a.ttxt,a.label,a.dOwn,a.dComp,null,a.raioKm,popFmtFinal,a.ibge,a.viaTop||'Calculando...',a.vmd||'–',bdc);
     }
 
-    // Sincroniza o popup do searchMarker se estiver aberto
-    if (window.searchMarker && window.searchMarker.isPopupOpen() && _ultimaAnalise) {
+    // Sincroniza popup do searchMarker (aberto ou fechado) com os dados finais do BDC
+    if (window.searchMarker && _ultimaAnalise) {
       const a = _ultimaAnalise;
-      const cor  = a.score >= 80 ? '#15803d' : a.score >= 55 ? '#b45309' : '#b91c1c';
-      const txt  = a.score >= 80 ? 'Ideal para rede' : a.score >= 55 ? 'Ponto viável' : 'Área saturada';
-      const dOwnFmt  = (a.dOwn  != null) ? a.dOwn.toFixed(2)  + ' km' : '— km';
-      const dCompFmt = (a.dComp != null) ? a.dComp.toFixed(2) + ' km' : '— km';
-      const syncHtml = `
+      const syncHtml = a.semDados ? `
+        <div style="font-family:Inter,sans-serif;min-width:200px;padding:2px">
+          <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:8px;line-height:1.3">${(a.label||'').split(',').slice(0,2).join(',')}</div>
+          <div style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1e293b,#334155);border-radius:8px;padding:9px 11px;margin-bottom:8px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,.5)" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="rgba(255,255,255,.6)" stroke-width="2" stroke-linecap="round"/></svg>
+            <div><div style="font-size:11px;font-weight:700;color:#fff">Dados insuficientes</div><div style="font-size:9px;color:rgba(255,255,255,.55)">Configure para calcular a viabilidade</div></div>
+          </div>
+          <div style="font-size:10px;color:#64748b;margin-bottom:10px">👥 Pop. estimada: <strong>${popFmtFinal} hab</strong></div>
+          <button onclick="abrirPainelRede(event)" style="width:100%;background:#f0f4ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:5px">+ Cadastrar Rede em Expansão</button>
+          <button onclick="abrirPainelConcorrentes(event)" style="width:100%;background:#fffbeb;color:#b45309;border:1px solid #fde68a;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">+ Buscar Concorrentes</button>
+        </div>` : `
         <div style="font-family:Inter,sans-serif;min-width:190px;padding:2px">
           <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:6px;line-height:1.3">${(a.label||'').split(',').slice(0,2).join(',')}</div>
-          <div style="display:flex;align-items:center;gap:8px;background:${cor};border-radius:8px;padding:7px 10px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:8px;background:${a.score>=80?'#15803d':a.score>=55?'#b45309':'#b91c1c'};border-radius:8px;padding:7px 10px;margin-bottom:8px">
             <span style="font-size:18px;font-weight:900;color:#fff">${a.score}%</span>
-            <span style="font-size:11px;color:#fff;font-weight:600">${txt}</span>
+            <span style="font-size:11px;color:#fff;font-weight:600">${a.score>=80?'Ideal para rede':a.score>=55?'Ponto viável':'Área saturada'}</span>
           </div>
           <div style="font-size:10px;color:#64748b;line-height:1.8;margin-bottom:8px">
             👥 Pop. estimada: <strong>${popFmtFinal} hab</strong><br>
-            🏠 Dist. rede: <strong>${dOwnFmt}</strong><br>
-            ⚔️ Dist. concorrente: <strong>${dCompFmt}</strong>
+            🏠 Dist. rede: <strong>${a.dOwn!=null?a.dOwn.toFixed(2)+' km':'— km'}</strong><br>
+            ⚔️ Dist. concorrente: <strong>${a.dComp!=null?a.dComp.toFixed(2)+' km':'— km'}</strong>
           </div>
-          <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">
-            📄 Gerar Relatório
-          </button>
+          <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">📄 Gerar Relatório</button>
         </div>`;
-      window.searchMarker.getPopup().setContent(syncHtml);
+      if (window.searchMarker.getPopup()) {
+        window.searchMarker.getPopup().setContent(syncHtml);
+      }
     }
   });
 }
