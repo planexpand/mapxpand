@@ -6,7 +6,6 @@
 <title>MapXpand — Inteligência Imobiliária</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js">
-// ── MOBILE: Touch drag para fechar/abrir o bottom sheet ──
 (function(){
   let startY=0, startH=0, dragging=false;
   const head = document.getElementById('sidebar-head');
@@ -93,21 +92,10 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 }
 .s-label svg{width:12px;height:12px;flex-shrink:0}
 
-
 /* Campo de busca */
-
-
-
-
-
-
-
-
-
 
 .sf-group{display:flex;flex-direction:column;gap:3px}
 .sf-flex1{flex:1}.sf-flex2{flex:2}.sf-flex3{flex:3}
-
 
 .sf-input::placeholder{color:#94a3b8;font-size:11px}
 
@@ -298,7 +286,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   white-space:nowrap;letter-spacing:.04em
 }
 
-
 /* Touch drag para fechar o sheet */
 
 #btn-pin-modo:hover{border-color:#C6A664!important;color:#C6A664!important}
@@ -330,11 +317,9 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   box-shadow:0 4px 16px rgba(0,0,0,.4)
 }
 
-
 #universal-input:hover{border-color:#94a3b8}
 #searchBtn:hover{opacity:.88}
 #searchBtn:disabled{opacity:.55;cursor:not-allowed}
-
 
 /* ═══════════════════════════════════════════
    RESPONSIVO MOBILE — MapXpand
@@ -786,8 +771,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         <div style="font-size:9px;color:#C6A664;letter-spacing:.06em">Inteligência Imobiliária</div>
       </div>
 
-
-  
 </aside>
 
 <!-- MAPA -->
@@ -799,7 +782,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   display:flex;align-items:center;justify-content:center;
   font-family:Inter,sans-serif
 ">
-
 
   <div style="
     background:linear-gradient(160deg,#0a1628 0%,#0B132B 60%,#0d1f38 100%);
@@ -989,42 +971,12 @@ const COMPETITORS=[
   {name:"Bio Ritmo — Jabaquara",lat:-23.6450,lng:-46.6410},
   {name:"Smart Fit — Interlagos",lat:-23.6760,lng:-46.6850}
 ];
-const TARGETS=[
-  {id:1,name:"Jardim Ângela / M'Boi Mirim",lat:-23.6961,lng:-46.7628,why:"CONECTIVIDADE MÁXIMA. Une Pq. Independência e Pq. Fernanda. Cria cinturão Sul impenetrável."},
-  {id:2,name:"Jardim São Luís",lat:-23.6690,lng:-46.7340,why:"Centro entre Sto. Antônio e Campo Limpo. Ideal para clientes Premium."},
-  {id:3,name:"Sacomã / Silva Bueno",lat:-23.6020,lng:-46.6020,why:"Espiral Leste. Apoia Heliópolis e expande para o ABC."},
-  {id:4,name:"Cidade Ademar Centro",lat:-23.6600,lng:-46.6700,why:"Elo vital entre Diadema e Zona Sul."},
-  {id:5,name:"Jardim Miriam / Cupecê",lat:-23.6738,lng:-46.6558,why:"Reforça o corredor da Cupecê. Alta densidade classe C/D."},
-  {id:6,name:"Capão Redondo Sul",lat:-23.6900,lng:-46.7900,why:"Expansão da espiral. Dominância territorial."},
-  {id:7,name:"Taboão (Pirajuçara)",lat:-23.6190,lng:-46.7720,why:"Conecta Vila Indiana à RMSP."},
-  {id:8,name:"Sapopemba / Teotônio",lat:-23.6060,lng:-46.5050,why:"Início da espiral Zona Leste."},
-  {id:9,name:"Brasilândia",lat:-23.4682,lng:-46.6853,why:"Nova espiral Norte. Sem concorrência premium."},
-  {id:10,name:"Cidade Tiradentes",lat:-23.5869,lng:-46.4069,why:"Nova espiral Leste. Foco em massa crítica."},
-  {id:11,name:"Guaianases",lat:-23.5430,lng:-46.4150,why:"Conectividade via trilhos."},
-  {id:12,name:"Eldorado Diadema",lat:-23.7093,lng:-46.6171,why:"Fechamento da espiral de Diadema."},
-  {id:13,name:"Cachoeirinha",lat:-23.4680,lng:-46.6710,why:"Fortalecimento do Cluster Norte."},
-  {id:14,name:"Vila Dirce",lat:-23.5501,lng:-46.8322,why:"Consolidação Carapicuíba."},
-  {id:15,name:"Jaraguá",lat:-23.4400,lng:-46.7300,why:"Expansão de borda Norte."},
-  {id:16,name:"Ponte Rasa",lat:-23.5000,lng:-46.4800,why:"Conecta São Miguel à espiral Leste."},
-  {id:17,name:"Parque Bristol",lat:-23.6250,lng:-46.6150,why:"Elo entre Heliópolis e Ipiranga."},
-  {id:18,name:"Grajaú Centro",lat:-23.7700,lng:-46.6950,why:"Apoio à unidade Cocaia."},
-  {id:19,name:"Varginha",lat:-23.7900,lng:-46.7100,why:"Ponta extrema da espiral Sul."},
-  {id:20,name:"Osasco Centro",lat:-23.5320,lng:-46.7780,why:"Porta de entrada nova espiral Oeste."}
-];
-
-
-// ═══════════════════════════════════════════════════════
-// BASE DEMOGRÁFICA — IBGE Censo 2022
-// SP + MG — 1493 municípios (dados reais do Censo 2022)
 // ═══════════════════════════════════════════════════════
 
-// Busca o município mais próximo de uma coordenada lat/lng
 const MUNI_COORDS={'SÃO PAULO':{lat:-23.5505,lng:-46.6333,areaKm2:1521},'GUARULHOS':{lat:-23.4637,lng:-46.5332,areaKm2:319},'CAMPINAS':{lat:-22.9099,lng:-47.0626,areaKm2:795},'SÃO BERNARDO DO CAMPO':{lat:-23.6944,lng:-46.5654,areaKm2:409},'SANTO ANDRÉ':{lat:-23.6537,lng:-46.5382,areaKm2:175},'OSASCO':{lat:-23.5329,lng:-46.7919,areaKm2:65},'DIADEMA':{lat:-23.6862,lng:-46.6220,areaKm2:31},'MAUÁ':{lat:-23.6678,lng:-46.4611,areaKm2:62},'CARAPICUÍBA':{lat:-23.5228,lng:-46.8353,areaKm2:35},'TABOÃO DA SERRA':{lat:-23.6061,lng:-46.7586,areaKm2:20},'BARUERI':{lat:-23.5050,lng:-46.8761,areaKm2:66},'EMBU DAS ARTES':{lat:-23.6486,lng:-46.8522,areaKm2:70},'COTIA':{lat:-23.6039,lng:-46.9192,areaKm2:325},'SANTOS':{lat:-23.9608,lng:-46.3336,areaKm2:281},'SOROCABA':{lat:-23.5015,lng:-47.4526,areaKm2:450},'RIBEIRÃO PRETO':{lat:-21.1767,lng:-47.8208,areaKm2:651},'SÃO JOSÉ DOS CAMPOS':{lat:-23.1794,lng:-45.8869,areaKm2:1099},'JUNDIAÍ':{lat:-23.1864,lng:-46.8981,areaKm2:432},'BELO HORIZONTE':{lat:-19.9167,lng:-43.9345,areaKm2:331},'CURITIBA':{lat:-25.4290,lng:-49.2671,areaKm2:435}};
 const DENS_BAIRRO_SP=[[-23.5505,-46.6333,14000],[-23.5489,-46.6388,16800],[-23.5629,-46.6544,22000],[-23.5731,-46.6458,18500],[-23.5875,-46.6823,19200],[-23.5475,-46.6419,20500],[-23.5284,-46.6506,17300],[-23.5128,-46.6236,15900],[-23.5390,-46.7272,21800],[-23.6667,-46.6406,28000],[-23.6547,-46.6016,24500],[-23.6428,-46.5683,22800],[-23.6250,-46.5447,25200],[-23.6027,-46.4836,26800],[-23.5720,-46.4750,23100],[-23.5550,-46.7261,24300],[-23.5909,-46.7267,22700],[-23.6264,-46.7369,20900],[-23.6528,-46.7503,24600],[-23.6669,-46.7189,26100],[-23.6881,-46.6900,23800],[-23.7039,-46.6597,21400],[-23.7183,-46.6281,25700],[-23.7294,-46.5764,22300],[-23.5995,-46.6608,20100],[-23.5828,-46.6523,18700],[-23.5717,-46.6369,21900],[-23.5587,-46.6600,19500],[-23.5497,-46.6718,17800],[-23.5342,-46.6819,16200],[-23.5248,-46.6711,18900],[-23.5144,-46.6139,17100],[-23.5580,-46.5917,20400],[-23.5830,-46.5530,22600],[-23.6100,-46.5900,24100],[-23.4850,-46.7400,18500],[-23.4950,-46.6740,17600],[-23.4750,-46.6200,16800],[-23.4620,-46.6550,15400],[-23.4700,-46.7100,16500],[-23.5180,-46.7800,19200],[-23.6862,-46.6220,32000],[-23.6678,-46.4611,22000],[-23.6537,-46.5382,28000],[-23.6944,-46.5654,24000],[-23.5329,-46.7919,30000],[-23.6061,-46.7586,26000]];
 function getDadosIBGE(lat,lng){let melhor=null,menorDist=Infinity;for(const [nome,coords] of Object.entries(MUNI_COORDS)){const d=IBGE_BASE[nome];if(!d)continue;const dlat=coords.lat-lat,dlng=coords.lng-lng,dist=Math.sqrt(dlat*dlat+dlng*dlng);if(dist<menorDist){menorDist=dist;melhor={nome,...d,lat:coords.lat,lng:coords.lng,areaKm2:coords.areaKm2,dist};}}return melhor;}
-// Pontos de densidade extra — Zona Sul, Oeste, Leste e Grande SP (hab/km²)
 const DENS_EXTRA_SP = [
-  // Zona Sul
   [-23.6491,-46.7481,14200], // Campo Limpo
   [-23.6603,-46.7200,13800], // Capão Redondo
   [-23.6720,-46.6950,12500], // Jardim Ângela
@@ -1036,22 +988,18 @@ const DENS_EXTRA_SP = [
   [-23.6050,-46.6650,18500], // Brooklin / Itaim
   [-23.5980,-46.7000,16400], // Vila Olímpia / Chácara Flora
   [-23.6150,-46.7400,12800], // Jabaquara / Sacomã
-  // Zona Oeste
   [-23.5380,-46.7300,15200], // Lapa / Pompeia
   [-23.5600,-46.7400,13600], // Butantã / Jaguaré
   [-23.5700,-46.7700,11800], // Raposo Tavares
   [-23.5450,-46.7600,12400], // Vila Leopoldina
-  // Zona Leste
   [-23.5450,-46.5700,18200], // Tatuapé / Carrão
   [-23.5600,-46.5400,17600], // Penha / Vila Matilde
   [-23.5800,-46.4900,14200], // Itaquera / Guaianazes
   [-23.5300,-46.4600,13800], // Ermelino Matarazzo
   [-23.6000,-46.5600,15400], // São Mateus / Iguatemi
-  // Zona Norte
   [-23.4800,-46.6200,16200], // Santana / Tucuruvi
   [-23.4600,-46.5800,14800], // Tremembé / Jaçanã
   [-23.5000,-46.6600,13200], // Casa Verde / Limão
-  // Grande SP
   [-23.5500,-46.7400,11600], // Osasco
   [-23.6900,-46.5700,12800], // São Bernardo do Campo
   [-23.7100,-46.5300,11400], // Diadema
@@ -1060,7 +1008,6 @@ const DENS_EXTRA_SP = [
   [-23.4900,-46.8600, 8600], // Jandira
 ];
 
-// ── DENSIDADE NACIONAL — principais regiões metropolitanas do Brasil (hab/km²) ──
 const DENS_NACIONAL = [
   // ── RIO DE JANEIRO ──────────────────────────────────
   [-22.9068,-43.1729,16800], // Centro / Lapa
@@ -1231,7 +1178,6 @@ const DENS_NACIONAL = [
 ];
 
 function calcularDensidadeLocal(lat,lng){
-  // 1. Área metropolitana de SP — dados de bairro (maior precisão)
   const dSP=Math.sqrt(Math.pow(lat-(-23.5505),2)+Math.pow(lng-(-46.6333),2));
   if(dSP<2.5){
     const todas = [...(typeof DENS_BAIRRO_SP!=='undefined'?DENS_BAIRRO_SP:[]), ...DENS_EXTRA_SP];
@@ -1242,21 +1188,17 @@ function calcularDensidadeLocal(lat,lng){
     }
     return dens;
   }
-  // 2. Demais regiões metropolitanas — dataset nacional
   let menorDN=Infinity, densN=null;
   for(const [blat,blng,d] of DENS_NACIONAL){
     const dd=Math.sqrt(Math.pow(blat-lat,2)+Math.pow(blng-lng,2));
     if(dd<menorDN){menorDN=dd;densN=d;}
   }
-  // Usa dado nacional se estiver a menos de 0.8° (~90 km) do ponto mais próximo
   if(densN && menorDN<0.8) return densN;
-  // 3. Fallback: densidade IBGE municipal (cobertura total do território)
   const ibge=getDadosIBGE(lat,lng);
   if(ibge?.areaKm2) return Math.round(ibge.pop/ibge.areaKm2);
   return 5000;
 }
 
-// Formata painel demográfico para popup/análise
 function painelIBGE(lat, lng) {
   const d = getDadosIBGE(lat, lng);
   if (!d || d.dist > 1.5) return ''; // só exibe se estiver perto o suficiente
@@ -1286,7 +1228,6 @@ function painelIBGE(lat, lng) {
     </div>`;
 }
 
-// MAP — Google Maps tiles (igual imagem original)
 const map=L.map('map',{zoomControl:false,center:[-23.651,-46.700],zoom:12});
 L.control.zoom({position:'bottomright'}).addTo(map);
 
@@ -1325,14 +1266,12 @@ function localizarUsuario(btn) {
     return;
   }
 
-  // Se já está ativo → apenas re-centraliza
   if (_locAtivo && _userLocMarker) {
     const pos = _userLocMarker.getLatLng();
     map.setView(pos, 16, { animate: true });
     return;
   }
 
-  // Estado: carregando
   btn.classList.add('loading');
   btn.innerHTML = _svgLocate('loading');
 
@@ -1342,10 +1281,8 @@ function localizarUsuario(btn) {
       const lng = pos.coords.longitude;
       const acc = pos.coords.accuracy;
 
-      // Remove marcador anterior
       if (_userLocMarker) { map.removeLayer(_userLocMarker); _userLocMarker = null; }
 
-      // Cria marcador pulsante
       const dotIcon = L.divIcon({
         className: '',
         html: '<div class="user-location-dot"></div>',
@@ -1356,7 +1293,6 @@ function localizarUsuario(btn) {
         .addTo(map)
         .bindPopup(`<div style="font-family:Inter,sans-serif;font-size:12px;font-weight:700;color:#0B132B;white-space:nowrap">📍 Sua localização atual</div>`);
 
-      // Círculo de precisão
       L.circle([lat, lng], {
         radius: acc,
         color: '#2563eb',
@@ -1366,11 +1302,9 @@ function localizarUsuario(btn) {
         dashArray: '4 4'
       }).addTo(map);
 
-      // Centraliza e abre popup
       map.setView([lat, lng], 16, { animate: true });
       setTimeout(() => _userLocMarker?.openPopup(), 600);
 
-      // Estado: ativo
       _locAtivo = true;
       btn.classList.remove('loading');
       btn.classList.add('active');
@@ -1392,7 +1326,6 @@ function localizarUsuario(btn) {
   );
 }
 window.localizarUsuario = localizarUsuario;
-// Tiles CartoDB Voyager — visual limpo, sem restrição de Referer
 const tileLayers = {
   ruas:      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
                {maxZoom:19,attribution:'© Esri'}),
@@ -1424,7 +1357,6 @@ const layerState={dfinefit:true,expansion:true,cannibal:false,competitor:false};
 
 function toggleLayer(id){
   layerState[id]=!layerState[id];
-  // Atualiza UI
   const chk=document.getElementById('chk-'+id);
   const cb=document.getElementById('cb-'+id);
   if(chk)chk.classList.toggle('on',layerState[id]);
@@ -1432,11 +1364,9 @@ function toggleLayer(id){
   layerState[id]?map.addLayer(layers[id]):map.removeLayer(layers[id]);
   if(id==='dfinefit'){
     renderCaptacao(parseFloat(document.querySelector('input[type=range]').value));
-    // Ao ativar D.Finefit, centraliza mapa nas unidades do cliente (se disponível)
     if(layerState[id] && window._clienteBounds){
       try{ map.fitBounds(window._clienteBounds); }catch(e){}
     }
-    // Restaura zonas de canibalização
     if(window._zonasCanibal){
       window._zonasCanibal.forEach(c=>{
         try{ layerState[id]?map.addLayer(c):map.removeLayer(c); }catch(e){}
@@ -1445,7 +1375,6 @@ function toggleLayer(id){
   }
 }
 window.toggleLayer=toggleLayer;
-
 
 // ÍCONES
 function mkIcon(html,w,h,ax,ay){return L.divIcon({className:'',html,iconSize:[w,h],iconAnchor:[ax,ay]})}
@@ -1513,8 +1442,6 @@ DFINEFIT.forEach(u=>{
     </div>`,popOpts).addTo(layers.dfinefit);
 });
 
-// TARGETS removidos — eram dados demo SmartFit, não fazem parte da plataforma genérica
-
 // COMPETITORS
 COMPETITORS.forEach(c=>{
   L.marker([c.lat,c.lng],{icon:competitorIcon(c.name)})
@@ -1522,10 +1449,6 @@ COMPETITORS.forEach(c=>{
     .addTo(layers.competitor);
 });
 
-// CANNIBAL ZONES — geradas dinamicamente em confirmarCanibRaio()
-// (não inicializa aqui para usar sempre as unidades corretas do cliente ativo)
-
-// RAIO CAPTAÇÃO (removido da UI — mantém variável para não quebrar referências legadas)
 let captacaoCircles=[];
 function renderCaptacao(km){
   captacaoCircles.forEach(c=>map.removeLayer(c));
@@ -1538,12 +1461,10 @@ function updateRaio(idx){
   document.getElementById('raioVal').textContent = label;
   renderCaptacao(val);
 
-  // Atualiza o círculo de análise no mapa
   if (window._raioAnalise && _ultimaAnalise) {
     window._raioAnalise.setRadius(val * 1000);
   }
 
-  // Recalcula população proporcional ao novo raio
   if (_ultimaAnalise) {
     const { lat, lng, score, label: endLabel, hBg, stxt, tc, ttxt, dOwn, dComp, ibge, viaTop, vmd } = _ultimaAnalise;
     const areaKm2 = Math.PI * val * val;
@@ -1552,12 +1473,10 @@ function updateRaio(idx){
     const popNoRaio = Math.round(dens * areaKm2 * fator);
     const popFmt = new Intl.NumberFormat('pt-BR').format(popNoRaio);
 
-    // Atualiza _ultimaAnalise com novos valores
     _ultimaAnalise.raioKm = val;
     _ultimaAnalise.popNoRaio = popNoRaio;
     _ultimaAnalise.popFmt = popFmt;
 
-    // Re-renderiza o painel com a população atualizada
     const el = document.getElementById('analysisResult');
     if (el && el.style.display !== 'none') {
       el.innerHTML = (_ultimaAnalise?.semDados)
@@ -1565,11 +1484,9 @@ function updateRaio(idx){
         : renderAnalise(score, hBg||`linear-gradient(135deg,#166534,#15803d)`, stxt||'Ideal para rede', tc||'green', ttxt||'', endLabel, dOwn, dComp, null, val, popFmt, ibge, viaTop||'Calculando...', vmd||'–', _ultimaAnalise?.bdc||null);
     }
 
-    // Atualiza elemento de pop na sidebar se visível
     const popEl = document.getElementById('ar-pop-val');
     if (popEl) popEl.textContent = popFmt + ' hab';
 
-    // Sincroniza popup com a nova população — única fonte de verdade
     _sincPopup();
   }
 }
@@ -1581,7 +1498,6 @@ function getRaioAtual(){
 }
 renderCaptacao(1.5);
 
-// DISTÂNCIA
 function dist(a,b){
   const R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLng=(b.lng-a.lng)*Math.PI/180;
   const x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
@@ -1590,7 +1506,6 @@ function dist(a,b){
 
 // ═══════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════
-// IBGE AGREGADOS v3 — Dados dinâmicos do Censo 2022
 // ═══════════════════════════════════════════════════════════════
 const _ibgeApiCache = {}; // cache por "cidade-uf" para evitar chamadas repetidas
 
@@ -1600,13 +1515,11 @@ async function buscarDadosIBGEDinamico(cidade, siglaUF) {
   if (_ibgeApiCache[cacheKey]) return _ibgeApiCache[cacheKey];
 
   try {
-    // 1. Busca código IBGE do município pelo nome
     const locUrl = `https://servicodados.ibge.gov.br/api/v1/localidades/municipios?nome=${encodeURIComponent(cidade)}`;
     const locRes = await fetchWithTimeout(locUrl, {}, 7000);
     const locData = await locRes.json();
     if (!locData?.length) return null;
 
-    // Filtra pelo estado se disponível (evita homônimos: ex. "São Paulo" em vários estados)
     let mun = locData[0];
     if (siglaUF && locData.length > 1) {
       const match = locData.find(m =>
@@ -1620,7 +1533,6 @@ async function buscarDadosIBGEDinamico(cidade, siglaUF) {
                  || mun.regiao_imediata?.regiao_intermediaria?.UF?.sigla
                  || siglaUF || '';
 
-    // 2. Busca população e renda em paralelo (Censo 2022)
     const [popRes, rendaRes] = await Promise.all([
       fetchWithTimeout(
         `https://servicodados.ibge.gov.br/api/v3/agregados/9514/periodos/2022/variaveis/93?localidades=N6[${codMun}]`,
@@ -1640,15 +1552,12 @@ async function buscarDadosIBGEDinamico(cidade, siglaUF) {
 
     if (!pop) return null; // retorno inválido
 
-    // Mantém areaKm2 do IBGE_BASE estático se disponível (API não fornece área)
     const ibgeEstatico = getDadosIBGE(
       window._lastAnalysisLat || -23.5505,
       window._lastAnalysisLng || -46.6333
     );
     const areaKm2 = ibgeEstatico?.areaKm2 || null;
 
-    // Calcula classe A/B a partir da renda (referência: ABEP 2023)
-    // Renda per capita familiar média: A ≥ R$5.500 | B ≥ R$2.000
     const classAB = renda >= 5500 ? Math.round(18 + (renda - 5500) / 500)
                   : renda >= 2000 ? Math.round(8  + (renda - 2000) / 300)
                   : Math.round(Math.max(2, renda / 400));
@@ -1673,7 +1582,6 @@ async function buscarDadosIBGEDinamico(cidade, siglaUF) {
   }
 }
 
-// BIGDATACLOUD — Enriquecimento de bairro e localidade
 // ═══════════════════════════════════════════════════════════════
 const BDC_KEY = 'bdc_40c6cf5fa3b044778f848e8610cfa436';
 
@@ -1683,13 +1591,11 @@ async function buscarDadosBDC(lat, lng) {
     const r = await fetchWithTimeout(url, {}, 6000);
     const d = await r.json();
 
-    // Extrai o bairro a partir do localityInfo
     const infos = d.localityInfo?.informational || [];
     const admins = d.localityInfo?.administrative || [];
     const vizinhanca = infos.find(i =>
       ['neighbourhood','quarter','suburb','village','hamlet'].includes(i.description)
     );
-    // Tenta pegar subprefeitura / distrito do array administrative
     const distrito = admins.find(i =>
       ['district','subdistrict','municipality'].includes(i.description?.toLowerCase())
     );
@@ -1710,7 +1616,6 @@ async function buscarDadosBDC(lat, lng) {
   }
 }
 
-// Auto-localização ao carregar (ipapi.co — sem chave)
 async function autoLocalizarUsuario() {
   try {
     const r = await fetch('https://ipapi.co/json/');
@@ -1721,14 +1626,11 @@ async function autoLocalizarUsuario() {
     }
   } catch(e) { /* silencioso */ }
 }
-// Executa após mapa pronto
 setTimeout(autoLocalizarUsuario, 1200);
 
 // MOTOR DE ANÁLISE
 let searchMarker=null;
 
-// Função central: reconstrói o popup do pin a partir do estado atual de _ultimaAnalise
-// Chamada sempre que sidebar é atualizada — garante popup e sidebar 100% sincronizados
 function _sincPopup() {
   if (!searchMarker || !_ultimaAnalise) return;
   const a = _ultimaAnalise;
@@ -1765,22 +1667,18 @@ function _sincPopup() {
 
 function analyse(lat,lng,label){
   if(searchMarker){layers.search.removeLayer(searchMarker);searchMarker=null;}
-  // Garante que layers.search está no mapa (pode ter sido removido pelo zerarAnalise)
   if(!map.hasLayer(layers.search)) layers.search.addTo(map);
   searchMarker=L.marker([lat,lng],{icon:searchIcon(),zIndexOffset:1000}).addTo(layers.search);
   window.searchMarker = searchMarker; // mantém window.searchMarker em sincronia com o let
-  // Clique no pin vermelho: reabre análise sem criar novo pin
   searchMarker.on('click', function(e) {
     e.originalEvent && e.originalEvent.stopPropagation();
     window._searchMarkerClicked = true;
     setTimeout(() => { window._searchMarkerClicked = false; }, 100);
-    // Mostra resultado na sidebar e rola até ele
     const el = document.getElementById('analysisResult');
     if (el) {
       el.style.display = 'block';
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-    // Abre popup com conteúdo atual de _ultimaAnalise
     if (_ultimaAnalise) {
       const a = _ultimaAnalise;
       const popupHtml = a.semDados
@@ -1810,15 +1708,12 @@ function analyse(lat,lng,label){
       searchMarker.bindPopup(popupHtml, { maxWidth:260, className:'map-popup' }).openPopup();
     }
   });
-  // Salva posição do pin para uso em busca de concorrentes
   window._lastAnalysisLat = lat;
   window._lastAnalysisLng = lng;
 
-  // Raio atual do slider
   const raioKm = getRaioAtual();
   const raioM = raioKm * 1000;
 
-  // Desenha raio no mapa
   if(window._raioAnalise) map.removeLayer(window._raioAnalise);
   window._raioAnalise = L.circle([lat,lng], {
     radius: raioM,
@@ -1827,7 +1722,6 @@ function analyse(lat,lng,label){
   }).addTo(map);
 
   const pt={lat,lng};
-  // Usa rede real se disponível — sem fallback para dados demo
   const unidadesRede = (window.redeUnidades?.length > 0)
     ? window.redeUnidades
     : (clienteAtivo?.unidades?.length > 0)
@@ -1835,13 +1729,10 @@ function analyse(lat,lng,label){
         : [];
   const temRede = unidadesRede.length > 0;
   const dOwn = temRede ? Math.min(...unidadesRede.map(u=>dist(pt,u))) : null;
-  // Canibalização: usa o raio configurado pelo usuário (padrão 1,25km)
   const RAIO_CANIB_KM = window.canibRaioAtual || 1.25;
   const emZonaCanib = temRede && unidadesRede.some(u => dist(pt,u) < RAIO_CANIB_KM);
-  // Concorrentes: apenas os buscados pelo usuário via painel, não dados demo
   const temConc = window._concorrentesLatLng?.length > 0;
   const dComp = temConc ? Math.min(...window._concorrentesLatLng.map(c=>dist(pt,c))) : null;
-  // Sem dados de rede e concorrentes → bloqueia exibição do score
   const semDados = !temRede && !temConc;
 
   let score=50;
@@ -1865,21 +1756,17 @@ function analyse(lat,lng,label){
   const popNoRaio=Math.round(densidadePop*areaRaioKm2*fatorUrb);
   const popFmt=new Intl.NumberFormat('pt-BR').format(popNoRaio);
 
-  // Fluxo viário — busca via Overpass em background
   const el=document.getElementById('analysisResult');
   el.style.display='block';
-  // Salva dados para o relatório + vincula popup imediatamente (evita estado stale)
   _ultimaAnalise = { score, label, raioKm, popNoRaio, popFmt, ibge, dOwn, dComp, lat, lng, hBg, stxt, tc, ttxt, bdc: null, semDados };
   el.innerHTML = semDados
     ? renderSemDados(label, raioKm, popFmt, ibge, 'Calculando...', '–', null)
     : renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,ibge,'Calculando...','–',null);
   _sincPopup(); // popup criado logo após sidebar — mesmos dados, zero divergência
 
-  // Busca fluxo das vias próximas via Overpass
   buscarFluxoVias(lat,lng,raioM).then(({viaTop,vmd})=>{
     if(_ultimaAnalise) { _ultimaAnalise.viaTop=viaTop; _ultimaAnalise.vmd=vmd; }
     const bdcAtual = _ultimaAnalise?.bdc || null;
-    // Usa sempre os valores mais atualizados do _ultimaAnalise (slider pode ter sido movido)
     const popAtual  = _ultimaAnalise?.popFmt  || popFmt;
     const raioAtual = _ultimaAnalise?.raioKm  || raioKm;
     el.innerHTML = (_ultimaAnalise?.semDados)
@@ -1888,13 +1775,10 @@ function analyse(lat,lng,label){
     _sincPopup(); // sincroniza popup com sidebar após fluxo viário
   });
 
-  // Enriquece com BigDataCloud + IBGE Agregados em paralelo
   buscarDadosBDC(lat, lng).then(async bdc => {
     if (!bdc) return;
     if (_ultimaAnalise) _ultimaAnalise.bdc = bdc;
 
-    // Refina população com densidade local
-    // Usa sempre o raioKm ATUAL do _ultimaAnalise (o slider pode ter sido movido desde o início da análise)
     let popFmtFinal = _ultimaAnalise?.popFmt || popFmt;
     if (_ultimaAnalise) {
       const isUrban = bdc.cidade && (bdc.bairro || bdc.localidade);
@@ -1910,10 +1794,8 @@ function analyse(lat,lng,label){
       }
     }
 
-    // Busca dados reais do Censo 2022 via IBGE Agregados v3
     const ibgeDinamico = await buscarDadosIBGEDinamico(bdc.cidade, bdc.siglaEstado);
     if (ibgeDinamico && _ultimaAnalise) {
-      // Mescla: mantém areaKm2 estático se API não retornou, atualiza pop e renda
       const ibgeAtual = _ultimaAnalise.ibge || {};
       _ultimaAnalise.ibge = {
         ...ibgeAtual,
@@ -1930,7 +1812,6 @@ function analyse(lat,lng,label){
     const elAtual = document.getElementById('analysisResult');
     if (elAtual && elAtual.style.display !== 'none' && _ultimaAnalise) {
       const a = _ultimaAnalise;
-      // Após o await, usa o popFmt ATUAL do _ultimaAnalise (slider pode ter sido movido)
       const popParaRender = a.popFmt || popFmtFinal;
       elAtual.innerHTML = a.semDados
         ? renderSemDados(a.label, a.raioKm, popParaRender, a.ibge, a.viaTop||'Calculando...', a.vmd||'–', bdc)
@@ -2032,7 +1913,6 @@ function renderSemDados(label, raioKm, popFmt, ibge, viaTop, vmd, bdc) {
   </div>`;
 }
 
-// Servidores Overpass em cascata (tenta o próximo se o anterior falhar)
 const OVERPASS_SERVERS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
@@ -2042,7 +1922,6 @@ const OVERPASS_SERVERS = [
 async function buscarFluxoVias(lat, lng, raioM) {
   const delta = (raioM / 111320) + 0.018; // bbox ligeiramente maior para capturar vias arteriais
   const bbox  = `${lat-delta},${lng-delta},${lat+delta},${lng+delta}`;
-  // Inclui motorway, trunk e primary_link — captura vias expressas e avenidas principais
   const q = `[out:json][timeout:18];(way["highway"~"motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary"](${bbox}););out tags;`;
   const vmdMap = {
     motorway: 90000, motorway_link: 50000,
@@ -2069,7 +1948,6 @@ async function buscarFluxoVias(lat, lng, raioM) {
     } catch(e) { /* tenta próximo servidor */ }
   }
 
-  // Fallback inteligente — estima pelo tipo de logradouro no endereço
   return estimarFluxoPorLabel(window._ultimaAnalise?.label || '');
 }
 
@@ -2088,13 +1966,6 @@ function estimarFluxoPorLabel(label) {
   return { viaTop: 'Via não identificada', vmd: '~12.000 veíc./dia' };
 }
 
-// PARSER DE ENDEREÇO COMPLETO
-
-
-
-
-
-// BASE IBGE — Censo 2022 — SP (640) e MG (853) municípios
 const IBGE_BASE = {"ADAMANTINA":{"id":3500105,"pop":35153,"uf":"SP"},"ADOLFO":{"id":3500204,"pop":3545,"uf":"SP"},"AGUAÍ":{"id":3500303,"pop":36981,"uf":"SP"},"ÁGUAS DA PRATA":{"id":3500402,"pop":8262,"uf":"SP"},"ÁGUAS DE LINDÓIA":{"id":3500501,"pop":18908,"uf":"SP"},"ÁGUAS DE SANTA BÁRBARA":{"id":3500550,"pop":6142,"uf":"SP"},"ÁGUAS DE SÃO PEDRO":{"id":3500600,"pop":3588,"uf":"SP"},"AGUDOS":{"id":3500709,"pop":37582,"uf":"SP"},"ALAMBARI":{"id":3500758,"pop":6231,"uf":"SP"},"ALFREDO MARCONDES":{"id":3500808,"pop":4201,"uf":"SP"},"ALTAIR":{"id":3500907,"pop":4211,"uf":"SP"},"ALTINÓPOLIS":{"id":3501004,"pop":16221,"uf":"SP"},"ALTO ALEGRE":{"id":3501103,"pop":4078,"uf":"SP"},"ALUMÍNIO":{"id":3501152,"pop":18903,"uf":"SP"},"ÁLVARES FLORENCE":{"id":3501202,"pop":3616,"uf":"SP"},"ÁLVARES MACHADO":{"id":3501301,"pop":25078,"uf":"SP"},"ÁLVARO DE CARVALHO":{"id":3501400,"pop":5320,"uf":"SP"},"ALVINLÂNDIA":{"id":3501509,"pop":3251,"uf":"SP"},"AMERICANA":{"id":3501608,"pop":244370,"uf":"SP"},"AMÉRICO BRASILIENSE":{"id":3501707,"pop":41545,"uf":"SP"},"AMÉRICO DE CAMPOS":{"id":3501806,"pop":5993,"uf":"SP"},"AMPARO":{"id":3501905,"pop":73145,"uf":"SP"},"ANALÂNDIA":{"id":3502002,"pop":5115,"uf":"SP"},"ANDRADINA":{"id":3502101,"pop":57245,"uf":"SP"},"ANGATUBA":{"id":3502200,"pop":25724,"uf":"SP"},"ANHEMBI":{"id":3502309,"pop":6911,"uf":"SP"},"ANHUMAS":{"id":3502408,"pop":4172,"uf":"SP"},"APARECIDA":{"id":3502507,"pop":36211,"uf":"SP"},"APARECIDA D'OESTE":{"id":3502606,"pop":4122,"uf":"SP"},"APIAÍ":{"id":3502705,"pop":24081,"uf":"SP"},"ARAÇARIGUAMA":{"id":3502754,"pop":23343,"uf":"SP"},"ARAÇATUBA":{"id":3502804,"pop":199210,"uf":"SP"},"ARAÇOIABA DA SERRA":{"id":3502903,"pop":35389,"uf":"SP"},"ARAMINA":{"id":3503000,"pop":5689,"uf":"SP"},"ARANDU":{"id":3503109,"pop":6373,"uf":"SP"},"ARAPEÍ":{"id":3503158,"pop":2452,"uf":"SP"},"ARARAQUARA":{"id":3503208,"pop":240542,"uf":"SP"},"ARARAS":{"id":3503307,"pop":136739,"uf":"SP"},"ARCO-ÍRIS":{"id":3503356,"pop":1755,"uf":"SP"},"AREALVA":{"id":3503406,"pop":8665,"uf":"SP"},"AREIAS":{"id":3503505,"pop":3906,"uf":"SP"},"AREIÓPOLIS":{"id":3503604,"pop":11186,"uf":"SP"},"ARIRANHA":{"id":3503703,"pop":9851,"uf":"SP"},"ARTUR NOGUEIRA":{"id":3503802,"pop":56247,"uf":"SP"},"ARUJÁ":{"id":3503901,"pop":92453,"uf":"SP"},"ASPÁSIA":{"id":3503950,"pop":1815,"uf":"SP"},"ASSIS":{"id":3504008,"pop":105768,"uf":"SP"},"ATIBAIA":{"id":3504107,"pop":145378,"uf":"SP"},"AURIFLAMA":{"id":3504206,"pop":15316,"uf":"SP"},"AVAÍ":{"id":3504305,"pop":5467,"uf":"SP"},"AVANHANDAVA":{"id":3504404,"pop":14063,"uf":"SP"},"AVARÉ":{"id":3504503,"pop":91792,"uf":"SP"},"BADY BASSITT":{"id":3504602,"pop":18013,"uf":"SP"},"BALBINOS":{"id":3504701,"pop":6127,"uf":"SP"},"BÁLSAMO":{"id":3504800,"pop":9209,"uf":"SP"},"BANANAL":{"id":3504909,"pop":11039,"uf":"SP"},"BARÃO DE ANTONINA":{"id":3505005,"pop":3525,"uf":"SP"},"BARBOSA":{"id":3505104,"pop":7532,"uf":"SP"},"BARIRI":{"id":3505203,"pop":35844,"uf":"SP"},"BARRA BONITA":{"id":3505302,"pop":36125,"uf":"SP"},"BARRA DO CHAPÉU":{"id":3505351,"pop":5794,"uf":"SP"},"BARRA DO TURVO":{"id":3505401,"pop":7606,"uf":"SP"},"BARRETOS":{"id":3505500,"pop":123546,"uf":"SP"},"BARRINHA":{"id":3505609,"pop":33537,"uf":"SP"},"BARUERI":{"id":3505708,"pop":279704,"uf":"SP"},"BASTOS":{"id":3505807,"pop":20952,"uf":"SP"},"BATATAIS":{"id":3505906,"pop":63438,"uf":"SP"},"BAURU":{"id":3506003,"pop":381706,"uf":"SP"},"BEBEDOURO":{"id":3506102,"pop":77612,"uf":"SP"},"BENTO DE ABREU":{"id":3506201,"pop":3028,"uf":"SP"},"BERNARDINO DE CAMPOS":{"id":3506300,"pop":11168,"uf":"SP"},"BERTIOGA":{"id":3506359,"pop":66154,"uf":"SP"},"BILAC":{"id":3506409,"pop":8197,"uf":"SP"},"BIRIGUI":{"id":3506508,"pop":126094,"uf":"SP"},"BIRITIBA MIRIM":{"id":3506607,"pop":33265,"uf":"SP"},"BOA ESPERANÇA DO SUL":{"id":3506706,"pop":15111,"uf":"SP"},"BOCAINA":{"id":3506805,"pop":12571,"uf":"SP"},"BOFETE":{"id":3506904,"pop":12107,"uf":"SP"},"BOITUVA":{"id":3507001,"pop":63310,"uf":"SP"},"BOM JESUS DOS PERDÕES":{"id":3507100,"pop":26506,"uf":"SP"},"BOM SUCESSO DE ITARARÉ":{"id":3507159,"pop":4013,"uf":"SP"},"BORÁ":{"id":3507209,"pop":839,"uf":"SP"},"BORACÉIA":{"id":3507308,"pop":4913,"uf":"SP"},"BORBOREMA":{"id":3507407,"pop":16278,"uf":"SP"},"BOREBI":{"id":3507456,"pop":2713,"uf":"SP"},"BOTUCATU":{"id":3507506,"pop":149718,"uf":"SP"},"BRAGANÇA PAULISTA":{"id":3507605,"pop":172346,"uf":"SP"},"BRAÚNA":{"id":3507704,"pop":5795,"uf":"SP"},"BREJO ALEGRE":{"id":3507753,"pop":2911,"uf":"SP"},"BRODOWSKI":{"id":3507803,"pop":25605,"uf":"SP"},"BROTAS":{"id":3507902,"pop":24862,"uf":"SP"},"BURI":{"id":3508009,"pop":20050,"uf":"SP"},"BURITAMA":{"id":3508108,"pop":17414,"uf":"SP"},"BURITIZAL":{"id":3508207,"pop":4547,"uf":"SP"},"CABRÁLIA PAULISTA":{"id":3508306,"pop":4222,"uf":"SP"},"CABREÚVA":{"id":3508405,"pop":51130,"uf":"SP"},"CAÇAPAVA":{"id":3508504,"pop":95752,"uf":"SP"},"CACHOEIRA PAULISTA":{"id":3508603,"pop":33827,"uf":"SP"},"CACONDE":{"id":3508702,"pop":19031,"uf":"SP"},"CAFELÂNDIA":{"id":3508801,"pop":17917,"uf":"SP"},"CAIABU":{"id":3508900,"pop":4195,"uf":"SP"},"CAIEIRAS":{"id":3509007,"pop":104044,"uf":"SP"},"CAIUÁ":{"id":3509106,"pop":6017,"uf":"SP"},"CAJAMAR":{"id":3509205,"pop":79034,"uf":"SP"},"CAJATI":{"id":3509254,"pop":28441,"uf":"SP"},"CAJOBI":{"id":3509304,"pop":10649,"uf":"SP"},"CAJURU":{"id":3509403,"pop":26613,"uf":"SP"},"CAMPINA DO MONTE ALEGRE":{"id":3509452,"pop":6088,"uf":"SP"},"CAMPINAS":{"id":3509502,"pop":1223237,"uf":"SP"},"CAMPO LIMPO PAULISTA":{"id":3509601,"pop":86407,"uf":"SP"},"CAMPOS DO JORDÃO":{"id":3509700,"pop":52713,"uf":"SP"},"CAMPOS NOVOS PAULISTA":{"id":3509809,"pop":5028,"uf":"SP"},"CANANÉIA":{"id":3509908,"pop":12542,"uf":"SP"},"CANAS":{"id":3509957,"pop":5268,"uf":"SP"},"CÂNDIDO MOTA":{"id":3510005,"pop":31410,"uf":"SP"},"CÂNDIDO RODRIGUES":{"id":3510104,"pop":2805,"uf":"SP"},"CANITAR":{"id":3510153,"pop":5365,"uf":"SP"},"CAPÃO BONITO":{"id":3510203,"pop":47098,"uf":"SP"},"CAPELA DO ALTO":{"id":3510302,"pop":21257,"uf":"SP"},"CAPIVARI":{"id":3510401,"pop":56973,"uf":"SP"},"CARAGUATATUBA":{"id":3510500,"pop":125194,"uf":"SP"},"CARAPICUÍBA":{"id":3510609,"pop":405375,"uf":"SP"},"CARDOSO":{"id":3510708,"pop":12371,"uf":"SP"},"CASA BRANCA":{"id":3510807,"pop":30655,"uf":"SP"},"CÁSSIA DOS COQUEIROS":{"id":3510906,"pop":2488,"uf":"SP"},"CASTILHO":{"id":3511003,"pop":21521,"uf":"SP"},"CATANDUVA":{"id":3511102,"pop":123114,"uf":"SP"},"CATIGUÁ":{"id":3511201,"pop":7905,"uf":"SP"},"CEDRAL":{"id":3511300,"pop":9452,"uf":"SP"},"CERQUEIRA CÉSAR":{"id":3511409,"pop":20391,"uf":"SP"},"CERQUILHO":{"id":3511508,"pop":50631,"uf":"SP"},"CESÁRIO LANGE":{"id":3511607,"pop":18595,"uf":"SP"},"CHARQUEADA":{"id":3511706,"pop":17539,"uf":"SP"},"CLEMENTINA":{"id":3511904,"pop":8894,"uf":"SP"},"COLINA":{"id":3512001,"pop":18601,"uf":"SP"},"COLÔMBIA":{"id":3512100,"pop":6223,"uf":"SP"},"CONCHAL":{"id":3512209,"pop":28491,"uf":"SP"},"CONCHAS":{"id":3512308,"pop":18138,"uf":"SP"},"CORDEIRÓPOLIS":{"id":3512407,"pop":25116,"uf":"SP"},"COROADOS":{"id":3512506,"pop":6197,"uf":"SP"},"CORONEL MACEDO":{"id":3512605,"pop":4591,"uf":"SP"},"CORUMBATAÍ":{"id":3512704,"pop":4072,"uf":"SP"},"COSMÓPOLIS":{"id":3512803,"pop":74662,"uf":"SP"},"COSMORAMA":{"id":3512902,"pop":7289,"uf":"SP"},"COTIA":{"id":3513009,"pop":257882,"uf":"SP"},"CRAVINHOS":{"id":3513108,"pop":35858,"uf":"SP"},"CRISTAIS PAULISTA":{"id":3513207,"pop":8803,"uf":"SP"},"CRUZÁLIA":{"id":3513306,"pop":2021,"uf":"SP"},"CRUZEIRO":{"id":3513405,"pop":82895,"uf":"SP"},"CUBATÃO":{"id":3513504,"pop":132521,"uf":"SP"},"CUNHA":{"id":3513603,"pop":21373,"uf":"SP"},"DESCALVADO":{"id":3513702,"pop":34097,"uf":"SP"},"DIADEMA":{"id":3513801,"pop":429550,"uf":"SP"},"DIRCE REIS":{"id":3513850,"pop":1805,"uf":"SP"},"DIVINOLÂNDIA":{"id":3513900,"pop":11027,"uf":"SP"},"DOBRADA":{"id":3514007,"pop":9088,"uf":"SP"},"DOIS CÓRREGOS":{"id":3514106,"pop":27704,"uf":"SP"},"DOLCINÓPOLIS":{"id":3514205,"pop":2108,"uf":"SP"},"DOURADO":{"id":3514304,"pop":8883,"uf":"SP"},"DRACENA":{"id":3514403,"pop":47287,"uf":"SP"},"DUARTINA":{"id":3514502,"pop":12421,"uf":"SP"},"DUMONT":{"id":3514601,"pop":10174,"uf":"SP"},"ECHAPORÃ":{"id":3514700,"pop":6026,"uf":"SP"},"ELDORADO":{"id":3514809,"pop":15592,"uf":"SP"},"ELIAS FAUSTO":{"id":3514908,"pop":18095,"uf":"SP"},"ELISIÁRIO":{"id":3514924,"pop":3742,"uf":"SP"},"EMBAÚBA":{"id":3514957,"pop":2446,"uf":"SP"},"EMBU DAS ARTES":{"id":3515004,"pop":279264,"uf":"SP"},"EMBU-GUAÇU":{"id":3515103,"pop":70402,"uf":"SP"},"EMILIANÓPOLIS":{"id":3515129,"pop":3238,"uf":"SP"},"ENGENHEIRO COELHO":{"id":3515152,"pop":21712,"uf":"SP"},"ESPÍRITO SANTO DO PINHAL":{"id":3515186,"pop":44607,"uf":"SP"},"ESPÍRITO SANTO DO TURVO":{"id":3515194,"pop":4926,"uf":"SP"},"ESTRELA D'OESTE":{"id":3515202,"pop":8420,"uf":"SP"},"ESTRELA DO NORTE":{"id":3515301,"pop":2774,"uf":"SP"},"EUCLIDES DA CUNHA PAULISTA":{"id":3515350,"pop":9280,"uf":"SP"},"FARTURA":{"id":3515400,"pop":16102,"uf":"SP"},"FERNANDÓPOLIS":{"id":3515509,"pop":69680,"uf":"SP"},"FERNANDO PRESTES":{"id":3515608,"pop":5805,"uf":"SP"},"FERNÃO":{"id":3515657,"pop":1739,"uf":"SP"},"FERRAZ DE VASCONCELOS":{"id":3515707,"pop":198661,"uf":"SP"},"FLORA RICA":{"id":3515806,"pop":1397,"uf":"SP"},"FLOREAL":{"id":3515905,"pop":2884,"uf":"SP"},"FLÓRIDA PAULISTA":{"id":3516002,"pop":14936,"uf":"SP"},"FLORÍNEA":{"id":3516101,"pop":2631,"uf":"SP"},"FRANCA":{"id":3516200,"pop":358539,"uf":"SP"},"FRANCISCO MORATO":{"id":3516309,"pop":179372,"uf":"SP"},"FRANCO DA ROCHA":{"id":3516408,"pop":158438,"uf":"SP"},"GABRIEL MONTEIRO":{"id":3516507,"pop":2776,"uf":"SP"},"GÁLIA":{"id":3516606,"pop":6419,"uf":"SP"},"GARÇA":{"id":3516705,"pop":44429,"uf":"SP"},"GASTÃO VIDIGAL":{"id":3516804,"pop":4911,"uf":"SP"},"GAVIÃO PEIXOTO":{"id":3516853,"pop":4841,"uf":"SP"},"GENERAL SALGADO":{"id":3516903,"pop":10855,"uf":"SP"},"GETULINA":{"id":3517000,"pop":11485,"uf":"SP"},"GLICÉRIO":{"id":3517109,"pop":4842,"uf":"SP"},"GUAIÇARA":{"id":3517208,"pop":12416,"uf":"SP"},"GUAIMBÊ":{"id":3517307,"pop":5806,"uf":"SP"},"GUAÍRA":{"id":3517406,"pop":41283,"uf":"SP"},"GUAPIAÇU":{"id":3517505,"pop":22087,"uf":"SP"},"GUAPIARA":{"id":3517604,"pop":16896,"uf":"SP"},"GUARÁ":{"id":3517703,"pop":21394,"uf":"SP"},"GUARAÇAÍ":{"id":3517802,"pop":8258,"uf":"SP"},"GUARACI":{"id":3517901,"pop":11382,"uf":"SP"},"GUARANI D'OESTE":{"id":3518008,"pop":1996,"uf":"SP"},"GUARANTÃ":{"id":3518107,"pop":6685,"uf":"SP"},"GUARARAPES":{"id":3518206,"pop":33257,"uf":"SP"},"GUARAREMA":{"id":3518305,"pop":30465,"uf":"SP"},"GUARATINGUETÁ":{"id":3518404,"pop":123192,"uf":"SP"},"GUAREÍ":{"id":3518503,"pop":19244,"uf":"SP"},"GUARIBA":{"id":3518602,"pop":40857,"uf":"SP"},"GUARUJÁ":{"id":3518701,"pop":324977,"uf":"SP"},"GUARULHOS":{"id":3518800,"pop":1404694,"uf":"SP"},"GUATAPARÁ":{"id":3518859,"pop":7760,"uf":"SP"},"GUZOLÂNDIA":{"id":3518909,"pop":5346,"uf":"SP"},"HERCULÂNDIA":{"id":3519006,"pop":9649,"uf":"SP"},"HOLAMBRA":{"id":3519055,"pop":15605,"uf":"SP"},"HORTOLÂNDIA":{"id":3519071,"pop":237570,"uf":"SP"},"IACANGA":{"id":3519105,"pop":12002,"uf":"SP"},"IACRI":{"id":3519204,"pop":6269,"uf":"SP"},"IARAS":{"id":3519253,"pop":9786,"uf":"SP"},"IBATÉ":{"id":3519303,"pop":35830,"uf":"SP"},"IBIRÁ":{"id":3519402,"pop":12639,"uf":"SP"},"IBIRAREMA":{"id":3519501,"pop":7926,"uf":"SP"},"IBITINGA":{"id":3519600,"pop":61150,"uf":"SP"},"IBIÚNA":{"id":3519709,"pop":80062,"uf":"SP"},"ICÉM":{"id":3519808,"pop":8363,"uf":"SP"},"IEPÊ":{"id":3519907,"pop":8228,"uf":"SP"},"IGARAÇU DO TIETÊ":{"id":3520004,"pop":24821,"uf":"SP"},"IGARAPAVA":{"id":3520103,"pop":30791,"uf":"SP"},"IGARATÁ":{"id":3520202,"pop":9631,"uf":"SP"},"IGUAPE":{"id":3520301,"pop":31117,"uf":"SP"},"ILHABELA":{"id":3520400,"pop":36194,"uf":"SP"},"ILHA COMPRIDA":{"id":3520426,"pop":11552,"uf":"SP"},"ILHA SOLTEIRA":{"id":3520442,"pop":26886,"uf":"SP"},"INDAIATUBA":{"id":3520509,"pop":260690,"uf":"SP"},"INDIANA":{"id":3520608,"pop":4873,"uf":"SP"},"INDIAPORÃ":{"id":3520707,"pop":3876,"uf":"SP"},"INÚBIA PAULISTA":{"id":3520806,"pop":4045,"uf":"SP"},"IPAUSSU":{"id":3520905,"pop":15165,"uf":"SP"},"IPERÓ":{"id":3521002,"pop":38771,"uf":"SP"},"IPEÚNA":{"id":3521101,"pop":7824,"uf":"SP"},"IPIGUÁ":{"id":3521150,"pop":5557,"uf":"SP"},"IPORANGA":{"id":3521200,"pop":4180,"uf":"SP"},"IPUÃ":{"id":3521309,"pop":16794,"uf":"SP"},"IRACEMÁPOLIS":{"id":3521408,"pop":24982,"uf":"SP"},"IRAPUÃ":{"id":3521507,"pop":8101,"uf":"SP"},"IRAPURU":{"id":3521606,"pop":8356,"uf":"SP"},"ITABERÁ":{"id":3521705,"pop":17405,"uf":"SP"},"ITAÍ":{"id":3521804,"pop":27632,"uf":"SP"},"ITAJOBI":{"id":3521903,"pop":15331,"uf":"SP"},"ITAJU":{"id":3522000,"pop":3937,"uf":"SP"},"ITANHAÉM":{"id":3522109,"pop":104351,"uf":"SP"},"ITAOCA":{"id":3522158,"pop":3332,"uf":"SP"},"ITAPECERICA DA SERRA":{"id":3522208,"pop":179574,"uf":"SP"},"ITAPETININGA":{"id":3522307,"pop":167106,"uf":"SP"},"ITAPEVA":{"id":3133600,"pop":9976,"uf":"MG"},"ITAPEVI":{"id":3522505,"pop":244131,"uf":"SP"},"ITAPIRA":{"id":3522604,"pop":75683,"uf":"SP"},"ITAPIRAPUÃ PAULISTA":{"id":3522653,"pop":4294,"uf":"SP"},"ITÁPOLIS":{"id":3522703,"pop":43536,"uf":"SP"},"ITAPORANGA":{"id":3522802,"pop":15197,"uf":"SP"},"ITAPUÍ":{"id":3522901,"pop":14297,"uf":"SP"},"ITAPURA":{"id":3523008,"pop":4994,"uf":"SP"},"ITAQUAQUECETUBA":{"id":3523107,"pop":379082,"uf":"SP"},"ITARARÉ":{"id":3523206,"pop":50778,"uf":"SP"},"ITARIRI":{"id":3523305,"pop":17754,"uf":"SP"},"ITATIBA":{"id":3523404,"pop":124254,"uf":"SP"},"ITATINGA":{"id":3523503,"pop":21139,"uf":"SP"},"ITIRAPINA":{"id":3523602,"pop":18610,"uf":"SP"},"ITIRAPUÃ":{"id":3523701,"pop":6587,"uf":"SP"},"ITOBI":{"id":3523800,"pop":7862,"uf":"SP"},"ITU":{"id":3523909,"pop":177150,"uf":"SP"},"ITUPEVA":{"id":3524006,"pop":64330,"uf":"SP"},"ITUVERAVA":{"id":3524105,"pop":42259,"uf":"SP"},"JABORANDI":{"id":3524204,"pop":6963,"uf":"SP"},"JABOTICABAL":{"id":3524303,"pop":78029,"uf":"SP"},"JACAREÍ":{"id":3524402,"pop":237119,"uf":"SP"},"JACI":{"id":3524501,"pop":7322,"uf":"SP"},"JACUPIRANGA":{"id":3524600,"pop":17911,"uf":"SP"},"JAGUARIÚNA":{"id":3524709,"pop":59921,"uf":"SP"},"JALES":{"id":3524808,"pop":49291,"uf":"SP"},"JAMBEIRO":{"id":3524907,"pop":6828,"uf":"SP"},"JANDIRA":{"id":3525003,"pop":127734,"uf":"SP"},"JARDINÓPOLIS":{"id":3525102,"pop":45544,"uf":"SP"},"JARINU":{"id":3525201,"pop":31173,"uf":"SP"},"JAÚ":{"id":3525300,"pop":153463,"uf":"SP"},"JERIQUARA":{"id":3525409,"pop":3143,"uf":"SP"},"JOANÓPOLIS":{"id":3525508,"pop":13453,"uf":"SP"},"JOÃO RAMALHO":{"id":3525607,"pop":4577,"uf":"SP"},"JOSÉ BONIFÁCIO":{"id":3525706,"pop":37707,"uf":"SP"},"JÚLIO MESQUITA":{"id":3525805,"pop":4824,"uf":"SP"},"JUMIRIM":{"id":3525854,"pop":3467,"uf":"SP"},"JUNDIAÍ":{"id":3525904,"pop":426935,"uf":"SP"},"JUNQUEIRÓPOLIS":{"id":3526001,"pop":20978,"uf":"SP"},"JUQUIÁ":{"id":3526100,"pop":18627,"uf":"SP"},"JUQUITIBA":{"id":3526209,"pop":31844,"uf":"SP"},"LAGOINHA":{"id":3526308,"pop":4882,"uf":"SP"},"LARANJAL PAULISTA":{"id":3526407,"pop":29047,"uf":"SP"},"LAVÍNIA":{"id":3526506,"pop":12581,"uf":"SP"},"LAVRINHAS":{"id":3526605,"pop":7361,"uf":"SP"},"LEME":{"id":3526704,"pop":105273,"uf":"SP"},"LENÇÓIS PAULISTA":{"id":3526803,"pop":69533,"uf":"SP"},"LIMEIRA":{"id":3526902,"pop":310783,"uf":"SP"},"LINDÓIA":{"id":3527009,"pop":8201,"uf":"SP"},"LINS":{"id":3527108,"pop":78978,"uf":"SP"},"LORENA":{"id":3527207,"pop":89532,"uf":"SP"},"LOURDES":{"id":3527256,"pop":2311,"uf":"SP"},"LOUVEIRA":{"id":3527306,"pop":51007,"uf":"SP"},"LUCÉLIA":{"id":3527405,"pop":22022,"uf":"SP"},"LUCIANÓPOLIS":{"id":3527504,"pop":2412,"uf":"SP"},"LUÍS ANTÔNIO":{"id":3527603,"pop":15628,"uf":"SP"},"LUIZIÂNIA":{"id":3527702,"pop":5918,"uf":"SP"},"LUPÉRCIO":{"id":3527801,"pop":4608,"uf":"SP"},"LUTÉCIA":{"id":3527900,"pop":2623,"uf":"SP"},"MACATUBA":{"id":3528007,"pop":17263,"uf":"SP"},"MACAUBAL":{"id":3528106,"pop":8174,"uf":"SP"},"MACEDÔNIA":{"id":3528205,"pop":3686,"uf":"SP"},"MAGDA":{"id":3528304,"pop":3086,"uf":"SP"},"MAIRINQUE":{"id":3528403,"pop":47723,"uf":"SP"},"MAIRIPORÃ":{"id":3528502,"pop":103645,"uf":"SP"},"MANDURI":{"id":3528601,"pop":9972,"uf":"SP"},"MARABÁ PAULISTA":{"id":3528700,"pop":6039,"uf":"SP"},"MARACAÍ":{"id":3528809,"pop":14069,"uf":"SP"},"MARAPOAMA":{"id":3528858,"pop":3097,"uf":"SP"},"MARIÁPOLIS":{"id":3528908,"pop":4098,"uf":"SP"},"MARÍLIA":{"id":3529005,"pop":242249,"uf":"SP"},"MARINÓPOLIS":{"id":3529104,"pop":2101,"uf":"SP"},"MARTINÓPOLIS":{"id":3529203,"pop":26791,"uf":"SP"},"MATÃO":{"id":3529302,"pop":84069,"uf":"SP"},"MAUÁ":{"id":3529401,"pop":481725,"uf":"SP"},"MENDONÇA":{"id":3529500,"pop":5638,"uf":"SP"},"MERIDIANO":{"id":3529609,"pop":3813,"uf":"SP"},"MESÓPOLIS":{"id":3529658,"pop":1903,"uf":"SP"},"MIGUELÓPOLIS":{"id":3529708,"pop":22480,"uf":"SP"},"MINEIROS DO TIETÊ":{"id":3529807,"pop":13023,"uf":"SP"},"MIRACATU":{"id":3529906,"pop":19511,"uf":"SP"},"MIRA ESTRELA":{"id":3530003,"pop":3125,"uf":"SP"},"MIRANDÓPOLIS":{"id":3530102,"pop":29844,"uf":"SP"},"MIRANTE DO PARANAPANEMA":{"id":3530201,"pop":18415,"uf":"SP"},"MIRASSOL":{"id":3530300,"pop":60768,"uf":"SP"},"MIRASSOLÂNDIA":{"id":3530409,"pop":4966,"uf":"SP"},"MOCOCA":{"id":3530508,"pop":69072,"uf":"SP"},"MOGI DAS CRUZES":{"id":3530607,"pop":455587,"uf":"SP"},"MOGI GUAÇU":{"id":3530706,"pop":154146,"uf":"SP"},"MOGI MIRIM":{"id":3530805,"pop":94098,"uf":"SP"},"MOMBUCA":{"id":3530904,"pop":3523,"uf":"SP"},"MONÇÕES":{"id":3531001,"pop":2274,"uf":"SP"},"MONGAGUÁ":{"id":3531100,"pop":58567,"uf":"SP"},"MONTE ALEGRE DO SUL":{"id":3531209,"pop":8181,"uf":"SP"},"MONTE ALTO":{"id":3531308,"pop":51039,"uf":"SP"},"MONTE APRAZÍVEL":{"id":3531407,"pop":25651,"uf":"SP"},"MONTE AZUL PAULISTA":{"id":3531506,"pop":18928,"uf":"SP"},"MONTE CASTELO":{"id":3531605,"pop":4166,"uf":"SP"},"MONTEIRO LOBATO":{"id":3531704,"pop":4739,"uf":"SP"},"MONTE MOR":{"id":3531803,"pop":61707,"uf":"SP"},"MORRO AGUDO":{"id":3531902,"pop":33598,"uf":"SP"},"MORUNGABA":{"id":3532009,"pop":13936,"uf":"SP"},"MOTUCA":{"id":3532058,"pop":4831,"uf":"SP"},"MURUTINGA DO SUL":{"id":3532108,"pop":4525,"uf":"SP"},"NANTES":{"id":3532157,"pop":3215,"uf":"SP"},"NARANDIBA":{"id":3532207,"pop":4950,"uf":"SP"},"NATIVIDADE DA SERRA":{"id":3532306,"pop":6624,"uf":"SP"},"NAZARÉ PAULISTA":{"id":3532405,"pop":18866,"uf":"SP"},"NEVES PAULISTA":{"id":3532504,"pop":8917,"uf":"SP"},"NHANDEARA":{"id":3532603,"pop":11575,"uf":"SP"},"NIPOÃ":{"id":3532702,"pop":5381,"uf":"SP"},"NOVA ALIANÇA":{"id":3532801,"pop":7161,"uf":"SP"},"NOVA CAMPINA":{"id":3532827,"pop":9962,"uf":"SP"},"NOVA CANAÃ PAULISTA":{"id":3532843,"pop":1824,"uf":"SP"},"NOVA CASTILHO":{"id":3532868,"pop":1290,"uf":"SP"},"NOVA EUROPA":{"id":3532900,"pop":11519,"uf":"SP"},"NOVA GRANADA":{"id":3533007,"pop":21871,"uf":"SP"},"NOVA GUATAPORANGA":{"id":3533106,"pop":2333,"uf":"SP"},"NOVA INDEPENDÊNCIA":{"id":3533205,"pop":4135,"uf":"SP"},"NOVAIS":{"id":3533254,"pop":6057,"uf":"SP"},"NOVA LUZITÂNIA":{"id":3533304,"pop":4217,"uf":"SP"},"NOVA ODESSA":{"id":3533403,"pop":61716,"uf":"SP"},"NOVO HORIZONTE":{"id":3533502,"pop":41765,"uf":"SP"},"NUPORANGA":{"id":3533601,"pop":7522,"uf":"SP"},"OCAUÇU":{"id":3533700,"pop":4294,"uf":"SP"},"ÓLEO":{"id":3533809,"pop":2447,"uf":"SP"},"OLÍMPIA":{"id":3533908,"pop":55477,"uf":"SP"},"ONDA VERDE":{"id":3534005,"pop":4462,"uf":"SP"},"ORIENTE":{"id":3534104,"pop":6569,"uf":"SP"},"ORINDIÚVA":{"id":3534203,"pop":7318,"uf":"SP"},"ORLÂNDIA":{"id":3534302,"pop":44682,"uf":"SP"},"OSASCO":{"id":3534401,"pop":701428,"uf":"SP"},"OSCAR BRESSANE":{"id":3534500,"pop":2603,"uf":"SP"},"OSVALDO CRUZ":{"id":3534609,"pop":33118,"uf":"SP"},"OURINHOS":{"id":3534708,"pop":115139,"uf":"SP"},"OUROESTE":{"id":3534757,"pop":10712,"uf":"SP"},"OURO VERDE":{"id":3534807,"pop":8676,"uf":"SP"},"PACAEMBU":{"id":3534906,"pop":14326,"uf":"SP"},"PALESTINA":{"id":3535002,"pop":13285,"uf":"SP"},"PALMARES PAULISTA":{"id":3535101,"pop":13691,"uf":"SP"},"PALMEIRA D'OESTE":{"id":3535200,"pop":9173,"uf":"SP"},"PALMITAL":{"id":3535309,"pop":22322,"uf":"SP"},"PANORAMA":{"id":3535408,"pop":15944,"uf":"SP"},"PARAGUAÇU PAULISTA":{"id":3535507,"pop":46180,"uf":"SP"},"PARAIBUNA":{"id":3535606,"pop":18302,"uf":"SP"},"PARAÍSO":{"id":3535705,"pop":6536,"uf":"SP"},"PARANAPANEMA":{"id":3535804,"pop":20588,"uf":"SP"},"PARANAPUÃ":{"id":3535903,"pop":4112,"uf":"SP"},"PARAPUÃ":{"id":3536000,"pop":10934,"uf":"SP"},"PARDINHO":{"id":3536109,"pop":6579,"uf":"SP"},"PARIQUERA-AÇU":{"id":3536208,"pop":19797,"uf":"SP"},"PARISI":{"id":3536257,"pop":2177,"uf":"SP"},"PATROCÍNIO PAULISTA":{"id":3536307,"pop":14941,"uf":"SP"},"PAULICÉIA":{"id":3536406,"pop":7540,"uf":"SP"},"PAULÍNIA":{"id":3536505,"pop":114508,"uf":"SP"},"PAULISTÂNIA":{"id":3536570,"pop":1835,"uf":"SP"},"PAULO DE FARIA":{"id":3536604,"pop":8973,"uf":"SP"},"PEDERNEIRAS":{"id":3536703,"pop":47523,"uf":"SP"},"PEDRA BELA":{"id":3536802,"pop":6127,"uf":"SP"},"PEDRANÓPOLIS":{"id":3536901,"pop":2468,"uf":"SP"},"PEDREGULHO":{"id":3537008,"pop":16876,"uf":"SP"},"PEDREIRA":{"id":3537107,"pop":48992,"uf":"SP"},"PEDRINHAS PAULISTA":{"id":3537156,"pop":3109,"uf":"SP"},"PEDRO DE TOLEDO":{"id":3537206,"pop":11507,"uf":"SP"},"PENÁPOLIS":{"id":3537305,"pop":64098,"uf":"SP"},"PEREIRA BARRETO":{"id":3537404,"pop":25685,"uf":"SP"},"PEREIRAS":{"id":3537503,"pop":8875,"uf":"SP"},"PERUÍBE":{"id":3537602,"pop":69697,"uf":"SP"},"PIACATU":{"id":3537701,"pop":6093,"uf":"SP"},"PIEDADE":{"id":3537800,"pop":55731,"uf":"SP"},"PILAR DO SUL":{"id":3537909,"pop":29612,"uf":"SP"},"PINDAMONHANGABA":{"id":3538006,"pop":171885,"uf":"SP"},"PINDORAMA":{"id":3538105,"pop":17378,"uf":"SP"},"PINHALZINHO":{"id":3538204,"pop":15564,"uf":"SP"},"PIQUEROBI":{"id":3538303,"pop":3706,"uf":"SP"},"PIQUETE":{"id":3538501,"pop":13495,"uf":"SP"},"PIRACAIA":{"id":3538600,"pop":27617,"uf":"SP"},"PIRACICABA":{"id":3538709,"pop":410275,"uf":"SP"},"PIRAJU":{"id":3538808,"pop":29930,"uf":"SP"},"PIRAJUÍ":{"id":3538907,"pop":25939,"uf":"SP"},"PIRANGI":{"id":3539004,"pop":11524,"uf":"SP"},"PIRAPORA DO BOM JESUS":{"id":3539103,"pop":19453,"uf":"SP"},"PIRAPOZINHO":{"id":3539202,"pop":27974,"uf":"SP"},"PIRASSUNUNGA":{"id":3539301,"pop":77330,"uf":"SP"},"PIRATININGA":{"id":3539400,"pop":13890,"uf":"SP"},"PITANGUEIRAS":{"id":3539509,"pop":40430,"uf":"SP"},"PLANALTO":{"id":3539608,"pop":5370,"uf":"SP"},"PLATINA":{"id":3539707,"pop":3606,"uf":"SP"},"POÁ":{"id":3539806,"pop":119221,"uf":"SP"},"POLONI":{"id":3539905,"pop":6166,"uf":"SP"},"POMPÉIA":{"id":3540002,"pop":22326,"uf":"SP"},"PONGAÍ":{"id":3540101,"pop":3385,"uf":"SP"},"PONTAL":{"id":3540200,"pop":51717,"uf":"SP"},"PONTALINDA":{"id":3540259,"pop":4719,"uf":"SP"},"PONTES GESTAL":{"id":3540309,"pop":2576,"uf":"SP"},"POPULINA":{"id":3540408,"pop":4136,"uf":"SP"},"PORANGABA":{"id":3540507,"pop":10205,"uf":"SP"},"PORTO FELIZ":{"id":3540606,"pop":53698,"uf":"SP"},"PORTO FERREIRA":{"id":3540705,"pop":56848,"uf":"SP"},"POTIM":{"id":3540754,"pop":25603,"uf":"SP"},"POTIRENDABA":{"id":3540804,"pop":17668,"uf":"SP"},"PRACINHA":{"id":3540853,"pop":4327,"uf":"SP"},"PRADÓPOLIS":{"id":3540903,"pop":22239,"uf":"SP"},"PRAIA GRANDE":{"id":3541000,"pop":336454,"uf":"SP"},"PRATÂNIA":{"id":3541059,"pop":5371,"uf":"SP"},"PRESIDENTE ALVES":{"id":3541109,"pop":4067,"uf":"SP"},"PRESIDENTE BERNARDES":{"id":3153103,"pop":5315,"uf":"MG"},"PRESIDENTE EPITÁCIO":{"id":3541307,"pop":44572,"uf":"SP"},"PRESIDENTE PRUDENTE":{"id":3541406,"pop":231953,"uf":"SP"},"PRESIDENTE VENCESLAU":{"id":3541505,"pop":39648,"uf":"SP"},"PROMISSÃO":{"id":3541604,"pop":41211,"uf":"SP"},"QUADRA":{"id":3541653,"pop":3902,"uf":"SP"},"QUATÁ":{"id":3541703,"pop":14309,"uf":"SP"},"QUEIROZ":{"id":3541802,"pop":3513,"uf":"SP"},"QUELUZ":{"id":3541901,"pop":13788,"uf":"SP"},"QUINTANA":{"id":3542008,"pop":6736,"uf":"SP"},"RAFARD":{"id":3542107,"pop":9126,"uf":"SP"},"RANCHARIA":{"id":3542206,"pop":29743,"uf":"SP"},"REDENÇÃO DA SERRA":{"id":3542305,"pop":3827,"uf":"SP"},"REGENTE FEIJÓ":{"id":3542404,"pop":20523,"uf":"SP"},"REGINÓPOLIS":{"id":3542503,"pop":10047,"uf":"SP"},"REGISTRO":{"id":3542602,"pop":56463,"uf":"SP"},"RESTINGA":{"id":3542701,"pop":7762,"uf":"SP"},"RIBEIRA":{"id":3542800,"pop":3320,"uf":"SP"},"RIBEIRÃO BONITO":{"id":3542909,"pop":13376,"uf":"SP"},"RIBEIRÃO BRANCO":{"id":3543006,"pop":15984,"uf":"SP"},"RIBEIRÃO CORRENTE":{"id":3543105,"pop":4786,"uf":"SP"},"RIBEIRÃO DO SUL":{"id":3543204,"pop":4537,"uf":"SP"},"RIBEIRÃO DOS ÍNDIOS":{"id":3543238,"pop":2222,"uf":"SP"},"RIBEIRÃO GRANDE":{"id":3543253,"pop":7686,"uf":"SP"},"RIBEIRÃO PIRES":{"id":3543303,"pop":125238,"uf":"SP"},"RIBEIRÃO PRETO":{"id":3543402,"pop":720116,"uf":"SP"},"RIVERSUL":{"id":3543501,"pop":5364,"uf":"SP"},"RIFAINA":{"id":3543600,"pop":3651,"uf":"SP"},"RINCÃO":{"id":3543709,"pop":10824,"uf":"SP"},"RINÓPOLIS":{"id":3543808,"pop":9940,"uf":"SP"},"RIO CLARO":{"id":3543907,"pop":209548,"uf":"SP"},"RIO DAS PEDRAS":{"id":3544004,"pop":36233,"uf":"SP"},"RIO GRANDE DA SERRA":{"id":3544103,"pop":52009,"uf":"SP"},"RIOLÂNDIA":{"id":3544202,"pop":12856,"uf":"SP"},"ROSANA":{"id":3544251,"pop":15929,"uf":"SP"},"ROSEIRA":{"id":3544301,"pop":10888,"uf":"SP"},"RUBIÁCEA":{"id":3544400,"pop":3195,"uf":"SP"},"RUBINÉIA":{"id":3544509,"pop":3191,"uf":"SP"},"SABINO":{"id":3544608,"pop":5638,"uf":"SP"},"SAGRES":{"id":3544707,"pop":2427,"uf":"SP"},"SALES":{"id":3544806,"pop":6481,"uf":"SP"},"SALES OLIVEIRA":{"id":3544905,"pop":12103,"uf":"SP"},"SALESÓPOLIS":{"id":3545001,"pop":17363,"uf":"SP"},"SALMOURÃO":{"id":3545100,"pop":5372,"uf":"SP"},"SALTINHO":{"id":3545159,"pop":8498,"uf":"SP"},"SALTO":{"id":3545209,"pop":120779,"uf":"SP"},"SALTO DE PIRAPORA":{"id":3545308,"pop":46285,"uf":"SP"},"SALTO GRANDE":{"id":3545407,"pop":9396,"uf":"SP"},"SANDOVALINA":{"id":3545506,"pop":4405,"uf":"SP"},"SANTA ADÉLIA":{"id":3545605,"pop":15639,"uf":"SP"},"SANTA ALBERTINA":{"id":3545704,"pop":6036,"uf":"SP"},"SANTA BÁRBARA D'OESTE":{"id":3545803,"pop":195278,"uf":"SP"},"SANTA BRANCA":{"id":3546009,"pop":14925,"uf":"SP"},"SANTA CLARA D'OESTE":{"id":3546108,"pop":2111,"uf":"SP"},"SANTA CRUZ DA CONCEIÇÃO":{"id":3546207,"pop":4584,"uf":"SP"},"SANTA CRUZ DA ESPERANÇA":{"id":3546256,"pop":2166,"uf":"SP"},"SANTA CRUZ DAS PALMEIRAS":{"id":3546306,"pop":35102,"uf":"SP"},"SANTA CRUZ DO RIO PARDO":{"id":3546405,"pop":48207,"uf":"SP"},"SANTA ERNESTINA":{"id":3546504,"pop":5577,"uf":"SP"},"SANTA FÉ DO SUL":{"id":3546603,"pop":32796,"uf":"SP"},"SANTA GERTRUDES":{"id":3546702,"pop":27850,"uf":"SP"},"SANTA ISABEL":{"id":3546801,"pop":58529,"uf":"SP"},"SANTA LÚCIA":{"id":3546900,"pop":8889,"uf":"SP"},"SANTA MARIA DA SERRA":{"id":3547007,"pop":6298,"uf":"SP"},"SANTA MERCEDES":{"id":3547106,"pop":2947,"uf":"SP"},"SANTANA DA PONTE PENSA":{"id":3547205,"pop":1448,"uf":"SP"},"SANTANA DE PARNAÍBA":{"id":3547304,"pop":145073,"uf":"SP"},"SANTA RITA D'OESTE":{"id":3547403,"pop":2476,"uf":"SP"},"SANTA RITA DO PASSA QUATRO":{"id":3547502,"pop":27641,"uf":"SP"},"SANTA ROSA DE VITERBO":{"id":3547601,"pop":26960,"uf":"SP"},"SANTA SALETE":{"id":3547650,"pop":1558,"uf":"SP"},"SANTO ANASTÁCIO":{"id":3547700,"pop":20855,"uf":"SP"},"SANTO ANDRÉ":{"id":3547809,"pop":723889,"uf":"SP"},"SANTO ANTÔNIO DA ALEGRIA":{"id":3547908,"pop":7024,"uf":"SP"},"SANTO ANTÔNIO DE POSSE":{"id":3548005,"pop":23742,"uf":"SP"},"SANTO ANTÔNIO DO ARACANGUÁ":{"id":3548054,"pop":8541,"uf":"SP"},"SANTO ANTÔNIO DO JARDIM":{"id":3548104,"pop":5926,"uf":"SP"},"SANTO ANTÔNIO DO PINHAL":{"id":3548203,"pop":6843,"uf":"SP"},"SANTO EXPEDITO":{"id":3548302,"pop":3159,"uf":"SP"},"SANTÓPOLIS DO AGUAPEÍ":{"id":3548401,"pop":4856,"uf":"SP"},"SANTOS":{"id":3548500,"pop":433991,"uf":"SP"},"SÃO BENTO DO SAPUCAÍ":{"id":3548609,"pop":10907,"uf":"SP"},"SÃO BERNARDO DO CAMPO":{"id":3548708,"pop":849874,"uf":"SP"},"SÃO CAETANO DO SUL":{"id":3548807,"pop":162763,"uf":"SP"},"SÃO CARLOS":{"id":3548906,"pop":256915,"uf":"SP"},"SÃO FRANCISCO":{"id":3161106,"pop":56625,"uf":"MG"},"SÃO JOÃO DA BOA VISTA":{"id":3549102,"pop":92315,"uf":"SP"},"SÃO JOÃO DAS DUAS PONTES":{"id":3549201,"pop":2555,"uf":"SP"},"SÃO JOÃO DE IRACEMA":{"id":3549250,"pop":1942,"uf":"SP"},"SÃO JOÃO DO PAU D'ALHO":{"id":3549300,"pop":2095,"uf":"SP"},"SÃO JOAQUIM DA BARRA":{"id":3549409,"pop":52737,"uf":"SP"},"SÃO JOSÉ DA BELA VISTA":{"id":3549508,"pop":8991,"uf":"SP"},"SÃO JOSÉ DO BARREIRO":{"id":3549607,"pop":4141,"uf":"SP"},"SÃO JOSÉ DO RIO PARDO":{"id":3549706,"pop":55298,"uf":"SP"},"SÃO JOSÉ DO RIO PRETO":{"id":3549805,"pop":469173,"uf":"SP"},"SÃO JOSÉ DOS CAMPOS":{"id":3549904,"pop":737310,"uf":"SP"},"SÃO LOURENÇO DA SERRA":{"id":3549953,"pop":16127,"uf":"SP"},"SÃO LUIZ DO PARAITINGA":{"id":3550001,"pop":10693,"uf":"SP"},"SÃO MANUEL":{"id":3550100,"pop":41287,"uf":"SP"},"SÃO MIGUEL ARCANJO":{"id":3550209,"pop":33071,"uf":"SP"},"SÃO PAULO":{"id":3550308,"pop":12396372,"uf":"SP"},"SÃO PEDRO":{"id":3550407,"pop":36298,"uf":"SP"},"SÃO PEDRO DO TURVO":{"id":3550506,"pop":7724,"uf":"SP"},"SÃO ROQUE":{"id":3550605,"pop":93076,"uf":"SP"},"SÃO SEBASTIÃO":{"id":3550704,"pop":91637,"uf":"SP"},"SÃO SEBASTIÃO DA GRAMA":{"id":3550803,"pop":12137,"uf":"SP"},"SÃO SIMÃO":{"id":3550902,"pop":15446,"uf":"SP"},"SÃO VICENTE":{"id":3551009,"pop":370839,"uf":"SP"},"SARAPUÍ":{"id":3551108,"pop":10493,"uf":"SP"},"SARUTAIÁ":{"id":3551207,"pop":3623,"uf":"SP"},"SEBASTIANÓPOLIS DO SUL":{"id":3551306,"pop":3595,"uf":"SP"},"SERRA AZUL":{"id":3551405,"pop":15292,"uf":"SP"},"SERRANA":{"id":3551504,"pop":46166,"uf":"SP"},"SERRA NEGRA":{"id":3551603,"pop":29669,"uf":"SP"},"SERTÃOZINHO":{"id":3551702,"pop":128432,"uf":"SP"},"SETE BARRAS":{"id":3551801,"pop":12731,"uf":"SP"},"SEVERÍNIA":{"id":3551900,"pop":17820,"uf":"SP"},"SILVEIRAS":{"id":3552007,"pop":6375,"uf":"SP"},"SOCORRO":{"id":3552106,"pop":41690,"uf":"SP"},"SOROCABA":{"id":3552205,"pop":695328,"uf":"SP"},"SUD MENNUCCI":{"id":3552304,"pop":7738,"uf":"SP"},"SUMARÉ":{"id":3552403,"pop":289875,"uf":"SP"},"SUZANO":{"id":3552502,"pop":303397,"uf":"SP"},"SUZANÁPOLIS":{"id":3552551,"pop":4063,"uf":"SP"},"TABAPUÃ":{"id":3552601,"pop":12561,"uf":"SP"},"TABATINGA":{"id":3552700,"pop":16787,"uf":"SP"},"TABOÃO DA SERRA":{"id":3552809,"pop":297528,"uf":"SP"},"TACIBA":{"id":3552908,"pop":6371,"uf":"SP"},"TAGUAÍ":{"id":3553005,"pop":14415,"uf":"SP"},"TAIAÇU":{"id":3553104,"pop":6346,"uf":"SP"},"TAIÚVA":{"id":3553203,"pop":5562,"uf":"SP"},"TAMBAÚ":{"id":3553302,"pop":23255,"uf":"SP"},"TANABI":{"id":3553401,"pop":26231,"uf":"SP"},"TAPIRAÍ":{"id":3168200,"pop":1869,"uf":"MG"},"TAPIRATIBA":{"id":3553609,"pop":12940,"uf":"SP"},"TAQUARAL":{"id":3553658,"pop":2815,"uf":"SP"},"TAQUARITINGA":{"id":3553708,"pop":57547,"uf":"SP"},"TAQUARITUBA":{"id":3553807,"pop":23292,"uf":"SP"},"TAQUARIVAÍ":{"id":3553856,"pop":5968,"uf":"SP"},"TARABAI":{"id":3553906,"pop":7609,"uf":"SP"},"TARUMÃ":{"id":3553955,"pop":15361,"uf":"SP"},"TATUÍ":{"id":3554003,"pop":124134,"uf":"SP"},"TAUBATÉ":{"id":3554102,"pop":320820,"uf":"SP"},"TEJUPÁ":{"id":3554201,"pop":4452,"uf":"SP"},"TEODORO SAMPAIO":{"id":3554300,"pop":23395,"uf":"SP"},"TERRA ROXA":{"id":3554409,"pop":9502,"uf":"SP"},"TIETÊ":{"id":3554508,"pop":42946,"uf":"SP"},"TIMBURI":{"id":3554607,"pop":2647,"uf":"SP"},"TORRE DE PEDRA":{"id":3554656,"pop":2432,"uf":"SP"},"TORRINHA":{"id":3554706,"pop":10100,"uf":"SP"},"TRABIJU":{"id":3554755,"pop":1752,"uf":"SP"},"TREMEMBÉ":{"id":3554805,"pop":48228,"uf":"SP"},"TRÊS FRONTEIRAS":{"id":3554904,"pop":5856,"uf":"SP"},"TUIUTI":{"id":3554953,"pop":7058,"uf":"SP"},"TUPÃ":{"id":3555000,"pop":65615,"uf":"SP"},"TUPI PAULISTA":{"id":3555109,"pop":15670,"uf":"SP"},"TURIÚBA":{"id":3555208,"pop":2024,"uf":"SP"},"TURMALINA":{"id":3169703,"pop":20280,"uf":"MG"},"UBARANA":{"id":3555356,"pop":6488,"uf":"SP"},"UBATUBA":{"id":3555406,"pop":92819,"uf":"SP"},"UBIRAJARA":{"id":3555505,"pop":4828,"uf":"SP"},"UCHOA":{"id":3555604,"pop":10191,"uf":"SP"},"UNIÃO PAULISTA":{"id":3555703,"pop":1886,"uf":"SP"},"URÂNIA":{"id":3555802,"pop":9125,"uf":"SP"},"URU":{"id":3555901,"pop":1142,"uf":"SP"},"URUPÊS":{"id":3556008,"pop":13965,"uf":"SP"},"VALENTIM GENTIL":{"id":3556107,"pop":13732,"uf":"SP"},"VALINHOS":{"id":3556206,"pop":133169,"uf":"SP"},"VALPARAÍSO":{"id":3556305,"pop":27154,"uf":"SP"},"VARGEM":{"id":3556354,"pop":10842,"uf":"SP"},"VARGEM GRANDE DO SUL":{"id":3556404,"pop":43368,"uf":"SP"},"VARGEM GRANDE PAULISTA":{"id":3556453,"pop":54315,"uf":"SP"},"VÁRZEA PAULISTA":{"id":3556503,"pop":124269,"uf":"SP"},"VERA CRUZ":{"id":3556602,"pop":10804,"uf":"SP"},"VINHEDO":{"id":3556701,"pop":81516,"uf":"SP"},"VIRADOURO":{"id":3556800,"pop":19133,"uf":"SP"},"VISTA ALEGRE DO ALTO":{"id":3556909,"pop":9163,"uf":"SP"},"VITÓRIA BRASIL":{"id":3556958,"pop":1852,"uf":"SP"},"VOTORANTIM":{"id":3557006,"pop":124468,"uf":"SP"},"VOTUPORANGA":{"id":3557105,"pop":96106,"uf":"SP"},"ZACARIAS":{"id":3557154,"pop":2784,"uf":"SP"},"CHAVANTES":{"id":3557204,"pop":12418,"uf":"SP"},"ESTIVA GERBI":{"id":3557303,"pop":11507,"uf":"SP"},"ABADIA DOS DOURADOS":{"id":3100104,"pop":7022,"uf":"MG"},"ABAETÉ":{"id":3100203,"pop":23263,"uf":"MG"},"ABRE CAMPO":{"id":3100302,"pop":13434,"uf":"MG"},"ACAIACA":{"id":3100401,"pop":3995,"uf":"MG"},"AÇUCENA":{"id":3100500,"pop":9270,"uf":"MG"},"ÁGUA BOA":{"id":3100609,"pop":13319,"uf":"MG"},"ÁGUA COMPRIDA":{"id":3100708,"pop":1986,"uf":"MG"},"AGUANIL":{"id":3100807,"pop":4557,"uf":"MG"},"ÁGUAS FORMOSAS":{"id":3100906,"pop":19285,"uf":"MG"},"ÁGUAS VERMELHAS":{"id":3101003,"pop":13656,"uf":"MG"},"AIMORÉS":{"id":3101102,"pop":25116,"uf":"MG"},"AIURUOCA":{"id":3101201,"pop":5949,"uf":"MG"},"ALAGOA":{"id":3101300,"pop":2657,"uf":"MG"},"ALBERTINA":{"id":3101409,"pop":3015,"uf":"MG"},"ALÉM PARAÍBA":{"id":3101508,"pop":35438,"uf":"MG"},"ALFENAS":{"id":3101607,"pop":80973,"uf":"MG"},"ALFREDO VASCONCELOS":{"id":3101631,"pop":7052,"uf":"MG"},"ALMENARA":{"id":3101706,"pop":42380,"uf":"MG"},"ALPERCATA":{"id":3101805,"pop":7448,"uf":"MG"},"ALPINÓPOLIS":{"id":3101904,"pop":20059,"uf":"MG"},"ALTEROSA":{"id":3102001,"pop":14566,"uf":"MG"},"ALTO CAPARAÓ":{"id":3102050,"pop":5938,"uf":"MG"},"ALTO RIO DOCE":{"id":3102100,"pop":10723,"uf":"MG"},"ALVARENGA":{"id":3102209,"pop":3783,"uf":"MG"},"ALVINÓPOLIS":{"id":3102308,"pop":15135,"uf":"MG"},"ALVORADA DE MINAS":{"id":3102407,"pop":3605,"uf":"MG"},"AMPARO DO SERRA":{"id":3102506,"pop":4643,"uf":"MG"},"ANDRADAS":{"id":3102605,"pop":41704,"uf":"MG"},"CACHOEIRA DE PAJEÚ":{"id":3102704,"pop":9470,"uf":"MG"},"ANDRELÂNDIA":{"id":3102803,"pop":12189,"uf":"MG"},"ANGELÂNDIA":{"id":3102852,"pop":8594,"uf":"MG"},"ANTÔNIO CARLOS":{"id":3102902,"pop":11471,"uf":"MG"},"ANTÔNIO DIAS":{"id":3103009,"pop":9233,"uf":"MG"},"ANTÔNIO PRADO DE MINAS":{"id":3103108,"pop":1577,"uf":"MG"},"ARAÇAÍ":{"id":3103207,"pop":2360,"uf":"MG"},"ARACITABA":{"id":3103306,"pop":2056,"uf":"MG"},"ARAÇUAÍ":{"id":3103405,"pop":36715,"uf":"MG"},"ARAGUARI":{"id":3103504,"pop":118361,"uf":"MG"},"ARANTINA":{"id":3103603,"pop":2779,"uf":"MG"},"ARAPONGA":{"id":3103702,"pop":8467,"uf":"MG"},"ARAPORÃ":{"id":3103751,"pop":6992,"uf":"MG"},"ARAPUÁ":{"id":3103801,"pop":2836,"uf":"MG"},"ARAÚJOS":{"id":3103900,"pop":9523,"uf":"MG"},"ARAXÁ":{"id":3104007,"pop":108403,"uf":"MG"},"ARCEBURGO":{"id":3104106,"pop":10990,"uf":"MG"},"ARCOS":{"id":3104205,"pop":40658,"uf":"MG"},"AREADO":{"id":3104304,"pop":15288,"uf":"MG"},"ARGIRITA":{"id":3104403,"pop":2681,"uf":"MG"},"ARICANDUVA":{"id":3104452,"pop":5305,"uf":"MG"},"ARINOS":{"id":3104502,"pop":17850,"uf":"MG"},"ASTOLFO DUTRA":{"id":3104601,"pop":14358,"uf":"MG"},"ATALÉIA":{"id":3104700,"pop":12496,"uf":"MG"},"AUGUSTO DE LIMA":{"id":3104809,"pop":4833,"uf":"MG"},"BAEPENDI":{"id":3104908,"pop":19249,"uf":"MG"},"BALDIM":{"id":3105004,"pop":7780,"uf":"MG"},"BAMBUÍ":{"id":3105103,"pop":23964,"uf":"MG"},"BANDEIRA":{"id":3105202,"pop":4738,"uf":"MG"},"BANDEIRA DO SUL":{"id":3105301,"pop":5808,"uf":"MG"},"BARÃO DE COCAIS":{"id":3105400,"pop":33232,"uf":"MG"},"BARÃO DO MONTE ALTO":{"id":3105509,"pop":5311,"uf":"MG"},"BARBACENA":{"id":3105608,"pop":139061,"uf":"MG"},"BARRA LONGA":{"id":3105707,"pop":4905,"uf":"MG"},"BARROSO":{"id":3105905,"pop":20981,"uf":"MG"},"BELA VISTA DE MINAS":{"id":3106002,"pop":10269,"uf":"MG"},"BELMIRO BRAGA":{"id":3106101,"pop":3422,"uf":"MG"},"BELO HORIZONTE":{"id":3106200,"pop":2530701,"uf":"MG"},"BELO ORIENTE":{"id":3106309,"pop":27277,"uf":"MG"},"BELO VALE":{"id":3106408,"pop":7723,"uf":"MG"},"BERILO":{"id":3106507,"pop":11813,"uf":"MG"},"BERTÓPOLIS":{"id":3106606,"pop":4609,"uf":"MG"},"BERIZAL":{"id":3106655,"pop":4792,"uf":"MG"},"BETIM":{"id":3106705,"pop":450024,"uf":"MG"},"BIAS FORTES":{"id":3106804,"pop":3282,"uf":"MG"},"BICAS":{"id":3106903,"pop":14612,"uf":"MG"},"BIQUINHAS":{"id":3107000,"pop":2482,"uf":"MG"},"BOA ESPERANÇA":{"id":3107109,"pop":40308,"uf":"MG"},"BOCAINA DE MINAS":{"id":3107208,"pop":5088,"uf":"MG"},"BOCAIÚVA":{"id":3107307,"pop":50521,"uf":"MG"},"BOM DESPACHO":{"id":3107406,"pop":51436,"uf":"MG"},"BOM JARDIM DE MINAS":{"id":3107505,"pop":6444,"uf":"MG"},"BOM JESUS DA PENHA":{"id":3107604,"pop":4270,"uf":"MG"},"BOM JESUS DO AMPARO":{"id":3107703,"pop":6182,"uf":"MG"},"BOM JESUS DO GALHO":{"id":3107802,"pop":14792,"uf":"MG"},"BOM REPOUSO":{"id":3107901,"pop":10527,"uf":"MG"},"BOM SUCESSO":{"id":3108008,"pop":17612,"uf":"MG"},"BONFIM":{"id":3108107,"pop":6852,"uf":"MG"},"BONFINÓPOLIS DE MINAS":{"id":3108206,"pop":5397,"uf":"MG"},"BONITO DE MINAS":{"id":3108255,"pop":11502,"uf":"MG"},"BORDA DA MATA":{"id":3108305,"pop":19809,"uf":"MG"},"BOTELHOS":{"id":3108404,"pop":14927,"uf":"MG"},"BOTUMIRIM":{"id":3108503,"pop":6259,"uf":"MG"},"BRASILÂNDIA DE MINAS":{"id":3108552,"pop":16950,"uf":"MG"},"BRASÍLIA DE MINAS":{"id":3108602,"pop":32460,"uf":"MG"},"BRÁS PIRES":{"id":3108701,"pop":4255,"uf":"MG"},"BRAÚNAS":{"id":3108800,"pop":4737,"uf":"MG"},"BRAZÓPOLIS":{"id":3108909,"pop":14364,"uf":"MG"},"BRUMADINHO":{"id":3109006,"pop":41208,"uf":"MG"},"BUENO BRANDÃO":{"id":3109105,"pop":10982,"uf":"MG"},"BUENÓPOLIS":{"id":3109204,"pop":10342,"uf":"MG"},"BUGRE":{"id":3109253,"pop":3984,"uf":"MG"},"BURITIS":{"id":3109303,"pop":25179,"uf":"MG"},"BURITIZEIRO":{"id":3109402,"pop":28184,"uf":"MG"},"CABECEIRA GRANDE":{"id":3109451,"pop":7025,"uf":"MG"},"CABO VERDE":{"id":3109501,"pop":14074,"uf":"MG"},"CACHOEIRA DA PRATA":{"id":3109600,"pop":3580,"uf":"MG"},"CACHOEIRA DE MINAS":{"id":3109709,"pop":11609,"uf":"MG"},"CACHOEIRA DOURADA":{"id":3109808,"pop":2720,"uf":"MG"},"CAETANÓPOLIS":{"id":3109907,"pop":11869,"uf":"MG"},"CAETÉ":{"id":3110004,"pop":45364,"uf":"MG"},"CAIANA":{"id":3110103,"pop":5584,"uf":"MG"},"CAJURI":{"id":3110202,"pop":3961,"uf":"MG"},"CALDAS":{"id":3110301,"pop":14600,"uf":"MG"},"CAMACHO":{"id":3110400,"pop":2839,"uf":"MG"},"CAMANDUCAIA":{"id":3110509,"pop":21831,"uf":"MG"},"CAMBUÍ":{"id":3110608,"pop":30068,"uf":"MG"},"CAMBUQUIRA":{"id":3110707,"pop":12810,"uf":"MG"},"CAMPANÁRIO":{"id":3110806,"pop":3739,"uf":"MG"},"CAMPANHA":{"id":3110905,"pop":16855,"uf":"MG"},"CAMPESTRE":{"id":3111002,"pop":21052,"uf":"MG"},"CAMPINA VERDE":{"id":3111101,"pop":19759,"uf":"MG"},"CAMPO AZUL":{"id":3111150,"pop":3830,"uf":"MG"},"CAMPO BELO":{"id":3111200,"pop":54338,"uf":"MG"},"CAMPO DO MEIO":{"id":3111309,"pop":11648,"uf":"MG"},"CAMPO FLORIDO":{"id":3111408,"pop":8383,"uf":"MG"},"CAMPOS ALTOS":{"id":3111507,"pop":15661,"uf":"MG"},"CAMPOS GERAIS":{"id":3111606,"pop":28908,"uf":"MG"},"CANAÃ":{"id":3111705,"pop":4533,"uf":"MG"},"CANÁPOLIS":{"id":3111804,"pop":12251,"uf":"MG"},"CANA VERDE":{"id":3111903,"pop":5585,"uf":"MG"},"CANDEIAS":{"id":3112000,"pop":14890,"uf":"MG"},"CANTAGALO":{"id":3112059,"pop":4575,"uf":"MG"},"CAPARAÓ":{"id":3112109,"pop":5464,"uf":"MG"},"CAPELA NOVA":{"id":3112208,"pop":4616,"uf":"MG"},"CAPELINHA":{"id":3112307,"pop":38321,"uf":"MG"},"CAPETINGA":{"id":3112406,"pop":6860,"uf":"MG"},"CAPIM BRANCO":{"id":3112505,"pop":9896,"uf":"MG"},"CAPINÓPOLIS":{"id":3112604,"pop":16294,"uf":"MG"},"CAPITÃO ANDRADE":{"id":3112653,"pop":5559,"uf":"MG"},"CAPITÃO ENÉAS":{"id":3112703,"pop":15388,"uf":"MG"},"CAPITÓLIO":{"id":3112802,"pop":8693,"uf":"MG"},"CAPUTIRA":{"id":3112901,"pop":9318,"uf":"MG"},"CARAÍ":{"id":3113008,"pop":23872,"uf":"MG"},"CARANAÍBA":{"id":3113107,"pop":3150,"uf":"MG"},"CARANDAÍ":{"id":3113206,"pop":25831,"uf":"MG"},"CARANGOLA":{"id":3113305,"pop":33022,"uf":"MG"},"CARATINGA":{"id":3113404,"pop":93124,"uf":"MG"},"CARBONITA":{"id":3113503,"pop":9423,"uf":"MG"},"CAREAÇU":{"id":3113602,"pop":6826,"uf":"MG"},"CARLOS CHAGAS":{"id":3113701,"pop":18516,"uf":"MG"},"CARMÉSIA":{"id":3113800,"pop":2660,"uf":"MG"},"CARMO DA CACHOEIRA":{"id":3113909,"pop":12193,"uf":"MG"},"CARMO DA MATA":{"id":3114006,"pop":11546,"uf":"MG"},"CARMO DE MINAS":{"id":3114105,"pop":15031,"uf":"MG"},"CARMO DO CAJURU":{"id":3114204,"pop":22900,"uf":"MG"},"CARMO DO PARANAÍBA":{"id":3114303,"pop":30339,"uf":"MG"},"CARMO DO RIO CLARO":{"id":3114402,"pop":21310,"uf":"MG"},"CARMÓPOLIS DE MINAS":{"id":3114501,"pop":19756,"uf":"MG"},"CARNEIRINHO":{"id":3114550,"pop":10103,"uf":"MG"},"CARRANCAS":{"id":3114600,"pop":4052,"uf":"MG"},"CARVALHÓPOLIS":{"id":3114709,"pop":3614,"uf":"MG"},"CARVALHOS":{"id":3114808,"pop":4445,"uf":"MG"},"CASA GRANDE":{"id":3114907,"pop":2251,"uf":"MG"},"CASCALHO RICO":{"id":3115003,"pop":3108,"uf":"MG"},"CÁSSIA":{"id":3115102,"pop":17741,"uf":"MG"},"CONCEIÇÃO DA BARRA DE MINAS":{"id":3115201,"pop":3939,"uf":"MG"},"CATAGUASES":{"id":3115300,"pop":75942,"uf":"MG"},"CATAS ALTAS":{"id":3115359,"pop":5465,"uf":"MG"},"CATAS ALTAS DA NORUEGA":{"id":3115409,"pop":3665,"uf":"MG"},"CATUJI":{"id":3115458,"pop":6206,"uf":"MG"},"CATUTI":{"id":3115474,"pop":4944,"uf":"MG"},"CAXAMBU":{"id":3115508,"pop":21566,"uf":"MG"},"CEDRO DO ABAETÉ":{"id":3115607,"pop":1150,"uf":"MG"},"CENTRAL DE MINAS":{"id":3115706,"pop":7059,"uf":"MG"},"CENTRALINA":{"id":3115805,"pop":10343,"uf":"MG"},"CHÁCARA":{"id":3115904,"pop":3216,"uf":"MG"},"CHALÉ":{"id":3116001,"pop":5695,"uf":"MG"},"CHAPADA DO NORTE":{"id":3116100,"pop":15334,"uf":"MG"},"CHAPADA GAÚCHA":{"id":3116159,"pop":14217,"uf":"MG"},"CHIADOR":{"id":3116209,"pop":2657,"uf":"MG"},"CIPOTÂNEA":{"id":3116308,"pop":6811,"uf":"MG"},"CLARAVAL":{"id":3116407,"pop":4873,"uf":"MG"},"CLARO DOS POÇÕES":{"id":3116506,"pop":7478,"uf":"MG"},"CLÁUDIO":{"id":3116605,"pop":29093,"uf":"MG"},"COIMBRA":{"id":3116704,"pop":7631,"uf":"MG"},"COLUNA":{"id":3116803,"pop":8810,"uf":"MG"},"COMENDADOR GOMES":{"id":3116902,"pop":3128,"uf":"MG"},"COMERCINHO":{"id":3117009,"pop":6624,"uf":"MG"},"CONCEIÇÃO DA APARECIDA":{"id":3117108,"pop":10351,"uf":"MG"},"CONCEIÇÃO DAS PEDRAS":{"id":3117207,"pop":2814,"uf":"MG"},"CONCEIÇÃO DAS ALAGOAS":{"id":3117306,"pop":28782,"uf":"MG"},"CONCEIÇÃO DE IPANEMA":{"id":3117405,"pop":4581,"uf":"MG"},"CONCEIÇÃO DO MATO DENTRO":{"id":3117504,"pop":17438,"uf":"MG"},"CONCEIÇÃO DO PARÁ":{"id":3117603,"pop":5558,"uf":"MG"},"CONCEIÇÃO DO RIO VERDE":{"id":3117702,"pop":13729,"uf":"MG"},"CONCEIÇÃO DOS OUROS":{"id":3117801,"pop":11852,"uf":"MG"},"CÔNEGO MARINHO":{"id":3117836,"pop":7730,"uf":"MG"},"CONFINS":{"id":3117876,"pop":6867,"uf":"MG"},"CONGONHAL":{"id":3117900,"pop":12209,"uf":"MG"},"CONGONHAS":{"id":3118007,"pop":55836,"uf":"MG"},"CONGONHAS DO NORTE":{"id":3118106,"pop":5047,"uf":"MG"},"CONQUISTA":{"id":3118205,"pop":6997,"uf":"MG"},"CONSELHEIRO LAFAIETE":{"id":3118304,"pop":130584,"uf":"MG"},"CONSELHEIRO PENA":{"id":3118403,"pop":22975,"uf":"MG"},"CONSOLAÇÃO":{"id":3118502,"pop":1786,"uf":"MG"},"CONTAGEM":{"id":3118601,"pop":673849,"uf":"MG"},"COQUEIRAL":{"id":3118700,"pop":9099,"uf":"MG"},"CORAÇÃO DE JESUS":{"id":3118809,"pop":26620,"uf":"MG"},"CORDISBURGO":{"id":3118908,"pop":8903,"uf":"MG"},"CORDISLÂNDIA":{"id":3119005,"pop":3546,"uf":"MG"},"CORINTO":{"id":3119104,"pop":23607,"uf":"MG"},"COROACI":{"id":3119203,"pop":9897,"uf":"MG"},"COROMANDEL":{"id":3119302,"pop":27958,"uf":"MG"},"CORONEL FABRICIANO":{"id":3119401,"pop":110709,"uf":"MG"},"CORONEL MURTA":{"id":3119500,"pop":9209,"uf":"MG"},"CORONEL PACHECO":{"id":3119609,"pop":3095,"uf":"MG"},"CORONEL XAVIER CHAVES":{"id":3119708,"pop":3448,"uf":"MG"},"CÓRREGO DANTA":{"id":3119807,"pop":3168,"uf":"MG"},"CÓRREGO DO BOM JESUS":{"id":3119906,"pop":3685,"uf":"MG"},"CÓRREGO FUNDO":{"id":3119955,"pop":6425,"uf":"MG"},"CÓRREGO NOVO":{"id":3120003,"pop":2688,"uf":"MG"},"COUTO DE MAGALHÃES DE MINAS":{"id":3120102,"pop":4436,"uf":"MG"},"CRISÓLITA":{"id":3120151,"pop":6814,"uf":"MG"},"CRISTAIS":{"id":3120201,"pop":13060,"uf":"MG"},"CRISTÁLIA":{"id":3120300,"pop":5992,"uf":"MG"},"CRISTIANO OTONI":{"id":3120409,"pop":5161,"uf":"MG"},"CRISTINA":{"id":3120508,"pop":10211,"uf":"MG"},"CRUCILÂNDIA":{"id":3120607,"pop":5072,"uf":"MG"},"CRUZEIRO DA FORTALEZA":{"id":3120706,"pop":3651,"uf":"MG"},"CRUZÍLIA":{"id":3120805,"pop":15529,"uf":"MG"},"CUPARAQUE":{"id":3120839,"pop":5026,"uf":"MG"},"CURRAL DE DENTRO":{"id":3120870,"pop":7867,"uf":"MG"},"CURVELO":{"id":3120904,"pop":81085,"uf":"MG"},"DATAS":{"id":3121001,"pop":5431,"uf":"MG"},"DELFIM MOREIRA":{"id":3121100,"pop":8007,"uf":"MG"},"DELFINÓPOLIS":{"id":3121209,"pop":7146,"uf":"MG"},"DELTA":{"id":3121258,"pop":10994,"uf":"MG"},"DESCOBERTO":{"id":3121308,"pop":5044,"uf":"MG"},"DESTERRO DE ENTRE RIOS":{"id":3121407,"pop":7266,"uf":"MG"},"DESTERRO DO MELO":{"id":3121506,"pop":2867,"uf":"MG"},"DIAMANTINA":{"id":3121605,"pop":47924,"uf":"MG"},"DIOGO DE VASCONCELOS":{"id":3121704,"pop":3779,"uf":"MG"},"DIONÍSIO":{"id":3121803,"pop":7493,"uf":"MG"},"DIVINÉSIA":{"id":3121902,"pop":3430,"uf":"MG"},"DIVINO":{"id":3122009,"pop":20020,"uf":"MG"},"DIVINO DAS LARANJEIRAS":{"id":3122108,"pop":4969,"uf":"MG"},"DIVINOLÂNDIA DE MINAS":{"id":3122207,"pop":7655,"uf":"MG"},"DIVINÓPOLIS":{"id":3122306,"pop":242505,"uf":"MG"},"DIVISA ALEGRE":{"id":3122355,"pop":6946,"uf":"MG"},"DIVISA NOVA":{"id":3122405,"pop":6039,"uf":"MG"},"DIVISÓPOLIS":{"id":3122454,"pop":11396,"uf":"MG"},"DOM BOSCO":{"id":3122470,"pop":3635,"uf":"MG"},"DOM CAVATI":{"id":3122504,"pop":5025,"uf":"MG"},"DOM JOAQUIM":{"id":3122603,"pop":4436,"uf":"MG"},"DOM SILVÉRIO":{"id":3122702,"pop":5227,"uf":"MG"},"DOM VIÇOSO":{"id":3122801,"pop":2992,"uf":"MG"},"DONA EUZÉBIA":{"id":3122900,"pop":6664,"uf":"MG"},"DORES DE CAMPOS":{"id":3123007,"pop":10291,"uf":"MG"},"DORES DE GUANHÃES":{"id":3123106,"pop":5139,"uf":"MG"},"DORES DO INDAIÁ":{"id":3123205,"pop":13373,"uf":"MG"},"DORES DO TURVO":{"id":3123304,"pop":4202,"uf":"MG"},"DORESÓPOLIS":{"id":3123403,"pop":1539,"uf":"MG"},"DOURADOQUARA":{"id":3123502,"pop":1915,"uf":"MG"},"DURANDÉ":{"id":3123528,"pop":7898,"uf":"MG"},"ELÓI MENDES":{"id":3123601,"pop":28556,"uf":"MG"},"ENGENHEIRO CALDAS":{"id":3123700,"pop":11268,"uf":"MG"},"ENGENHEIRO NAVARRO":{"id":3123809,"pop":7240,"uf":"MG"},"ENTRE FOLHAS":{"id":3123858,"pop":5383,"uf":"MG"},"ENTRE RIOS DE MINAS":{"id":3123908,"pop":15458,"uf":"MG"},"ERVÁLIA":{"id":3124005,"pop":19019,"uf":"MG"},"ESMERALDAS":{"id":3124104,"pop":72512,"uf":"MG"},"ESPERA FELIZ":{"id":3124203,"pop":25287,"uf":"MG"},"ESPINOSA":{"id":3124302,"pop":31603,"uf":"MG"},"ESPÍRITO SANTO DO DOURADO":{"id":3124401,"pop":4728,"uf":"MG"},"ESTIVA":{"id":3124500,"pop":11416,"uf":"MG"},"ESTRELA DALVA":{"id":3124609,"pop":2308,"uf":"MG"},"ESTRELA DO INDAIÁ":{"id":3124708,"pop":3483,"uf":"MG"},"ESTRELA DO SUL":{"id":3124807,"pop":8057,"uf":"MG"},"EUGENÓPOLIS":{"id":3124906,"pop":11383,"uf":"MG"},"EWBANK DA CÂMARA":{"id":3125002,"pop":3932,"uf":"MG"},"EXTREMA":{"id":3125101,"pop":37649,"uf":"MG"},"FAMA":{"id":3125200,"pop":2374,"uf":"MG"},"FARIA LEMOS":{"id":3125309,"pop":3202,"uf":"MG"},"FELÍCIO DOS SANTOS":{"id":3125408,"pop":4656,"uf":"MG"},"SÃO GONÇALO DO RIO PRETO":{"id":3125507,"pop":3178,"uf":"MG"},"FELISBURGO":{"id":3125606,"pop":7548,"uf":"MG"},"FELIXLÂNDIA":{"id":3125705,"pop":15528,"uf":"MG"},"FERNANDES TOURINHO":{"id":3125804,"pop":3500,"uf":"MG"},"FERROS":{"id":3125903,"pop":9576,"uf":"MG"},"FERVEDOURO":{"id":3125952,"pop":11100,"uf":"MG"},"FLORESTAL":{"id":3126000,"pop":7602,"uf":"MG"},"FORMIGA":{"id":3126109,"pop":67956,"uf":"MG"},"FORMOSO":{"id":3126208,"pop":9810,"uf":"MG"},"FORTALEZA DE MINAS":{"id":3126307,"pop":4460,"uf":"MG"},"FORTUNA DE MINAS":{"id":3126406,"pop":2986,"uf":"MG"},"FRANCISCO BADARÓ":{"id":3126505,"pop":10311,"uf":"MG"},"FRANCISCO DUMONT":{"id":3126604,"pop":5268,"uf":"MG"},"FRANCISCO SÁ":{"id":3126703,"pop":26459,"uf":"MG"},"FRANCISCÓPOLIS":{"id":3126752,"pop":5287,"uf":"MG"},"FREI GASPAR":{"id":3126802,"pop":5858,"uf":"MG"},"FREI INOCÊNCIO":{"id":3126901,"pop":9716,"uf":"MG"},"FREI LAGONEGRO":{"id":3126950,"pop":3496,"uf":"MG"},"FRONTEIRA":{"id":3127008,"pop":18866,"uf":"MG"},"FRONTEIRA DOS VALES":{"id":3127057,"pop":4542,"uf":"MG"},"FRUTA DE LEITE":{"id":3127073,"pop":5232,"uf":"MG"},"FRUTAL":{"id":3127107,"pop":60508,"uf":"MG"},"FUNILÂNDIA":{"id":3127206,"pop":4434,"uf":"MG"},"GALILÉIA":{"id":3127305,"pop":6764,"uf":"MG"},"GAMELEIRAS":{"id":3127339,"pop":5084,"uf":"MG"},"GLAUCILÂNDIA":{"id":3127354,"pop":3177,"uf":"MG"},"GOIABEIRA":{"id":3127370,"pop":3402,"uf":"MG"},"GOIANÁ":{"id":3127388,"pop":4014,"uf":"MG"},"GONÇALVES":{"id":3127404,"pop":4360,"uf":"MG"},"GONZAGA":{"id":3127503,"pop":6184,"uf":"MG"},"GOUVEIA":{"id":3127602,"pop":11811,"uf":"MG"},"GOVERNADOR VALADARES":{"id":3127701,"pop":282164,"uf":"MG"},"GRÃO MOGOL":{"id":3127800,"pop":15943,"uf":"MG"},"GRUPIARA":{"id":3127909,"pop":1386,"uf":"MG"},"GUANHÃES":{"id":3128006,"pop":34818,"uf":"MG"},"GUAPÉ":{"id":3128105,"pop":14269,"uf":"MG"},"GUARACIABA":{"id":3128204,"pop":10307,"uf":"MG"},"GUARACIAMA":{"id":3128253,"pop":5005,"uf":"MG"},"GUARANÉSIA":{"id":3128303,"pop":19014,"uf":"MG"},"GUARANI":{"id":3128402,"pop":8926,"uf":"MG"},"GUARARÁ":{"id":3128501,"pop":3755,"uf":"MG"},"GUARDA-MOR":{"id":3128600,"pop":6558,"uf":"MG"},"GUAXUPÉ":{"id":3128709,"pop":52234,"uf":"MG"},"GUIDOVAL":{"id":3128808,"pop":7026,"uf":"MG"},"GUIMARÂNIA":{"id":3128907,"pop":8168,"uf":"MG"},"GUIRICEMA":{"id":3129004,"pop":8296,"uf":"MG"},"GURINHATÃ":{"id":3129103,"pop":5516,"uf":"MG"},"HELIODORA":{"id":3129202,"pop":6623,"uf":"MG"},"IAPU":{"id":3129301,"pop":11085,"uf":"MG"},"IBERTIOGA":{"id":3129400,"pop":4999,"uf":"MG"},"IBIÁ":{"id":3129509,"pop":25511,"uf":"MG"},"IBIAÍ":{"id":3129608,"pop":8478,"uf":"MG"},"IBIRACATU":{"id":3129657,"pop":5340,"uf":"MG"},"IBIRACI":{"id":3129707,"pop":14128,"uf":"MG"},"IBIRITÉ":{"id":3129806,"pop":184030,"uf":"MG"},"IBITIÚRA DE MINAS":{"id":3129905,"pop":3497,"uf":"MG"},"IBITURUNA":{"id":3130002,"pop":3003,"uf":"MG"},"ICARAÍ DE MINAS":{"id":3130051,"pop":12200,"uf":"MG"},"IGARAPÉ":{"id":3130101,"pop":44561,"uf":"MG"},"IGARATINGA":{"id":3130200,"pop":11146,"uf":"MG"},"IGUATAMA":{"id":3130309,"pop":7901,"uf":"MG"},"IJACI":{"id":3130408,"pop":6667,"uf":"MG"},"ILICÍNEA":{"id":3130507,"pop":12511,"uf":"MG"},"IMBÉ DE MINAS":{"id":3130556,"pop":6976,"uf":"MG"},"INCONFIDENTES":{"id":3130606,"pop":7387,"uf":"MG"},"INDAIABIRA":{"id":3130655,"pop":7328,"uf":"MG"},"INDIANÓPOLIS":{"id":3130705,"pop":7009,"uf":"MG"},"INGAÍ":{"id":3130804,"pop":2785,"uf":"MG"},"INHAPIM":{"id":3130903,"pop":24020,"uf":"MG"},"INHAÚMA":{"id":3131000,"pop":6352,"uf":"MG"},"INIMUTABA":{"id":3131109,"pop":7605,"uf":"MG"},"IPABA":{"id":3131158,"pop":18926,"uf":"MG"},"IPANEMA":{"id":3131208,"pop":20133,"uf":"MG"},"IPATINGA":{"id":3131307,"pop":267333,"uf":"MG"},"IPIAÇU":{"id":3131406,"pop":4229,"uf":"MG"},"IPUIÚNA":{"id":3131505,"pop":10156,"uf":"MG"},"IRAÍ DE MINAS":{"id":3131604,"pop":7067,"uf":"MG"},"ITABIRA":{"id":3131703,"pop":121717,"uf":"MG"},"ITABIRINHA":{"id":3131802,"pop":11637,"uf":"MG"},"ITABIRITO":{"id":3131901,"pop":52996,"uf":"MG"},"ITACAMBIRA":{"id":3132008,"pop":5447,"uf":"MG"},"ITACARAMBI":{"id":3132107,"pop":18175,"uf":"MG"},"ITAGUARA":{"id":3132206,"pop":13510,"uf":"MG"},"ITAIPÉ":{"id":3132305,"pop":12910,"uf":"MG"},"ITAJUBÁ":{"id":3132404,"pop":97782,"uf":"MG"},"ITAMARANDIBA":{"id":3132503,"pop":35130,"uf":"MG"},"ITAMARATI DE MINAS":{"id":3132602,"pop":4395,"uf":"MG"},"ITAMBACURI":{"id":3132701,"pop":23207,"uf":"MG"},"ITAMBÉ DO MATO DENTRO":{"id":3132800,"pop":2032,"uf":"MG"},"ITAMOGI":{"id":3132909,"pop":10122,"uf":"MG"},"ITAMONTE":{"id":3133006,"pop":15844,"uf":"MG"},"ITANHANDU":{"id":3133105,"pop":15511,"uf":"MG"},"ITANHOMI":{"id":3133204,"pop":12259,"uf":"MG"},"ITAOBIM":{"id":3133303,"pop":20997,"uf":"MG"},"ITAPAGIPE":{"id":3133402,"pop":15511,"uf":"MG"},"ITAPECERICA":{"id":3133501,"pop":21760,"uf":"MG"},"ITATIAIUÇU":{"id":3133709,"pop":11354,"uf":"MG"},"ITAÚ DE MINAS":{"id":3133758,"pop":16286,"uf":"MG"},"ITAÚNA":{"id":3133808,"pop":94455,"uf":"MG"},"ITAVERAVA":{"id":3133907,"pop":5321,"uf":"MG"},"ITINGA":{"id":3134004,"pop":15053,"uf":"MG"},"ITUETA":{"id":3134103,"pop":6074,"uf":"MG"},"ITUIUTABA":{"id":3134202,"pop":105818,"uf":"MG"},"ITUMIRIM":{"id":3134301,"pop":5978,"uf":"MG"},"ITURAMA":{"id":3134400,"pop":40101,"uf":"MG"},"ITUTINGA":{"id":3134509,"pop":3749,"uf":"MG"},"JABOTICATUBAS":{"id":3134608,"pop":20683,"uf":"MG"},"JACINTO":{"id":3134707,"pop":12320,"uf":"MG"},"JACUÍ":{"id":3134806,"pop":7695,"uf":"MG"},"JACUTINGA":{"id":3134905,"pop":26538,"uf":"MG"},"JAGUARAÇU":{"id":3135001,"pop":3151,"uf":"MG"},"JAÍBA":{"id":3135050,"pop":39850,"uf":"MG"},"JAMPRUCA":{"id":3135076,"pop":5453,"uf":"MG"},"JANAÚBA":{"id":3135100,"pop":72374,"uf":"MG"},"JANUÁRIA":{"id":3135209,"pop":67958,"uf":"MG"},"JAPARAÍBA":{"id":3135308,"pop":4418,"uf":"MG"},"JAPONVAR":{"id":3135357,"pop":7991,"uf":"MG"},"JECEABA":{"id":3135407,"pop":4795,"uf":"MG"},"JENIPAPO DE MINAS":{"id":3135456,"pop":7781,"uf":"MG"},"JEQUERI":{"id":3135506,"pop":12246,"uf":"MG"},"JEQUITAÍ":{"id":3135605,"pop":7407,"uf":"MG"},"JEQUITIBÁ":{"id":3135704,"pop":5203,"uf":"MG"},"JEQUITINHONHA":{"id":3135803,"pop":25555,"uf":"MG"},"JESUÂNIA":{"id":3135902,"pop":4774,"uf":"MG"},"JOAÍMA":{"id":3136009,"pop":15476,"uf":"MG"},"JOANÉSIA":{"id":3136108,"pop":4382,"uf":"MG"},"JOÃO MONLEVADE":{"id":3136207,"pop":80903,"uf":"MG"},"JOÃO PINHEIRO":{"id":3136306,"pop":47990,"uf":"MG"},"JOAQUIM FELÍCIO":{"id":3136405,"pop":4757,"uf":"MG"},"JORDÂNIA":{"id":3136504,"pop":10872,"uf":"MG"},"JOSÉ GONÇALVES DE MINAS":{"id":3136520,"pop":4474,"uf":"MG"},"JOSÉ RAYDAN":{"id":3136553,"pop":5104,"uf":"MG"},"JOSENÓPOLIS":{"id":3136579,"pop":4911,"uf":"MG"},"NOVA UNIÃO":{"id":3136603,"pop":5739,"uf":"MG"},"JUATUBA":{"id":3136652,"pop":27823,"uf":"MG"},"JUIZ DE FORA":{"id":3136702,"pop":577532,"uf":"MG"},"JURAMENTO":{"id":3136801,"pop":4359,"uf":"MG"},"JURUAIA":{"id":3136900,"pop":10795,"uf":"MG"},"JUVENÍLIA":{"id":3136959,"pop":5706,"uf":"MG"},"LADAINHA":{"id":3137007,"pop":18272,"uf":"MG"},"LAGAMAR":{"id":3137106,"pop":7588,"uf":"MG"},"LAGOA DA PRATA":{"id":3137205,"pop":53236,"uf":"MG"},"LAGOA DOS PATOS":{"id":3137304,"pop":4062,"uf":"MG"},"LAGOA DOURADA":{"id":3137403,"pop":13115,"uf":"MG"},"LAGOA FORMOSA":{"id":3137502,"pop":18168,"uf":"MG"},"LAGOA GRANDE":{"id":3137536,"pop":9681,"uf":"MG"},"LAGOA SANTA":{"id":3137601,"pop":66744,"uf":"MG"},"LAJINHA":{"id":3137700,"pop":19914,"uf":"MG"},"LAMBARI":{"id":3137809,"pop":20995,"uf":"MG"},"LAMIM":{"id":3137908,"pop":3366,"uf":"MG"},"LARANJAL":{"id":3138005,"pop":6856,"uf":"MG"},"LASSANCE":{"id":3138104,"pop":6494,"uf":"MG"},"LAVRAS":{"id":3138203,"pop":105756,"uf":"MG"},"LEANDRO FERREIRA":{"id":3138302,"pop":3222,"uf":"MG"},"LEME DO PRADO":{"id":3138351,"pop":4923,"uf":"MG"},"LEOPOLDINA":{"id":3138401,"pop":52690,"uf":"MG"},"LIBERDADE":{"id":3138500,"pop":4994,"uf":"MG"},"LIMA DUARTE":{"id":3138609,"pop":16749,"uf":"MG"},"LIMEIRA DO OESTE":{"id":3138625,"pop":7640,"uf":"MG"},"LONTRA":{"id":3138658,"pop":9766,"uf":"MG"},"LUISBURGO":{"id":3138674,"pop":6249,"uf":"MG"},"LUISLÂNDIA":{"id":3138682,"pop":6735,"uf":"MG"},"LUMINÁRIAS":{"id":3138708,"pop":5431,"uf":"MG"},"LUZ":{"id":3138807,"pop":18297,"uf":"MG"},"MACHACALIS":{"id":3138906,"pop":7112,"uf":"MG"},"MACHADO":{"id":3139003,"pop":42682,"uf":"MG"},"MADRE DE DEUS DE MINAS":{"id":3139102,"pop":5119,"uf":"MG"},"MALACACHETA":{"id":3139201,"pop":18556,"uf":"MG"},"MAMONAS":{"id":3139250,"pop":6565,"uf":"MG"},"MANGA":{"id":3139300,"pop":18051,"uf":"MG"},"MANHUAÇU":{"id":3139409,"pop":92074,"uf":"MG"},"MANHUMIRIM":{"id":3139508,"pop":22894,"uf":"MG"},"MANTENA":{"id":3139607,"pop":27651,"uf":"MG"},"MARAVILHAS":{"id":3139706,"pop":8113,"uf":"MG"},"MAR DE ESPANHA":{"id":3139805,"pop":12985,"uf":"MG"},"MARIA DA FÉ":{"id":3139904,"pop":14019,"uf":"MG"},"MARIANA":{"id":3140001,"pop":61830,"uf":"MG"},"MARILAC":{"id":3140100,"pop":4079,"uf":"MG"},"MÁRIO CAMPOS":{"id":3140159,"pop":15814,"uf":"MG"},"MARIPÁ DE MINAS":{"id":3140209,"pop":3000,"uf":"MG"},"MARLIÉRIA":{"id":3140308,"pop":4030,"uf":"MG"},"MARMELÓPOLIS":{"id":3140407,"pop":2701,"uf":"MG"},"MARTINHO CAMPOS":{"id":3140506,"pop":13497,"uf":"MG"},"MARTINS SOARES":{"id":3140530,"pop":8640,"uf":"MG"},"MATA VERDE":{"id":3140555,"pop":8700,"uf":"MG"},"MATERLÂNDIA":{"id":3140605,"pop":4415,"uf":"MG"},"MATEUS LEME":{"id":3140704,"pop":31631,"uf":"MG"},"MATIAS BARBOSA":{"id":3140803,"pop":14626,"uf":"MG"},"MATIAS CARDOSO":{"id":3140852,"pop":11360,"uf":"MG"},"MATIPÓ":{"id":3140902,"pop":19098,"uf":"MG"},"MATO VERDE":{"id":3141009,"pop":12367,"uf":"MG"},"MATOZINHOS":{"id":3141108,"pop":38469,"uf":"MG"},"MATUTINA":{"id":3141207,"pop":3733,"uf":"MG"},"MEDEIROS":{"id":3141306,"pop":3861,"uf":"MG"},"MEDINA":{"id":3141405,"pop":20701,"uf":"MG"},"MENDES PIMENTEL":{"id":3141504,"pop":6446,"uf":"MG"},"MERCÊS":{"id":3141603,"pop":10775,"uf":"MG"},"MESQUITA":{"id":3141702,"pop":5489,"uf":"MG"},"MINAS NOVAS":{"id":3141801,"pop":31509,"uf":"MG"},"MINDURI":{"id":3141900,"pop":3891,"uf":"MG"},"MIRABELA":{"id":3142007,"pop":13651,"uf":"MG"},"MIRADOURO":{"id":3142106,"pop":10818,"uf":"MG"},"MIRAÍ":{"id":3142205,"pop":15205,"uf":"MG"},"MIRAVÂNIA":{"id":3142254,"pop":4939,"uf":"MG"},"MOEDA":{"id":3142304,"pop":4948,"uf":"MG"},"MOEMA":{"id":3142403,"pop":7589,"uf":"MG"},"MONJOLOS":{"id":3142502,"pop":2184,"uf":"MG"},"MONSENHOR PAULO":{"id":3142601,"pop":8764,"uf":"MG"},"MONTALVÂNIA":{"id":3142700,"pop":14621,"uf":"MG"},"MONTE ALEGRE DE MINAS":{"id":3142809,"pop":21349,"uf":"MG"},"MONTE AZUL":{"id":3142908,"pop":20544,"uf":"MG"},"MONTE BELO":{"id":3143005,"pop":13139,"uf":"MG"},"MONTE CARMELO":{"id":3143104,"pop":48049,"uf":"MG"},"MONTE FORMOSO":{"id":3143153,"pop":4939,"uf":"MG"},"MONTE SANTO DE MINAS":{"id":3143203,"pop":21504,"uf":"MG"},"MONTES CLAROS":{"id":3143302,"pop":417478,"uf":"MG"},"MONTE SIÃO":{"id":3143401,"pop":24247,"uf":"MG"},"MONTEZUMA":{"id":3143450,"pop":8379,"uf":"MG"},"MORADA NOVA DE MINAS":{"id":3143500,"pop":8955,"uf":"MG"},"MORRO DA GARÇA":{"id":3143609,"pop":2413,"uf":"MG"},"MORRO DO PILAR":{"id":3143708,"pop":3126,"uf":"MG"},"MUNHOZ":{"id":3143807,"pop":5960,"uf":"MG"},"MURIAÉ":{"id":3143906,"pop":109997,"uf":"MG"},"MUTUM":{"id":3144003,"pop":26945,"uf":"MG"},"MUZAMBINHO":{"id":3144102,"pop":20522,"uf":"MG"},"NACIP RAYDAN":{"id":3144201,"pop":3221,"uf":"MG"},"NANUQUE":{"id":3144300,"pop":40583,"uf":"MG"},"NAQUE":{"id":3144359,"pop":7104,"uf":"MG"},"NATALÂNDIA":{"id":3144375,"pop":3306,"uf":"MG"},"NATÉRCIA":{"id":3144409,"pop":4727,"uf":"MG"},"NAZARENO":{"id":3144508,"pop":8710,"uf":"MG"},"NEPOMUCENO":{"id":3144607,"pop":26882,"uf":"MG"},"NINHEIRA":{"id":3144656,"pop":10355,"uf":"MG"},"NOVA BELÉM":{"id":3144672,"pop":3067,"uf":"MG"},"NOVA ERA":{"id":3144706,"pop":17524,"uf":"MG"},"NOVA LIMA":{"id":3144805,"pop":97378,"uf":"MG"},"NOVA MÓDICA":{"id":3144904,"pop":3548,"uf":"MG"},"NOVA PONTE":{"id":3145000,"pop":16046,"uf":"MG"},"NOVA PORTEIRINHA":{"id":3145059,"pop":7493,"uf":"MG"},"NOVA RESENDE":{"id":3145109,"pop":16937,"uf":"MG"},"NOVA SERRANA":{"id":3145208,"pop":108241,"uf":"MG"},"NOVO CRUZEIRO":{"id":3145307,"pop":31339,"uf":"MG"},"NOVO ORIENTE DE MINAS":{"id":3145356,"pop":10800,"uf":"MG"},"NOVORIZONTE":{"id":3145372,"pop":5348,"uf":"MG"},"OLARIA":{"id":3145406,"pop":1694,"uf":"MG"},"OLHOS-D'ÁGUA":{"id":3145455,"pop":6243,"uf":"MG"},"OLÍMPIO NORONHA":{"id":3145505,"pop":2829,"uf":"MG"},"OLIVEIRA":{"id":3145604,"pop":41987,"uf":"MG"},"OLIVEIRA FORTES":{"id":3145703,"pop":2128,"uf":"MG"},"ONÇA DE PITANGUI":{"id":3145802,"pop":3155,"uf":"MG"},"ORATÓRIOS":{"id":3145851,"pop":4671,"uf":"MG"},"ORIZÂNIA":{"id":3145877,"pop":8138,"uf":"MG"},"OURO BRANCO":{"id":3145901,"pop":40220,"uf":"MG"},"OURO FINO":{"id":3146008,"pop":33938,"uf":"MG"},"OURO PRETO":{"id":3146107,"pop":74824,"uf":"MG"},"OURO VERDE DE MINAS":{"id":3146206,"pop":5895,"uf":"MG"},"PADRE CARVALHO":{"id":3146255,"pop":6466,"uf":"MG"},"PADRE PARAÍSO":{"id":3146305,"pop":20346,"uf":"MG"},"PAINEIRAS":{"id":3146404,"pop":4440,"uf":"MG"},"PAINS":{"id":3146503,"pop":8308,"uf":"MG"},"PAI PEDRO":{"id":3146552,"pop":6098,"uf":"MG"},"PAIVA":{"id":3146602,"pop":1517,"uf":"MG"},"PALMA":{"id":3146701,"pop":6606,"uf":"MG"},"PALMÓPOLIS":{"id":3146750,"pop":5196,"uf":"MG"},"PAPAGAIOS":{"id":3146909,"pop":15922,"uf":"MG"},"PARACATU":{"id":3147006,"pop":94539,"uf":"MG"},"PARÁ DE MINAS":{"id":3147105,"pop":95616,"uf":"MG"},"PARAGUAÇU":{"id":3147204,"pop":21693,"uf":"MG"},"PARAISÓPOLIS":{"id":3147303,"pop":21353,"uf":"MG"},"PARAOPEBA":{"id":3147402,"pop":24854,"uf":"MG"},"PASSABÉM":{"id":3147501,"pop":1619,"uf":"MG"},"PASSA QUATRO":{"id":3147600,"pop":16439,"uf":"MG"},"PASSA TEMPO":{"id":3147709,"pop":8031,"uf":"MG"},"PASSA VINTE":{"id":3147808,"pop":2024,"uf":"MG"},"PASSOS":{"id":3147907,"pop":115970,"uf":"MG"},"PATIS":{"id":3147956,"pop":6031,"uf":"MG"},"PATOS DE MINAS":{"id":3148004,"pop":154641,"uf":"MG"},"PATROCÍNIO":{"id":3148103,"pop":92116,"uf":"MG"},"PATROCÍNIO DO MURIAÉ":{"id":3148202,"pop":5744,"uf":"MG"},"PAULA CÂNDIDO":{"id":3148301,"pop":9597,"uf":"MG"},"PAULISTAS":{"id":3148400,"pop":4794,"uf":"MG"},"PAVÃO":{"id":3148509,"pop":8390,"uf":"MG"},"PEÇANHA":{"id":3148608,"pop":17534,"uf":"MG"},"PEDRA AZUL":{"id":3148707,"pop":24333,"uf":"MG"},"PEDRA BONITA":{"id":3148756,"pop":7157,"uf":"MG"},"PEDRA DO ANTA":{"id":3148806,"pop":2960,"uf":"MG"},"PEDRA DO INDAIÁ":{"id":3148905,"pop":3977,"uf":"MG"},"PEDRA DOURADA":{"id":3149002,"pop":2559,"uf":"MG"},"PEDRALVA":{"id":3149101,"pop":11098,"uf":"MG"},"PEDRAS DE MARIA DA CRUZ":{"id":3149150,"pop":12313,"uf":"MG"},"PEDRINÓPOLIS":{"id":3149200,"pop":3651,"uf":"MG"},"PEDRO LEOPOLDO":{"id":3149309,"pop":65149,"uf":"MG"},"PEDRO TEIXEIRA":{"id":3149408,"pop":1804,"uf":"MG"},"PEQUERI":{"id":3149507,"pop":3340,"uf":"MG"},"PEQUI":{"id":3149606,"pop":4457,"uf":"MG"},"PERDIGÃO":{"id":3149705,"pop":11994,"uf":"MG"},"PERDIZES":{"id":3149804,"pop":16469,"uf":"MG"},"PERDÕES":{"id":3149903,"pop":21577,"uf":"MG"},"PERIQUITO":{"id":3149952,"pop":6738,"uf":"MG"},"PESCADOR":{"id":3150000,"pop":4261,"uf":"MG"},"PIAU":{"id":3150109,"pop":2719,"uf":"MG"},"PIEDADE DE CARATINGA":{"id":3150158,"pop":8832,"uf":"MG"},"PIEDADE DE PONTE NOVA":{"id":3150208,"pop":4141,"uf":"MG"},"PIEDADE DO RIO GRANDE":{"id":3150307,"pop":4436,"uf":"MG"},"PIEDADE DOS GERAIS":{"id":3150406,"pop":5034,"uf":"MG"},"PIMENTA":{"id":3150505,"pop":8715,"uf":"MG"},"PINGO-D'ÁGUA":{"id":3150539,"pop":5029,"uf":"MG"},"PINTÓPOLIS":{"id":3150570,"pop":7540,"uf":"MG"},"PIRACEMA":{"id":3150604,"pop":6386,"uf":"MG"},"PIRAJUBA":{"id":3150703,"pop":6491,"uf":"MG"},"PIRANGA":{"id":3150802,"pop":17641,"uf":"MG"},"PIRANGUÇU":{"id":3150901,"pop":5504,"uf":"MG"},"PIRANGUINHO":{"id":3151008,"pop":8683,"uf":"MG"},"PIRAPETINGA":{"id":3151107,"pop":10791,"uf":"MG"},"PIRAPORA":{"id":3151206,"pop":56845,"uf":"MG"},"PIRAÚBA":{"id":3151305,"pop":10732,"uf":"MG"},"PITANGUI":{"id":3151404,"pop":28433,"uf":"MG"},"PIUMHI":{"id":3151503,"pop":35137,"uf":"MG"},"PLANURA":{"id":3151602,"pop":12445,"uf":"MG"},"POÇO FUNDO":{"id":3151701,"pop":16900,"uf":"MG"},"POÇOS DE CALDAS":{"id":3151800,"pop":169838,"uf":"MG"},"POCRANE":{"id":3151909,"pop":8288,"uf":"MG"},"POMPÉU":{"id":3152006,"pop":32248,"uf":"MG"},"PONTE NOVA":{"id":3152105,"pop":60003,"uf":"MG"},"PONTO CHIQUE":{"id":3152131,"pop":4305,"uf":"MG"},"PONTO DOS VOLANTES":{"id":3152170,"pop":12235,"uf":"MG"},"PORTEIRINHA":{"id":3152204,"pop":37823,"uf":"MG"},"PORTO FIRME":{"id":3152303,"pop":11414,"uf":"MG"},"POTÉ":{"id":3152402,"pop":16675,"uf":"MG"},"POUSO ALEGRE":{"id":3152501,"pop":154293,"uf":"MG"},"POUSO ALTO":{"id":3152600,"pop":5862,"uf":"MG"},"PRADOS":{"id":3152709,"pop":9128,"uf":"MG"},"PRATA":{"id":3152808,"pop":28173,"uf":"MG"},"PRATÁPOLIS":{"id":3152907,"pop":8530,"uf":"MG"},"PRATINHA":{"id":3153004,"pop":3658,"uf":"MG"},"PRESIDENTE JUSCELINO":{"id":3153202,"pop":3572,"uf":"MG"},"PRESIDENTE KUBITSCHEK":{"id":3153301,"pop":3000,"uf":"MG"},"PRESIDENTE OLEGÁRIO":{"id":3153400,"pop":19680,"uf":"MG"},"ALTO JEQUITIBÁ":{"id":3153509,"pop":8286,"uf":"MG"},"PRUDENTE DE MORAIS":{"id":3153608,"pop":10931,"uf":"MG"},"QUARTEL GERAL":{"id":3153707,"pop":3603,"uf":"MG"},"QUELUZITO":{"id":3153806,"pop":1948,"uf":"MG"},"RAPOSOS":{"id":3153905,"pop":16501,"uf":"MG"},"RAUL SOARES":{"id":3154002,"pop":23663,"uf":"MG"},"RECREIO":{"id":3154101,"pop":10522,"uf":"MG"},"REDUTO":{"id":3154150,"pop":7247,"uf":"MG"},"RESENDE COSTA":{"id":3154200,"pop":11578,"uf":"MG"},"RESPLENDOR":{"id":3154309,"pop":17396,"uf":"MG"},"RESSAQUINHA":{"id":3154408,"pop":4826,"uf":"MG"},"RIACHINHO":{"id":3154457,"pop":8132,"uf":"MG"},"RIACHO DOS MACHADOS":{"id":3154507,"pop":9471,"uf":"MG"},"RIBEIRÃO DAS NEVES":{"id":3154606,"pop":341415,"uf":"MG"},"RIBEIRÃO VERMELHO":{"id":3154705,"pop":4061,"uf":"MG"},"RIO ACIMA":{"id":3154804,"pop":10524,"uf":"MG"},"RIO CASCA":{"id":3154903,"pop":13384,"uf":"MG"},"RIO DOCE":{"id":3155009,"pop":2630,"uf":"MG"},"RIO DO PRADO":{"id":3155108,"pop":5117,"uf":"MG"},"RIO ESPERA":{"id":3155207,"pop":5332,"uf":"MG"},"RIO MANSO":{"id":3155306,"pop":5924,"uf":"MG"},"RIO NOVO":{"id":3155405,"pop":8964,"uf":"MG"},"RIO PARANAÍBA":{"id":3155504,"pop":12356,"uf":"MG"},"RIO PARDO DE MINAS":{"id":3155603,"pop":31171,"uf":"MG"},"RIO PIRACICABA":{"id":3155702,"pop":14325,"uf":"MG"},"RIO POMBA":{"id":3155801,"pop":18007,"uf":"MG"},"RIO PRETO":{"id":3155900,"pop":5493,"uf":"MG"},"RIO VERMELHO":{"id":3156007,"pop":12635,"uf":"MG"},"RITÁPOLIS":{"id":3156106,"pop":4521,"uf":"MG"},"ROCHEDO DE MINAS":{"id":3156205,"pop":2335,"uf":"MG"},"RODEIRO":{"id":3156304,"pop":8333,"uf":"MG"},"ROMARIA":{"id":3156403,"pop":3507,"uf":"MG"},"ROSÁRIO DA LIMEIRA":{"id":3156452,"pop":4648,"uf":"MG"},"RUBELITA":{"id":3156502,"pop":5609,"uf":"MG"},"RUBIM":{"id":3156601,"pop":10269,"uf":"MG"},"SABARÁ":{"id":3156700,"pop":137877,"uf":"MG"},"SABINÓPOLIS":{"id":3156809,"pop":15364,"uf":"MG"},"SACRAMENTO":{"id":3156908,"pop":26556,"uf":"MG"},"SALINAS":{"id":3157005,"pop":41864,"uf":"MG"},"SALTO DA DIVISA":{"id":3157104,"pop":7014,"uf":"MG"},"SANTA BÁRBARA":{"id":3157203,"pop":31873,"uf":"MG"},"SANTA BÁRBARA DO LESTE":{"id":3157252,"pop":8212,"uf":"MG"},"SANTA BÁRBARA DO MONTE VERDE":{"id":3157278,"pop":3212,"uf":"MG"},"SANTA BÁRBARA DO TUGÚRIO":{"id":3157302,"pop":4385,"uf":"MG"},"SANTA CRUZ DE MINAS":{"id":3157336,"pop":8723,"uf":"MG"},"SANTA CRUZ DE SALINAS":{"id":3157377,"pop":4074,"uf":"MG"},"SANTA CRUZ DO ESCALVADO":{"id":3157401,"pop":4693,"uf":"MG"},"SANTA EFIGÊNIA DE MINAS":{"id":3157500,"pop":4354,"uf":"MG"},"SANTA FÉ DE MINAS":{"id":3157609,"pop":3806,"uf":"MG"},"SANTA HELENA DE MINAS":{"id":3157658,"pop":6406,"uf":"MG"},"SANTA JULIANA":{"id":3157708,"pop":14497,"uf":"MG"},"SANTA LUZIA":{"id":3157807,"pop":221705,"uf":"MG"},"SANTA MARGARIDA":{"id":3157906,"pop":16393,"uf":"MG"},"SANTA MARIA DE ITABIRA":{"id":3158003,"pop":10867,"uf":"MG"},"SANTA MARIA DO SALTO":{"id":3158102,"pop":5203,"uf":"MG"},"SANTA MARIA DO SUAÇUÍ":{"id":3158201,"pop":14607,"uf":"MG"},"SANTANA DA VARGEM":{"id":3158300,"pop":7047,"uf":"MG"},"SANTANA DE CATAGUASES":{"id":3158409,"pop":3909,"uf":"MG"},"SANTANA DE PIRAPAMA":{"id":3158508,"pop":7538,"uf":"MG"},"SANTANA DO DESERTO":{"id":3158607,"pop":3985,"uf":"MG"},"SANTANA DO GARAMBÉU":{"id":3158706,"pop":2494,"uf":"MG"},"SANTANA DO JACARÉ":{"id":3158805,"pop":4847,"uf":"MG"},"SANTANA DO MANHUAÇU":{"id":3158904,"pop":8660,"uf":"MG"},"SANTANA DO PARAÍSO":{"id":3158953,"pop":36048,"uf":"MG"},"SANTANA DO RIACHO":{"id":3159001,"pop":4334,"uf":"MG"},"SANTANA DOS MONTES":{"id":3159100,"pop":3753,"uf":"MG"},"SANTA RITA DE CALDAS":{"id":3159209,"pop":8900,"uf":"MG"},"SANTA RITA DE JACUTINGA":{"id":3159308,"pop":4843,"uf":"MG"},"SANTA RITA DE MINAS":{"id":3159357,"pop":7322,"uf":"MG"},"SANTA RITA DE IBITIPOCA":{"id":3159407,"pop":3380,"uf":"MG"},"SANTA RITA DO ITUETO":{"id":3159506,"pop":5426,"uf":"MG"},"SANTA RITA DO SAPUCAÍ":{"id":3159605,"pop":44226,"uf":"MG"},"SANTA ROSA DA SERRA":{"id":3159704,"pop":3364,"uf":"MG"},"SANTA VITÓRIA":{"id":3159803,"pop":19997,"uf":"MG"},"SANTO ANTÔNIO DO AMPARO":{"id":3159902,"pop":18697,"uf":"MG"},"SANTO ANTÔNIO DO AVENTUREIRO":{"id":3160009,"pop":3602,"uf":"MG"},"SANTO ANTÔNIO DO GRAMA":{"id":3160108,"pop":3861,"uf":"MG"},"SANTO ANTÔNIO DO ITAMBÉ":{"id":3160207,"pop":3763,"uf":"MG"},"SANTO ANTÔNIO DO JACINTO":{"id":3160306,"pop":11570,"uf":"MG"},"SANTO ANTÔNIO DO MONTE":{"id":3160405,"pop":28603,"uf":"MG"},"SANTO ANTÔNIO DO RETIRO":{"id":3160454,"pop":7316,"uf":"MG"},"SANTO ANTÔNIO DO RIO ABAIXO":{"id":3160504,"pop":1756,"uf":"MG"},"SANTO HIPÓLITO":{"id":3160603,"pop":3044,"uf":"MG"},"SANTOS DUMONT":{"id":3160702,"pop":46357,"uf":"MG"},"SÃO BENTO ABADE":{"id":3160801,"pop":5411,"uf":"MG"},"SÃO BRÁS DO SUAÇUÍ":{"id":3160900,"pop":3770,"uf":"MG"},"SÃO DOMINGOS DAS DORES":{"id":3160959,"pop":5672,"uf":"MG"},"SÃO DOMINGOS DO PRATA":{"id":3161007,"pop":17296,"uf":"MG"},"SÃO FÉLIX DE MINAS":{"id":3161056,"pop":3354,"uf":"MG"},"SÃO FRANCISCO DE PAULA":{"id":3161205,"pop":6512,"uf":"MG"},"SÃO FRANCISCO DE SALES":{"id":3161304,"pop":6309,"uf":"MG"},"SÃO FRANCISCO DO GLÓRIA":{"id":3161403,"pop":4758,"uf":"MG"},"SÃO GERALDO":{"id":3161502,"pop":12751,"uf":"MG"},"SÃO GERALDO DA PIEDADE":{"id":3161601,"pop":3860,"uf":"MG"},"SÃO GERALDO DO BAIXIO":{"id":3161650,"pop":4104,"uf":"MG"},"SÃO GONÇALO DO ABAETÉ":{"id":3161700,"pop":8527,"uf":"MG"},"SÃO GONÇALO DO PARÁ":{"id":3161809,"pop":12776,"uf":"MG"},"SÃO GONÇALO DO RIO ABAIXO":{"id":3161908,"pop":11114,"uf":"MG"},"SÃO GONÇALO DO SAPUCAÍ":{"id":3162005,"pop":25670,"uf":"MG"},"SÃO GOTARDO":{"id":3162104,"pop":36084,"uf":"MG"},"SÃO JOÃO BATISTA DO GLÓRIA":{"id":3162203,"pop":7541,"uf":"MG"},"SÃO JOÃO DA LAGOA":{"id":3162252,"pop":4949,"uf":"MG"},"SÃO JOÃO DA MATA":{"id":3162302,"pop":2743,"uf":"MG"},"SÃO JOÃO DA PONTE":{"id":3162401,"pop":25033,"uf":"MG"},"SÃO JOÃO DAS MISSÕES":{"id":3162450,"pop":13232,"uf":"MG"},"SÃO JOÃO DEL REI":{"id":3162500,"pop":90897,"uf":"MG"},"SÃO JOÃO DO MANHUAÇU":{"id":3162559,"pop":11785,"uf":"MG"},"SÃO JOÃO DO MANTENINHA":{"id":3162575,"pop":5975,"uf":"MG"},"SÃO JOÃO DO ORIENTE":{"id":3162609,"pop":7393,"uf":"MG"},"SÃO JOÃO DO PACUÍ":{"id":3162658,"pop":4476,"uf":"MG"},"SÃO JOÃO DO PARAÍSO":{"id":3162708,"pop":23797,"uf":"MG"},"SÃO JOÃO EVANGELISTA":{"id":3162807,"pop":15761,"uf":"MG"},"SÃO JOÃO NEPOMUCENO":{"id":3162906,"pop":26530,"uf":"MG"},"SÃO JOAQUIM DE BICAS":{"id":3162922,"pop":32696,"uf":"MG"},"SÃO JOSÉ DA BARRA":{"id":3162948,"pop":7532,"uf":"MG"},"SÃO JOSÉ DA LAPA":{"id":3162955,"pop":24490,"uf":"MG"},"SÃO JOSÉ DA SAFIRA":{"id":3163003,"pop":4291,"uf":"MG"},"SÃO JOSÉ DA VARGINHA":{"id":3163102,"pop":5151,"uf":"MG"},"SÃO JOSÉ DO ALEGRE":{"id":3163201,"pop":4222,"uf":"MG"},"SÃO JOSÉ DO DIVINO":{"id":3163300,"pop":3851,"uf":"MG"},"SÃO JOSÉ DO GOIABAL":{"id":3163409,"pop":5356,"uf":"MG"},"SÃO JOSÉ DO JACURI":{"id":3163508,"pop":6409,"uf":"MG"},"SÃO JOSÉ DO MANTIMENTO":{"id":3163607,"pop":2821,"uf":"MG"},"SÃO LOURENÇO":{"id":3163706,"pop":46539,"uf":"MG"},"SÃO MIGUEL DO ANTA":{"id":3163805,"pop":6949,"uf":"MG"},"SÃO PEDRO DA UNIÃO":{"id":3163904,"pop":4563,"uf":"MG"},"SÃO PEDRO DOS FERROS":{"id":3164001,"pop":7634,"uf":"MG"},"SÃO PEDRO DO SUAÇUÍ":{"id":3164100,"pop":5160,"uf":"MG"},"SÃO ROMÃO":{"id":3164209,"pop":12713,"uf":"MG"},"SÃO ROQUE DE MINAS":{"id":3164308,"pop":7100,"uf":"MG"},"SÃO SEBASTIÃO DA BELA VISTA":{"id":3164407,"pop":5598,"uf":"MG"},"SÃO SEBASTIÃO DA VARGEM ALEGRE":{"id":3164431,"pop":3039,"uf":"MG"},"SÃO SEBASTIÃO DO ANTA":{"id":3164472,"pop":6697,"uf":"MG"},"SÃO SEBASTIÃO DO MARANHÃO":{"id":3164506,"pop":9884,"uf":"MG"},"SÃO SEBASTIÃO DO OESTE":{"id":3164605,"pop":6948,"uf":"MG"},"SÃO SEBASTIÃO DO PARAÍSO":{"id":3164704,"pop":71915,"uf":"MG"},"SÃO SEBASTIÃO DO RIO PRETO":{"id":3164803,"pop":1478,"uf":"MG"},"SÃO SEBASTIÃO DO RIO VERDE":{"id":3164902,"pop":2259,"uf":"MG"},"SÃO TIAGO":{"id":3165008,"pop":10979,"uf":"MG"},"SÃO TOMÁS DE AQUINO":{"id":3165107,"pop":6980,"uf":"MG"},"SÃO TOMÉ DAS LETRAS":{"id":3165206,"pop":7151,"uf":"MG"},"SÃO VICENTE DE MINAS":{"id":3165305,"pop":7876,"uf":"MG"},"SAPUCAÍ-MIRIM":{"id":3165404,"pop":7045,"uf":"MG"},"SARDOÁ":{"id":3165503,"pop":6421,"uf":"MG"},"SARZEDO":{"id":3165537,"pop":34050,"uf":"MG"},"SETUBINHA":{"id":3165552,"pop":12493,"uf":"MG"},"SEM-PEIXE":{"id":3165560,"pop":2579,"uf":"MG"},"SENADOR AMARAL":{"id":3165578,"pop":5365,"uf":"MG"},"SENADOR CORTES":{"id":3165602,"pop":2001,"uf":"MG"},"SENADOR FIRMINO":{"id":3165701,"pop":7902,"uf":"MG"},"SENADOR JOSÉ BENTO":{"id":3165800,"pop":1422,"uf":"MG"},"SENADOR MODESTINO GONÇALVES":{"id":3165909,"pop":4056,"uf":"MG"},"SENHORA DE OLIVEIRA":{"id":3166006,"pop":5786,"uf":"MG"},"SENHORA DO PORTO":{"id":3166105,"pop":3516,"uf":"MG"},"SENHORA DOS REMÉDIOS":{"id":3166204,"pop":10474,"uf":"MG"},"SERICITA":{"id":3166303,"pop":7340,"uf":"MG"},"SERITINGA":{"id":3166402,"pop":1857,"uf":"MG"},"SERRA AZUL DE MINAS":{"id":3166501,"pop":4292,"uf":"MG"},"SERRA DA SAUDADE":{"id":3166600,"pop":771,"uf":"MG"},"SERRA DOS AIMORÉS":{"id":3166709,"pop":8725,"uf":"MG"},"SERRA DO SALITRE":{"id":3166808,"pop":11750,"uf":"MG"},"SERRANIA":{"id":3166907,"pop":7667,"uf":"MG"},"SERRANÓPOLIS DE MINAS":{"id":3166956,"pop":4836,"uf":"MG"},"SERRANOS":{"id":3167004,"pop":1949,"uf":"MG"},"SERRO":{"id":3167103,"pop":20915,"uf":"MG"},"SETE LAGOAS":{"id":3167202,"pop":243950,"uf":"MG"},"SILVEIRÂNIA":{"id":3167301,"pop":2267,"uf":"MG"},"SILVIANÓPOLIS":{"id":3167400,"pop":6258,"uf":"MG"},"SIMÃO PEREIRA":{"id":3167509,"pop":2621,"uf":"MG"},"SIMONÉSIA":{"id":3167608,"pop":19834,"uf":"MG"},"SOBRÁLIA":{"id":3167707,"pop":5476,"uf":"MG"},"SOLEDADE DE MINAS":{"id":3167806,"pop":6226,"uf":"MG"},"TABULEIRO":{"id":3167905,"pop":3669,"uf":"MG"},"TAIOBEIRAS":{"id":3168002,"pop":34653,"uf":"MG"},"TAPARUBA":{"id":3168051,"pop":3093,"uf":"MG"},"TAPIRA":{"id":3168101,"pop":4890,"uf":"MG"},"TAQUARAÇU DE MINAS":{"id":3168309,"pop":4120,"uf":"MG"},"TARUMIRIM":{"id":3168408,"pop":14280,"uf":"MG"},"TEIXEIRAS":{"id":3168507,"pop":11680,"uf":"MG"},"TEÓFILO OTONI":{"id":3168606,"pop":141269,"uf":"MG"},"TIMÓTEO":{"id":3168705,"pop":91268,"uf":"MG"},"TIRADENTES":{"id":3168804,"pop":8160,"uf":"MG"},"TIROS":{"id":3168903,"pop":6369,"uf":"MG"},"TOCANTINS":{"id":3169000,"pop":16769,"uf":"MG"},"TOCOS DO MOJI":{"id":3169059,"pop":4117,"uf":"MG"},"TOLEDO":{"id":3169109,"pop":6336,"uf":"MG"},"TOMBOS":{"id":3169208,"pop":7683,"uf":"MG"},"TRÊS CORAÇÕES":{"id":3169307,"pop":80561,"uf":"MG"},"TRÊS MARIAS":{"id":3169356,"pop":33062,"uf":"MG"},"TRÊS PONTAS":{"id":3169406,"pop":57127,"uf":"MG"},"TUMIRITINGA":{"id":3169505,"pop":6797,"uf":"MG"},"TUPACIGUARA":{"id":3169604,"pop":25466,"uf":"MG"},"TURVOLÂNDIA":{"id":3169802,"pop":5099,"uf":"MG"},"UBÁ":{"id":3169901,"pop":117995,"uf":"MG"},"UBAÍ":{"id":3170008,"pop":12661,"uf":"MG"},"UBAPORANGA":{"id":3170057,"pop":12514,"uf":"MG"},"UBERABA":{"id":3170107,"pop":340277,"uf":"MG"},"UBERLÂNDIA":{"id":3170206,"pop":706597,"uf":"MG"},"UMBURATIBA":{"id":3170305,"pop":2582,"uf":"MG"},"UNAÍ":{"id":3170404,"pop":85461,"uf":"MG"},"UNIÃO DE MINAS":{"id":3170438,"pop":4265,"uf":"MG"},"URUANA DE MINAS":{"id":3170479,"pop":3256,"uf":"MG"},"URUCÂNIA":{"id":3170503,"pop":10333,"uf":"MG"},"URUCUIA":{"id":3170529,"pop":17470,"uf":"MG"},"VARGEM ALEGRE":{"id":3170578,"pop":6460,"uf":"MG"},"VARGEM BONITA":{"id":3170602,"pop":2143,"uf":"MG"},"VARGEM GRANDE DO RIO PARDO":{"id":3170651,"pop":5045,"uf":"MG"},"VARGINHA":{"id":3170701,"pop":137608,"uf":"MG"},"VARJÃO DE MINAS":{"id":3170750,"pop":7235,"uf":"MG"},"VÁRZEA DA PALMA":{"id":3170800,"pop":40101,"uf":"MG"},"VARZELÂNDIA":{"id":3170909,"pop":19290,"uf":"MG"},"VAZANTE":{"id":3171006,"pop":20692,"uf":"MG"},"VERDELÂNDIA":{"id":3171030,"pop":9527,"uf":"MG"},"VEREDINHA":{"id":3171071,"pop":5733,"uf":"MG"},"VERÍSSIMO":{"id":3171105,"pop":4090,"uf":"MG"},"VERMELHO NOVO":{"id":3171154,"pop":4852,"uf":"MG"},"VESPASIANO":{"id":3171204,"pop":131849,"uf":"MG"},"VIÇOSA":{"id":3171303,"pop":79910,"uf":"MG"},"VIEIRAS":{"id":3171402,"pop":3570,"uf":"MG"},"MATHIAS LOBATO":{"id":3171501,"pop":3157,"uf":"MG"},"VIRGEM DA LAPA":{"id":3171600,"pop":13729,"uf":"MG"},"VIRGÍNIA":{"id":3171709,"pop":8652,"uf":"MG"},"VIRGINÓPOLIS":{"id":3171808,"pop":10459,"uf":"MG"},"VIRGOLÂNDIA":{"id":3171907,"pop":5303,"uf":"MG"},"VISCONDE DO RIO BRANCO":{"id":3172004,"pop":43351,"uf":"MG"},"VOLTA GRANDE":{"id":3172103,"pop":5270,"uf":"MG"},"WENCESLAU BRAZ":{"id":3172202,"pop":2543,"uf":"MG"}};
 
 function getIBGEByNome(nomeMunicipio) {
@@ -2124,10 +1995,6 @@ function extrairMunicipio(displayName) {
 window.getIBGEByNome = getIBGEByNome;
 window.extrairMunicipio = extrairMunicipio;
 
-// GEOCODING via Anthropic API — funciona sem servidor, sem CORS
-// Seleciona o melhor trecho de rua para um número específico via interpolação
-
-// Helper: fetch com timeout via Promise.race (evita AbortSignal que falha com postMessage)
 function fetchWithTimeout(url, opts, ms) {
   return Promise.race([
     fetch(url, opts || {}),
@@ -2135,8 +2002,6 @@ function fetchWithTimeout(url, opts, ms) {
   ]);
 }
 
-// GEOCODING — Nominatim funciona quando hospedado (GitHub Pages, etc)
-// Google Maps Geocoding API — precisão de número de porta exato
 const GMAPS_KEY = 'AIzaSyBxf8WQy6U7eiO_QYQ6KMxPANrFElcQy_Y';
 
 async function geocodeEndereco(query) {
@@ -2160,9 +2025,7 @@ async function geocodeEndereco(query) {
 }
 
 async function geocodePOI(query) {
-  // Places API v1 (nova) — chamada direta sem proxy, suporta CORS
   const q = /brasil/i.test(query) ? query : query + ', Brasil';
-  // Tentativa 1: Places API v1 Text Search (direta, sem proxy)
   try {
     const body = JSON.stringify({
       textQuery: q,
@@ -2193,7 +2056,6 @@ async function geocodePOI(query) {
     }
   } catch(e) { console.warn('Places v1 erro:', e); }
 
-  // Tentativa 2: Places Text Search legado via allorigins (fallback)
   try {
     const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(q)}&language=pt-BR&region=br&key=${GMAPS_KEY}`;
     const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
@@ -2221,7 +2083,6 @@ async function geocodeEnderecoAll(query) {
   return result ? [result] : null;
 }
 
-// Valida se resultado tem relação com a query (evita matches falsos do Nominatim)
 function resultadoRelevante(result, query) {
   if (!result) return false;
   const palavras = query.toLowerCase()
@@ -2233,7 +2094,6 @@ function resultadoRelevante(result, query) {
   return palavras.some(w => display.includes(w));
 }
 
-// ── Open-Meteo Geocoding — gratuito, sem chave, sem cadastro ──
 async function geocodeOpenMeteo(query) {
   try {
     const q = query.replace(/,?\s*brasil$/i,'').trim();
@@ -2253,7 +2113,6 @@ async function geocodeOpenMeteo(query) {
   } catch(e) { console.warn('Open-Meteo geocoding erro:', e.message); return null; }
 }
 
-// ── Geoapify Geocoding — gratuito 3.000/dia (cadastro grátis em geoapify.com) ──
 const GEOAPIFY_KEY = '15354b247bdf4f55a353282cdd5b5e12'; // Geoapify — 3.000 chamadas/dia
 async function geocodeGeoapify(query) {
   if (!GEOAPIFY_KEY) return null;
@@ -2274,7 +2133,6 @@ async function geocodeGeoapify(query) {
   } catch(e) { console.warn('Geoapify geocoding erro:', e.message); return null; }
 }
 
-// ── OpenCage Geocoding — gratuito 2.500/dia (cadastro grátis em opencagedata.com) ──
 const OPENCAGE_KEY = 'bc2fb7edee614f7bafcd3d90ac009b5a'; // OpenCage — 2.500 chamadas/dia
 async function geocodeOpenCage(query) {
   if (!OPENCAGE_KEY) return null;
@@ -2295,7 +2153,6 @@ async function geocodeOpenCage(query) {
   } catch(e) { console.warn('OpenCage geocoding erro:', e.message); return null; }
 }
 
-// Fallback via Nominatim (OpenStreetMap) — sem chave de API
 async function geocodeNominatim(query) {
   try {
     const q = /brasil/i.test(query) ? query : query + ', Brasil';
@@ -2306,7 +2163,6 @@ async function geocodeNominatim(query) {
     if (!r.ok) return null;
     const d = await r.json();
     if (!d.length) return null;
-    // Filtra resultados relevantes (nome deve conter pelo menos uma palavra-chave)
     const relevantes = d.filter(item => resultadoRelevante(
       { display_name: item.display_name }, query
     ));
@@ -2331,7 +2187,6 @@ async function reverseGeocode(lat, lng) {
     if (!r.ok) return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
     const d = await r.json();
     if (d.status === 'OK' && d.results.length) {
-      // Extrai cidade e estado dos componentes do endereço
       const comps = d.results[0].address_components || [];
       const cidade = comps.find(c => c.types.includes('administrative_area_level_2'))?.long_name || '';
       const estado = comps.find(c => c.types.includes('administrative_area_level_1'))?.short_name || '';
@@ -2344,12 +2199,9 @@ async function reverseGeocode(lat, lng) {
   }
 }
 
-
 // ═══════════════════════════════════════════════════════════════
-// EXPANSOR DE ABREVIAÇÕES DE ENDEREÇO — Brasil
 // ═══════════════════════════════════════════════════════════════
 const ABREV_MAP = [
-  // Logradouros
   [/\bshop\.?\s*/gi,       'Shopping '],
   [/\bshp\.?\s*/gi,        'Shopping '],
   [/\bshopping\.?\s*/gi,   'Shopping '],
@@ -2381,7 +2233,6 @@ const ABREV_MAP = [
   [/\bemp\.\s*/gi,         'Empresarial '],
   [/\bcentr\.?\s*/gi,      'Centro '],
   [/\bctr\.\s*/gi,         'Centro '],
-  // Bairros / localidades
   [/\bjd\.\s*/gi,          'Jardim '],
   [/\bjard\.\s*/gi,        'Jardim '],
   [/\bvl\.\s*/gi,          'Vila '],
@@ -2397,7 +2248,6 @@ const ABREV_MAP = [
   [/\bsul\.\s*/gi,         'Sul '],
   [/\bleste\.?\s*/gi,      'Leste '],
   [/\boeste\.?\s*/gi,      'Oeste '],
-  // Nomes / títulos
   [/\bsto\.\s*/gi,         'Santo '],
   [/\bsta\.\s*/gi,         'Santa '],
   [/\bsão\.\s*/gi,         'São '],
@@ -2416,7 +2266,6 @@ const ABREV_MAP = [
   [/\bdep\.\s*/gi,         'Deputado '],
   [/\bmin\.\s*/gi,         'Ministro '],
   [/\bsec\.\s*/gi,         'Secretário '],
-  // Complementos numéricos
   [/\bn[°º]\.?\s*/gi,      'número '],
   [/\bnr?\.\s*/gi,         'número '],
   [/\bapto?\.?\s*/gi,      'apartamento '],
@@ -2427,18 +2276,15 @@ const ABREV_MAP = [
 function expandirAbreviacoes(texto) {
   if (!texto) return texto;
   let t = texto.trim();
-  // Aplica cada substituição
   for (const [re, sub] of ABREV_MAP) {
     t = t.replace(re, sub);
   }
-  // Colapsa espaços duplos
   t = t.replace(/\s{2,}/g, ' ').trim();
   return t;
 }
 window.expandirAbreviacoes = expandirAbreviacoes;
 
 // ═══════════════════════════════════════════════════════════════
-// BUSCADOR UNIVERSAL — lê qualquer formato do Google Maps
 // ═══════════════════════════════════════════════════════════════
 
 function detectarTipoInput(texto) {
@@ -2474,61 +2320,47 @@ function detectarTipoInput(texto) {
 }
 
 function parsearInputUniversal(texto) {
-  // Retorna { tipo, lat, lng, query }
   const t = texto.trim();
 
-  // 1. Coordenadas !3d!4d no link (mais preciso)
   let m = t.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
   if (m) return { tipo:'coord', lat:parseFloat(m[1]), lng:parseFloat(m[2]) };
 
-  // 2. Coordenadas @lat,lng no link
   m = t.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
   if (m) return { tipo:'coord', lat:parseFloat(m[1]), lng:parseFloat(m[2]) };
 
-  // 3. Coordenadas puras
   m = t.match(/^(-?\d{1,3}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)$/);
   if (m) return { tipo:'coord', lat:parseFloat(m[1]), lng:parseFloat(m[2]) };
 
-  // 4. Link curto (precisa resolver redirect)
   if (/maps\.app\.goo\.gl|goo\.gl\/maps/i.test(t))
     return { tipo:'link_curto', query:t };
 
-  // 5. Link longo — extrai nome do lugar
   if (/google\.com\/maps/i.test(t)) {
     const nm = t.match(/\/(?:place|search)\/([^/@?]+)/);
     const nome = nm ? decodeURIComponent(nm[1]).replace(/\+/g,' ') : '';
     return { tipo:'endereco', query: nome ? nome + ' Brasil' : 'São Paulo Brasil' };
   }
 
-  // 6. CEP isolado
   if (/^\d{5}-?\d{3}$/.test(t.replace(/\s/g,'')))
     return { tipo:'endereco', query: t + ' São Paulo Brasil' };
 
-  // 7. POI — shopping, supermercado, hospital, academia, etc.
-  // Expande abreviações ANTES de testar, para que "shop." → "Shopping " seja detectado
   const tExp = expandirAbreviacoes(t);
   const rePOI = /\b(shopping|supermercado|hipermercado|hypermarket|mall|center norte|boulevard|outlet|galeria|hospital|clínica|clinica|ubs|upa|escola|colégio|colegio|universidade|faculdade|academia|farmácia|farmacia|drogaria|aeroporto|estação|estacao|terminal|teatro|museu|estádio|estadio|ginásio|ginasio|parque\s+\w|zoológico|zoologico)\b/i;
   if (rePOI.test(tExp)) {
     return { tipo:'poi', query: tExp };
   }
 
-  // 8. Endereço genérico — abreviações já expandidas
   return { tipo:'endereco', query: tExp };
 }
 
 async function resolverLinkCurto(url) {
-  // Tenta resolver o redirect via allorigins (CORS)
   try {
     const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
     const r = await fetchWithTimeout(proxy, {}, 6000);
     const d = await r.json();
-    // allorigins retorna o URL final nos headers ou no body
     const finalUrl = d.status?.url || d.contents || '';
     if (finalUrl) {
-      // tenta extrair coords do URL expandido
       const parsed = parsearInputUniversal(finalUrl);
       if (parsed.tipo === 'coord') return parsed;
-      // tenta pegar o nome do lugar
       const nm = finalUrl.match(/\/(?:place|search)\/([^/@?]+)/);
       if (nm) return { tipo:'endereco', query: decodeURIComponent(nm[1]).replace(/\+/g,' ') + ' Brasil' };
     }
@@ -2560,7 +2392,6 @@ async function buscarUniversal() {
 
   let parsed = parsearInputUniversal(texto);
 
-  // Resolve link curto
   if (parsed.tipo === 'link_curto') {
     const resolvido = await resolverLinkCurto(parsed.query);
     if (resolvido) parsed = resolvido;
@@ -2574,7 +2405,6 @@ async function buscarUniversal() {
     lng = parsed.lng;
     label = await reverseGeocode(lat, lng);
   } else if (parsed.tipo === 'poi') {
-    // POI: tenta Places Text Search primeiro (mais preciso para shoppings, hospitais, etc.)
     let result = await geocodePOI(parsed.query);
     if (!result) result = await geocodeNominatim(parsed.query);              // fallback 1: Nominatim OSM
     if (!result) result = await geocodeGeoapify(parsed.query);              // fallback 2: Geoapify (se chave configurada)
@@ -2589,7 +2419,6 @@ async function buscarUniversal() {
     lng   = parseFloat(result.lon);
     label = result.display_name;
   } else {
-    // Geocodifica via Google → Nominatim → OpenCage → Geoapify → Open-Meteo
     let result = await geocodeEndereco(parsed.query);
     if (!result) result = await geocodeNominatim(parsed.query);   // fallback 1: OSM
     if (!result) result = await geocodeOpenCage(parsed.query);    // fallback 2: OpenCage (se chave configurada)
@@ -2607,14 +2436,12 @@ async function buscarUniversal() {
 
   reset();
 
-  // Determina zoom: mais preciso = mais zoom
   const isExato = /\d/.test(texto.split(',')[0]); // tem número no início
   const zoom = parsed.tipo === 'coord' ? 17 : parsed.tipo === 'poi' ? 16 : isExato ? 17 : 15;
 
   map.flyTo([lat, lng], zoom, { animate:true, duration:1 });
   analyse(lat, lng, label);
 
-  // Feedback visual no input
   input.style.borderColor = '#22c55e';
   input.style.background  = '#f0fdf4';
   setTimeout(() => { input.style.borderColor = ''; input.style.background = ''; }, 2000);
@@ -2648,9 +2475,7 @@ window.baixarPlataforma = baixarPlataforma;
 
 window.fecharSidebar = fecharSidebar;
 
-
 // ═══════════════════════════════════════════════════════
-// SISTEMA DE CLIENTES — MapXpand Demo
 // ═══════════════════════════════════════════════════════
 
 const CLIENTES = {
@@ -2721,7 +2546,6 @@ function fazerLogin() {
       btn.disabled = false;
       return;
     }
-    // Verifica senha: primeiro localStorage (senha personalizada), depois padrão
     const senhaSalva = (() => { try { return JSON.parse(localStorage.getItem('mx_senha_' + email)); } catch(e){ return null; } })();
     const senhaValida = senhaSalva ? senhaSalva === senha : cliente.senha === senha;
     if (!senhaValida) {
@@ -2741,7 +2565,6 @@ function fazerLogin() {
 }
 
 function inicializarParaCliente(cliente) {
-  // Atualiza header com dados do cliente
   const logoTxt = document.querySelector('.logo-title');
   const logoSub  = document.querySelector('.logo-sub');
   if (logoTxt) {
@@ -2754,11 +2577,9 @@ function inicializarParaCliente(cliente) {
     }
   }
 
-  // Atualiza avatar no header com foto ou inicial do usuário logado
   const inicialEl2 = document.getElementById('header-avatar-inicial');
   const imgEl2     = document.getElementById('header-avatar-img');
   if (inicialEl2) inicialEl2.textContent = (cliente.nome || '?')[0].toUpperCase();
-  // Carrega foto salva se houver
   try {
     const fotoSalva = localStorage.getItem('mx_foto_' + clienteAtivo.email);
     if (fotoSalva && imgEl2) {
@@ -2766,7 +2587,6 @@ function inicializarParaCliente(cliente) {
       imgEl2.style.display = 'block';
       if (inicialEl2) inicialEl2.style.display = 'none';
     }
-    // Carrega dados de perfil editados
     const perfilSalvo = localStorage.getItem('mx_perfil_' + clienteAtivo.email);
     if (perfilSalvo) {
       const p = JSON.parse(perfilSalvo);
@@ -2776,12 +2596,8 @@ function inicializarParaCliente(cliente) {
     }
   } catch(e){}
 
-  // ── Dispara modal de boas-vindas PRIMEIRO — mapa limpo antes de qualquer desenho ──
-  // O próprio mostrarBoasVindas chama zerarAnalise() internamente
   if (typeof mostrarBoasVindas === 'function') mostrarBoasVindas();
 
-  // Carrega unidades do cliente na LayerGroup (off-screen enquanto modal estiver aberto)
-  // As unidades ficam prontas para exibição quando o usuário ativar a camada D.Finefit
   if (window._zonasCanibal) window._zonasCanibal.forEach(c => { try { map.removeLayer(c); } catch(e){} });
   window._zonasCanibal = [];
 
@@ -2789,14 +2605,12 @@ function inicializarParaCliente(cliente) {
     layers.dfinefit.clearLayers();
     const raioCanib = (window.canibRaioAtual || 1.25) * 1000;
     cliente.unidades.forEach(u => {
-      // Zona canibalização — adicionada ao map mas ficará oculta (map.removeLayer já foi chamado em zerarAnalise)
       const c = L.circle([u.lat, u.lng], {
         radius: raioCanib,
         color:'#dc2626', fillColor:'#ef4444',
         fillOpacity:.07, weight:1, dashArray:'4,4'
       });
       window._zonasCanibal.push(c);
-      // Marker — adicionado à LayerGroup (que está off-screen)
       const icon = L.divIcon({
         className: '', iconSize:[0,0],
         html: `<div style="background:#0B132B;color:#C6A664;border:2px solid #C6A664;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;white-space:nowrap;font-family:Inter,sans-serif">${u.name.split('—')[0].trim()}</div>`
@@ -2806,7 +2620,6 @@ function inicializarParaCliente(cliente) {
         .addTo(layers.dfinefit);
     });
 
-    // Guarda bounds para uso posterior (ao ativar camada D.Finefit)
     const lats = cliente.unidades.map(u => u.lat);
     const lngs = cliente.unidades.map(u => u.lng);
     window._clienteBounds = [[Math.min(...lats)-0.05, Math.min(...lngs)-0.05],
@@ -2842,13 +2655,11 @@ function enviarSolicitacao() {
   const email = document.getElementById('cad-email').value;
   const wa    = document.getElementById('cad-whats').value;
   if (!nome || !email) { alert('Preencha nome e e-mail.'); return; }
-  // Abre WhatsApp para Ricardo com os dados
   const msg = encodeURIComponent(`Novo lead MapXpand!\nNome: ${nome}\nEmpresa: ${emp}\nEmail: ${email}\nWhatsApp: ${wa}`);
   window.open(`https://wa.me/5513982305997?text=${msg}`, '_blank');
   fecharCadastro();
   alert('Solicitação enviada! Ricardo entrará em contato em breve.');
 }
-
 
 function toggleSenha() {
   const inp = document.getElementById('login-senha');
@@ -2861,7 +2672,6 @@ function toggleSenha() {
 }
 window.toggleSenha = toggleSenha;
 
-// Salva/carrega credenciais
 function salvarCredenciais(email, senha) {
   try { localStorage.setItem('mx_email', email); localStorage.setItem('mx_senha', btoa(senha)); } catch(e){}
 }
@@ -2907,7 +2717,6 @@ window.fazerLogin = fazerLogin;
     if(!sb) return;
     sb.style.transition = 'transform .35s cubic-bezier(.4,0,.2,1), height .25s ease';
     const h = sb.getBoundingClientRect().height;
-    // Snap: se muito pequeno → recolhe; se grande → expande
     if(h < window.innerHeight * 0.2){
       sb.style.height = '56px';
       sidebarVisivel = false;
@@ -2929,16 +2738,11 @@ window.fazerLogin = fazerLogin;
   });
 })();
 
-
 // ═══════════════════════════════════════════════════════
 // MAPA DE CALOR DEMOGRÁFICO
-// Usa pontos dos municípios SP/MG com peso pela população
 // ═══════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════
-// SCORE DE ADERÊNCIA REGIONAL — MapXpand
-// Cada região recebe nota 0-100 conforme aderência
-// aos parâmetros ideais definidos pelo cliente
 // ═══════════════════════════════════════════════════════
 
 let scoreLayer = null;
@@ -2954,9 +2758,7 @@ let scoreParams = {
   pesosFitness: 20
 };
 
-// Dataset base: municípios com população, perfil estimado e dados proxy
 const MUNICIPIOS_BASE = [
-  // [lat, lng, pop, rendaScore(0-100), fluxoProxy, fitnessProxy, nome]
   [-23.5505,-46.6333, 12396372, 72, 95, 9.2, 'São Paulo'],
   [-23.4543,-46.5333,  1404694, 68, 80, 8.1, 'Guarulhos'],
   [-22.9056,-47.0608,  1223237, 74, 82, 8.8, 'Campinas'],
@@ -3009,35 +2811,28 @@ const MUNICIPIOS_BASE = [
   [-16.6864,-49.2643,  1555626, 58, 68, 7.5, 'Goiânia'],
 ];
 
-// Parâmetros de renda por código
 const RENDA_SCORES = { 'AB': 80, 'BC': 60, 'CD': 40, 'DE': 20 };
 
 function calcularScoreRegiao(mun, params) {
   const { popMin, rendaAlvo, fluxoMin, potFitnessMin, pesosPop, pesosRenda, pesosFluxo, pesosFitness } = params;
   const [, , pop, rendaScore, fluxoProxy, fitnessProxy] = mun;
 
-  // Score de população: % de aderência ao mínimo (cap em 100)
   const sPop = Math.min((pop / popMin) * 100, 100);
 
-  // Score de renda: proximidade ao perfil alvo
   const rendaAlvoScore = RENDA_SCORES[rendaAlvo] || 60;
   const diffRenda = Math.abs(rendaScore - rendaAlvoScore);
   const sRenda = Math.max(0, 100 - diffRenda * 1.5);
 
-  // Score de fluxo: % do mínimo desejado (proxy 0-100 do dataset)
   const fluxoReal = fluxoProxy * 1000; // proxy → veículos estimados
   const sFluxo = Math.min((fluxoReal / fluxoMin) * 100, 100);
 
-  // Score fitness: % do potencial mínimo
   const sFitness = Math.min((fitnessProxy / potFitnessMin) * 100, 100);
 
-  // Score ponderado
   const total = (sPop * pesosPop + sRenda * pesosRenda + sFluxo * pesosFluxo + sFitness * pesosFitness) / 100;
   return Math.round(Math.min(total, 100));
 }
 
 function scoreParaCor(score) {
-  // 0=azul frio, 25=azul-esverdeado, 40=verde, 55=amarelo, 70=laranja, 85+=vermelho quente
   if (score >= 85) return { fill: '#ef4444', border: '#dc2626', opacity: 0.85 };
   if (score >= 70) return { fill: '#f97316', border: '#ea580c', opacity: 0.78 };
   if (score >= 55) return { fill: '#eab308', border: '#ca8a04', opacity: 0.72 };
@@ -3047,7 +2842,6 @@ function scoreParaCor(score) {
 }
 
 function renderScoreMap(params) {
-  // Remove camada anterior
   if (scoreLayer) { map.removeLayer(scoreLayer); scoreLayer = null; }
 
   scoreLayer = L.layerGroup();
@@ -3061,7 +2855,6 @@ function renderScoreMap(params) {
     const renda = mun[3];
     const fitness = mun[5];
 
-    // Raio proporcional à população (min 8km, max 35km)
     const raioKm = Math.max(8, Math.min(35, Math.sqrt(mun[2] / 10000)));
 
     const circle = L.circle([mun[0], mun[1]], {
@@ -3073,7 +2866,6 @@ function renderScoreMap(params) {
       interactive: true
     });
 
-    // Label central com score
     const label = L.marker([mun[0], mun[1]], {
       icon: L.divIcon({
         className: '',
@@ -3177,7 +2969,6 @@ window.fecharScoreMap = fecharScoreMap;
 function abrirPainelScore(e) {
   if (e) e.preventDefault();
   if (scoreAtivo) { fecharScoreMap(); return; }
-  // Pré-seleciona o segmento ativo: clienteAtivo > tela inicial (mapeado) > fallback academia
   const segAtivo = clienteAtivo?.segmento || window._segmentoScoreKey || 'academia';
   const sel = document.getElementById('sp-segmento');
   if(sel){ sel.value = segAtivo; atualizarCampoConsumo(segAtivo); }
@@ -3212,12 +3003,10 @@ function aplicarScoreParams() {
 }
 window.aplicarScoreParams = aplicarScoreParams;
 
-// Toggle antigo mantido como alias
 function toggleHeatmap() { abrirPainelScore(); }
 window.toggleHeatmap = toggleHeatmap;
 
 // ═══════════════════════════════════════════════════════
-// BUSCA AUTOMÁTICA DE CONCORRENTES — Google Places API
 // ═══════════════════════════════════════════════════════
 
 let concorrentesAutoLayer = L.layerGroup();
@@ -3241,9 +3030,6 @@ const SEGMENTO_TIPOS = {
 };
 
 // ── CONFIG DE CONCORRÊNCIA POR SEGMENTO ─────────────────────────
-// convPop = taxa de consumo do segmento sobre a população no raio (benchmarks IBGE/SEBRAE)
-// convFluxo fixo em 2% do VMD para todos os segmentos
-// capturaBairro fixo em 125 clientes por unidade concorrente de bairro
 const SEGMENTO_CONCORRENCIA = {
   academia:    {
     emoji1:'🏋️', label1:'Academias independentes / bairro',
@@ -3400,7 +3186,6 @@ async function buscarConcorrentesAuto(lat, lng, forcar=false) {
     if (d.error) throw new Error(d.error.message);
     places = d.places || [];
   } catch(e) {
-    // Fallback Overpass
     try { await buscarConcorrentesOverpass(lat, lng); return; } catch(e2){}
   }
 
@@ -3421,10 +3206,8 @@ async function buscarConcorrentesAuto(lat, lng, forcar=false) {
   if (label) label.textContent = `📍 Concorrentes (${places.length} encontrados)`;
 }
 
-
 // SIDEBAR TOGGLE MOBILE
 let sidebarVisivel = true;
-// Garante sidebar visível ao iniciar
 document.addEventListener('DOMContentLoaded', function() {
   const sb = document.getElementById('sidebar');
   if (sb) sb.classList.remove('hidden');
@@ -3459,8 +3242,6 @@ function baixarPlataforma() {
   a.click();
 }
 window.baixarPlataforma = baixarPlataforma;
-
-
 
 function toggleConcorrentesAuto(labelEl) {
   const cb = document.getElementById('cb-concorrentes-auto');
@@ -3507,10 +3288,8 @@ async function buscarConcorrentesOverpass(lat, lng) {
 window.toggleConcorrentesAuto = toggleConcorrentesAuto;
 
 function mudarSegmento(valor) {
-  // Atualiza o segmento ativo
   if (clienteAtivo) clienteAtivo.segmento = valor;
   
-  // Se concorrentes já estão ativos, recarrega com novo segmento
   if (concorrentesAutoAtivo) {
     concorrentesAutoLayer.clearLayers();
     ultimaBuscaPos = null;
@@ -3519,8 +3298,6 @@ function mudarSegmento(valor) {
   }
 }
 window.mudarSegmento = mudarSegmento;
-
-
 
 // ═══════════════════════════════════════════════════════
 // SISTEMA DE PERFIL DO USUÁRIO
@@ -3546,17 +3323,14 @@ function fecharPerfilDropdown() {
 function preencherFormularioPerfil() {
   if (!clienteAtivo) return;
   const c = clienteAtivo;
-  // Cabeçalho
   document.getElementById('perfil-nome-display').textContent    = c.nome    || '—';
   document.getElementById('perfil-empresa-display').textContent = c.empresa || '—';
   document.getElementById('perfil-plano-badge').textContent     = c.plano   || 'Starter';
   document.getElementById('perfil-foto-inicial').textContent    = (c.nome||'?')[0].toUpperCase();
-  // Campos editáveis
   document.getElementById('perfil-edit-nome').value    = c.nome    || '';
   document.getElementById('perfil-edit-empresa').value = c.empresa || '';
   document.getElementById('perfil-edit-whats').value   = c.whatsapp|| '';
   document.getElementById('perfil-edit-email').value   = c.email   || '';
-  // Foto salva
   const fotoSalva = localStorage.getItem('mx_foto_' + c.email);
   if (fotoSalva) {
     aplicarFotoPerfil(fotoSalva);
@@ -3573,11 +3347,9 @@ function carregarFotoPerfil(input) {
   reader.onload = function(e) {
     const base64 = e.target.result;
     aplicarFotoPerfil(base64);
-    // Salva localmente
     if (clienteAtivo?.email) {
       try { localStorage.setItem('mx_foto_' + clienteAtivo.email, base64); } catch(err){}
     }
-    // Atualiza avatar no header também
     atualizarAvatarHeader(base64, null);
   };
   reader.readAsDataURL(file);
@@ -3597,24 +3369,18 @@ function salvarPerfil() {
   const empresa = document.getElementById('perfil-edit-empresa').value.trim();
   const whats   = document.getElementById('perfil-edit-whats').value.trim();
   if (!nome) { alert('O nome não pode ficar em branco.'); return; }
-  // Atualiza objeto em memória
   clienteAtivo.nome    = nome;
   clienteAtivo.empresa = empresa;
   clienteAtivo.whatsapp= whats;
-  // Persiste no localStorage
   try {
     const dados = { nome, empresa, whatsapp: whats };
     localStorage.setItem('mx_perfil_' + clienteAtivo.email, JSON.stringify(dados));
   } catch(e){}
-  // Atualiza cabeçalho do painel
   document.getElementById('perfil-nome-display').textContent    = nome;
   document.getElementById('perfil-empresa-display').textContent = empresa;
-  // Atualiza avatar header com nova inicial
   atualizarAvatarHeader(null, nome);
-  // Atualiza logo/subtítulo do sidebar
   const logoTxt = document.getElementById('logo-txt');
   if (logoTxt) logoTxt.innerHTML = `<span style="font-size:13px;letter-spacing:.06em">${empresa}</span>`;
-  // Feedback visual no botão
   const btn = event.target.closest('button');
   const orig = btn.innerHTML;
   btn.innerHTML = '✅ Salvo!';
@@ -3653,7 +3419,6 @@ function toggleAlterarSenha() {
   btn.style.borderColor = aberto ? '#e2e8f0' : '#2563eb';
   btn.style.color       = aberto ? '#475569' : '#2563eb';
   if (!aberto) {
-    // Limpa campos ao abrir
     ['senha-atual','senha-nova','senha-confirmar'].forEach(id => {
       const el = document.getElementById(id); if(el) el.value = '';
     });
@@ -3714,7 +3479,6 @@ function confirmarAlteracaoSenha() {
   if (!atual || !nova || !confirmar) return mostrarErro('Preencha todos os campos.');
   if (!clienteAtivo) return;
 
-  // Verifica senha atual — checa memória e localStorage
   const senhaAtualCorreta = CLIENTES[clienteAtivo.email]?.senha === atual
     || JSON.parse(localStorage.getItem('mx_senha_' + clienteAtivo.email) || 'null') === atual;
   if (!senhaAtualCorreta) return mostrarErro('Senha atual incorreta.');
@@ -3722,19 +3486,15 @@ function confirmarAlteracaoSenha() {
   if (nova !== confirmar)  return mostrarErro('As senhas não coincidem.');
   if (nova === atual)      return mostrarErro('A nova senha deve ser diferente da atual.');
 
-  // Salva nova senha no localStorage
   try { localStorage.setItem('mx_senha_' + clienteAtivo.email, JSON.stringify(nova)); } catch(e){}
-  // Atualiza objeto em memória
   if (CLIENTES[clienteAtivo.email]) CLIENTES[clienteAtivo.email].senha = nova;
 
-  // Feedback sucesso
   erroEl.style.background = '#f0fdf4';
   erroEl.style.borderColor = '#bbf7d0';
   erroEl.style.color = '#16a34a';
   erroEl.textContent = '✅ Senha alterada com sucesso!';
   erroEl.style.display = 'block';
 
-  // Fecha após 2s
   setTimeout(() => {
     toggleAlterarSenha();
     erroEl.style.background = '#fef2f2';
@@ -3796,7 +3556,6 @@ function renderFiltros() {
   if (!lista) return;
   const filtros = _getFiltros();
 
-  // Limpa itens antigos (mantém o placeholder vazio)
   Array.from(lista.querySelectorAll('.filtro-item')).forEach(el => el.remove());
 
   if (filtros.length === 0) {
@@ -3805,7 +3564,6 @@ function renderFiltros() {
   }
   if (vazio) vazio.style.display = 'none';
 
-  // Ordena: filtro ativo primeiro
   const ordenados = [...filtros].sort((a,b) => {
     if (a.id === _filtroAtivoId) return -1;
     if (b.id === _filtroAtivoId) return  1;
@@ -3891,18 +3649,15 @@ function carregarFiltro(id) {
   if (!f) return;
   const e = f.estado;
 
-  // Restaura busca
   const inp = document.getElementById('universal-input');
   if (inp) inp.value = e.searchQuery || '';
 
-  // Restaura raio
   const slider = document.getElementById('raioSlider');
   if (slider && e.raioIdx !== undefined) {
     slider.value = e.raioIdx;
     if (typeof updateRaio === 'function') updateRaio(e.raioIdx);
   }
 
-  // Restaura camadas
   if (e.layers) {
     ['dfinefit','expansion','cannibal','competitor'].forEach(id => {
       if (e.layers[id] !== undefined && layerState[id] !== e.layers[id]) {
@@ -3911,12 +3666,10 @@ function carregarFiltro(id) {
     });
   }
 
-  // Restaura posição do mapa
   if (e.mapCenter && typeof map !== 'undefined') {
     map.setView(e.mapCenter, e.mapZoom || 13);
   }
 
-  // Marca filtro ativo e re-renderiza chips
   _filtroAtivoId = f.id;
   renderFiltros();
   const badge = document.getElementById('filtro-ativo-badge');
@@ -3947,7 +3700,6 @@ function novaAnalise() {
 
 // ── Zera todas as configurações de busca ──────────────
 function zerarAnalise() {
-  // 1. Inputs e feedbacks
   const inp = document.getElementById('universal-input');
   if (inp) inp.value = '';
   ['search-error','input-tipo-tag'].forEach(id=>{ const el=document.getElementById(id); if(el)el.style.display='none'; });
@@ -3956,52 +3708,40 @@ function zerarAnalise() {
   const ar = document.getElementById('analysisResult');
   if (ar) { ar.innerHTML=''; ar.style.display='none'; }
 
-  // 2. Remove TODAS as camadas do mapa
   if (typeof map !== 'undefined') {
-    // Marcador de busca
     if (window.searchMarker) { try { if(typeof layers!=='undefined'&&layers.search) layers.search.removeLayer(window.searchMarker); } catch(e){} window.searchMarker=null; }
-    // Raio de análise
     if (window._raioAnalise) { try { map.removeLayer(window._raioAnalise); } catch(e){} window._raioAnalise=null; }
-    // Todas as layer groups
     if (typeof layers !== 'undefined') {
       ['dfinefit','expansion','cannibal','competitor','search'].forEach(id => {
         try { if(layers[id]&&map.hasLayer(layers[id])) map.removeLayer(layers[id]); } catch(e){}
       });
     }
-    // Concorrentes auto
     if (typeof concorrentesAutoLayer !== 'undefined') {
       try { concorrentesAutoLayer.clearLayers(); map.removeLayer(concorrentesAutoLayer); } catch(e){}
     }
-    // Score / heatmap
     if (typeof scoreLayer !== 'undefined' && scoreLayer) { try { map.removeLayer(scoreLayer); } catch(e){} }
     if (typeof scoreMapLayer !== 'undefined' && scoreMapLayer) { try { map.removeLayer(scoreMapLayer); } catch(e){} }
-    // Círculos de captação
     if (typeof captacaoCircles !== 'undefined') {
       captacaoCircles.forEach(c=>{ try{map.removeLayer(c);}catch(e){} });
       captacaoCircles.length=0;
     }
-    // Zonas canibalização extras
     if (window._zonasCanibal) {
       window._zonasCanibal.forEach(c=>{ try{map.removeLayer(c);}catch(e){} });
       window._zonasCanibal=[];
     }
-    // Pins e rede markers
     if (typeof pinsLayer!=='undefined'&&pinsLayer) { try{pinsLayer.clearLayers();}catch(e){} }
     if (typeof redeMarkers!=='undefined'&&redeMarkers&&redeMarkers.length) {
       redeMarkers.forEach(m=>{ try{map.removeLayer(m);}catch(e){} });
       redeMarkers.length=0;
     }
-    // Limpa unidades da rede vinculadas à canibalização
     if (typeof window !== 'undefined') window.redeUnidades = [];
   }
 
-  // 3. Reseta layerState
   if (typeof layerState !== 'undefined') {
     layerState.dfinefit=false; layerState.expansion=false;
     layerState.cannibal=false; layerState.competitor=false;
   }
 
-  // 4. Sincroniza UI
   ['cb-dfinefit','cb-raio','cb-heatmap','cb-concorrentes-auto'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.checked=false;
   });
@@ -4010,20 +3750,16 @@ function zerarAnalise() {
   const balao=document.getElementById('balao-espirais'); if(balao) balao.style.display='none';
   if (typeof espiraisAtivo!=='undefined') window.espiraisAtivo=false;
 
-  // 5. Reset raio
   const slider=document.getElementById('raioSlider');
   if(slider){ slider.value=2; if(typeof updateRaio==='function') updateRaio(2); }
 
-  // 6. Limpa coordenadas
   window._lastAnalysisLat=null; window._lastAnalysisLng=null;
 
-  // 7. Fecha modais
   ['modal-concorrencia','relatorio-modal','modal-canib'].forEach(id=>{
     const m=document.getElementById(id);
     if(m){ m.style.display='none'; m.classList&&m.classList.remove('show'); }
   });
 
-  // 8. Centraliza mapa
   if (typeof map!=='undefined') map.setView([-23.55,-46.63],11);
 
   _mostrarToast('🔄 Mapa zerado. Pronto para nova análise!');
@@ -4054,7 +3790,6 @@ function _mostrarToast(msg) {
   }, 2800);
 }
 
-// Expõe globalmente
 window.zerarAnalise        = zerarAnalise;
 window.novaAnalise         = novaAnalise;
 window.abrirSalvarFiltro   = abrirSalvarFiltro;
@@ -4064,19 +3799,14 @@ window.carregarFiltro      = carregarFiltro;
 window.deletarFiltro       = deletarFiltro;
 window.renderFiltros       = renderFiltros;
 
-// Inicializa ao carregar
 document.addEventListener('DOMContentLoaded', () => {
   renderFiltros();
 });
-// Fallback se DOMContentLoaded já disparou
 if (document.readyState !== 'loading') renderFiltros();
 
-
 // ═══════════════════════════════════════════════════════════════════
-// SISTEMA DE RELATÓRIO TÉCNICO MAPXPAND
 // ═══════════════════════════════════════════════════════════════════
 
-// Busca vias principais via Overpass API (adaptado do Nova Fit)
 let topViasData = [];
 let overpassCache = {};
 
@@ -4121,12 +3851,10 @@ async function buscarViasOverpass(lat, lng, raioMetros) {
   return vias;
 }
 
-// Formata número brasileiro
 function fmtNum(n) {
   return new Intl.NumberFormat('pt-BR').format(Math.round(n));
 }
 
-// Abre/fecha modal
 function fecharRelatorio() {
   document.getElementById('relatorio-modal').classList.remove('show');
 }
@@ -4172,7 +3900,6 @@ function exportarWord() {
   a.click();
 }
 
-// FUNÇÃO PRINCIPAL — Gerar Relatório
 async function gerarRelatorio() {
   const btn = document.getElementById('btn-gerar-relatorio');
   const orig = btn.innerHTML;
@@ -4180,7 +3907,6 @@ async function gerarRelatorio() {
   btn.disabled = true;
 
   try {
-    // Usa dados da última análise feita no mapa
     if (!_ultimaAnalise) {
       alert('Analise um ponto no mapa antes de gerar o relatório.');
       btn.innerHTML = orig; btn.disabled = false; return;
@@ -4188,21 +3914,14 @@ async function gerarRelatorio() {
     const { score, label: enderecoAnalisado, raioKm, popNoRaio, ibge, lat, lng, viaTop, vmd, bdc } = _ultimaAnalise;
     const raio = raioKm * 1000;
 
-    // Dados dos campos de concorrência (do modal)
     const qtdBairro = parseInt(document.getElementById('gyms-bairro')?.value || 0);
     const qtdRede = parseInt(document.getElementById('gyms-rede')?.value || 0);
 
-    // Parâmetros do segmento ativo
     const segId = clienteAtivo?.segmento || window._segmentoScoreKey || 'academia';
     const segCfg = SEGMENTO_CONCORRENCIA[segId] || SEGMENTO_CONCORRENCIA.academia;
 
-    // Fluxo viário — extrai número do vmd formatado ou estima
     const vmdNum = parseInt((vmd||'0').replace(/\D/g,'')) || Math.round((ibge?.pop || popNoRaio || 50000) * 0.3);
 
-    // Metodologia de projeção:
-    // convPop   = população no raio × taxa de consumo do segmento (ex: fitness 7%, saúde 8%...)
-    // convFluxo = 2% do VMD (demanda por fluxo de passagem) — fixo para todos os segmentos
-    // satBairro = qtd concorrentes bairro × 125 — fixo por unidade
     const popRaio    = popNoRaio || 0;
     const convPop    = Math.round(popRaio * segCfg.convPop);  // taxa específica por segmento
     const convFluxo  = Math.round(vmdNum  * segCfg.convFluxo); // 2% do VMD
@@ -4211,20 +3930,16 @@ async function gerarRelatorio() {
     let projFinal    = Math.round((convPop + convFluxo - satBairro) / split);
     if (projFinal < 0) projFinal = 0;
 
-    // Busca vias para o relatório (já temos o vmd da análise)
     const fluxoMedio = vmdNum;
 
-    // 6. Preenche o relatório
     const hoje = new Date().toLocaleDateString('pt-BR');
     document.getElementById('rep-data').textContent = hoje;
-    // Prioriza dados do BigDataCloud, fallback para IBGE
     document.getElementById('rep-estado').textContent = bdc?.siglaEstado || bdc?.estado || ibge?.uf || 'SP';
     document.getElementById('rep-municipio').textContent = bdc?.cidade || ibge?.nome || 'São Paulo';
     document.getElementById('rep-loc-nome').textContent = bdc?.bairro ? `${bdc.bairro} — ${bdc.cidade}` : (enderecoAnalisado || 'Ponto Analisado');
     document.getElementById('rep-loc-coords').textContent = `LAT: ${lat.toFixed(4)} | LNG: ${lng.toFixed(4)} | RAIO: ${raio}m | SCORE: ${score}/100${bdc?.cep ? ' | CEP: '+bdc.cep : ''}`;
 
     const popDisplay = ibge?.pop || popNoRaio;
-    // Atualiza labels dinâmicos do relatório pelo segmento
     const repLabelB = document.getElementById('rep-label-bairro');
     const repLabelR = document.getElementById('rep-label-rede');
     const repUnid   = document.getElementById('rep-unidade-label');
@@ -4246,7 +3961,6 @@ async function gerarRelatorio() {
     document.getElementById('rep-split-rede').textContent = `Rateio: ${split} player(s)`;
     document.getElementById('rep-proj-val').textContent = fmtNum(projFinal);
 
-    // 7. Veredito dinâmico
     const vBox = document.getElementById('rep-veredito-box');
     const vTit = document.getElementById('rep-veredito-titulo');
     const vMsg = document.getElementById('rep-veredito-msg');
@@ -4273,7 +3987,6 @@ async function gerarRelatorio() {
       vParecer.textContent = `Score MAPXpand: ${score}/100. Segmento: ${segCfg.unidade}. Saturação da concorrência (${totalPlayers} player${totalPlayers !== 1 ? 's' : ''}) combinada com fluxo insuficiente projeta operação abaixo do break-even. Comitê recomenda rejeição do ponto e busca por novos eixos na zona analítica.`;
     }
 
-    // 8. Top vias — monta lista a partir dos dados da análise
     const vmdParsed = parseInt((vmd||'0').replace(/\D/g,'')) || 0;
     const top3 = (viaTop && viaTop !== 'Calculando...' && viaTop !== '–' && vmdParsed > 0)
       ? [{ nome: viaTop, vmd: vmdParsed }]
@@ -4283,7 +3996,6 @@ async function gerarRelatorio() {
       ? top3.map((v,i) => `<li style="margin-bottom:5px;display:flex;align-items:start;gap:6px"><span style="background:#0B132B;color:#C6A664;border-radius:3px;padding:1px 5px;font-size:8px;flex-shrink:0">#${i+1}</span><div><span style="display:block">${v.nome}</span><span style="font-size:8px;font-weight:600;color:#64748b">~${fmtNum(Math.round(v.vmd * 1.15))} passantes/dia</span></div></li>`).join('')
       : '<li style="list-style:none;margin-left:-14px;color:#ef4444;font-size:9px">Nenhuma via arterial detectada. Avaliar imóveis de esquina.</li>';
 
-    // 9. Box IBGE + BigDataCloud
     const ibgeBox = document.getElementById('rep-ibge-box');
     const ibgeContent = document.getElementById('rep-ibge-content');
     if (ibge && ibge.pop) {
@@ -4299,7 +4011,6 @@ async function gerarRelatorio() {
         `<strong>${bdc.cidade}</strong> — ${bdc.siglaEstado||bdc.estado}${bdc.bairro ? ` &nbsp;|&nbsp; 🏘️ <strong>${bdc.bairro}</strong>` : ''}${bdc.cep ? ` &nbsp;|&nbsp; CEP: <strong>${bdc.cep}</strong>` : ''} &nbsp;|&nbsp; <em style="color:#64748b">Fonte: BigDataCloud</em>`;
     }
 
-    // Abre o modal
     document.getElementById('relatorio-modal').classList.add('show');
 
   } catch(e) {
@@ -4367,9 +4078,7 @@ window.anexarImagem = anexarImagem;
 window.exportarPDF = exportarPDF;
 window.exportarWord = exportarWord;
 
-
 // ═══════════════════════════════════
-// MODO PIN — adicionar pins de análise
 // ═══════════════════════════════════
 let modoPIN = false;
 let pinsLayer = L.layerGroup().addTo(map);
@@ -4400,21 +4109,16 @@ function analisarPin(id) {
   const d = _pinsData[id];
   if (!d) return;
   map.closePopup();
-  // 1. Primeiro roda a análise geográfica em background
   analyse(d.lat, d.lng, d.label);
-  // 2. Abre modal para o usuário informar concorrência → depois gera relatório
   abrirModalConcorrenciaPin(id);
 }
 window.analisarPin = analisarPin;
 
 function abrirModalConcorrenciaPin(pinId) {
-  // Preenche dados do pin no modal para contexto
   const d = _pinsData[pinId];
   const endLabel = d?.label ? d.label.split(',').slice(0,2).join(',') : 'Ponto selecionado';
-  // Preenche cabeçalho do modal com endereço
   const tit = document.getElementById('modal-conc-endereco');
   if (tit) tit.textContent = endLabel;
-  // Sempre começa zerado — usuário informa manualmente
   document.getElementById('gyms-bairro').value = 0;
   document.getElementById('gyms-rede').value   = 0;
   atualizarModalConcorrencia();
@@ -4446,7 +4150,6 @@ function iniciarEdicaoRede(e) {
     novoSpan.innerHTML = novoNome + ' <span style="font-size:8px;color:#C6A664;margin-left:4px" title="Editar nome">✏️</span>';
     input.replaceWith(novoSpan);
     
-    // Atualiza os markers da rede no mapa
     atualizarNomeRede(novoNome);
   };
   
@@ -4455,7 +4158,6 @@ function iniciarEdicaoRede(e) {
 }
 
 function atualizarNomeRede(nome) {
-  // Atualiza os labels dos pins da rede no mapa
   layers.dfinefit.eachLayer(marker => {
     const icon = marker.options.icon;
     if (icon && icon.options.html) {
@@ -4470,21 +4172,17 @@ function atualizarNomeRede(nome) {
 window.iniciarEdicaoRede = iniciarEdicaoRede;
 window.atualizarNomeRede = atualizarNomeRede;
 
-
 // ═══════════════════════════════════════════
-// ESPIRAIS + AGENTE IA — integração
 // ═══════════════════════════════════════════
 let espiraisAtivo = true;
 let balaoVisivel  = false;
 
 function ativarEspiraisIA() {
   espiraisAtivo = !espiraisAtivo;
-  // toggle visual da camada
   const chk = document.getElementById('chk-expansion');
   if(chk) chk.classList.toggle('on', espiraisAtivo);
   espiraisAtivo ? map.addLayer(layers.expansion) : map.removeLayer(layers.expansion);
 
-  // Mostra/esconde balão
   const balao = document.getElementById('balao-espirais');
   if(!balao) return;
   if(espiraisAtivo && !balaoVisivel){
@@ -4498,7 +4196,6 @@ function ativarEspiraisIA() {
 window.ativarEspiraisIA = ativarEspiraisIA;
 
 function focarAgentIA() {
-  // Fecha balão e scrolla até o chat
   const balao = document.getElementById('balao-espirais');
   if(balao) { balao.style.display='none'; balaoVisivel=false; }
   const input = document.getElementById('ia-input');
@@ -4507,7 +4204,6 @@ function focarAgentIA() {
 window.focarAgentIA = focarAgentIA;
 
 // ═══════════════════════════════════════════
-// AGENTE IA DE EXPANSÃO — MapXpand
 // ═══════════════════════════════════════════
 
 let iaHistorico = [];
@@ -4546,7 +4242,6 @@ async function enviarMensagemIA() {
   const pergunta = input.value.trim();
   if (!pergunta) return;
 
-  // Detecta se o usuário colou uma chave Groq diretamente no chat
   if (pergunta.trim().startsWith('gsk_') && pergunta.trim().length > 20) {
     input.value = '';
     localStorage.setItem('mapxpand_groq_key', pergunta.trim());
@@ -4563,20 +4258,17 @@ async function enviarMensagemIA() {
   iaAdicionarMensagem(pergunta, 'user');
   iaTyping(true);
 
-  // Contexto do ponto analisado
   let contextoMapa = '';
   const lastAnalysis = document.getElementById('analysisResult')?.innerText;
   if (lastAnalysis && lastAnalysis.length > 10) {
     contextoMapa = `\n\nDADOS DO PONTO ATUALMENTE ANALISADO NA PLATAFORMA:\n${lastAnalysis.substring(0, 1000)}`;
   }
-  // Contexto da rede do cliente
   const nomeRede = clienteAtivo?.empresa || clienteAtivo?.nome || 'a rede do cliente';
   const numUnidades = clienteAtivo?.unidades?.length || 0;
   const raioAtual = document.getElementById('raioVal')?.textContent || '1,5 km';
 
   iaHistorico.push({ role: 'user', content: pergunta });
 
-  // ── Detecta perfil do cliente pelo histórico e contexto ──
   const historicoTexto = iaHistorico.map(m=>m.content).join(' ').toLowerCase();
   const temInvestimento = historicoTexto.match(/r\$\s*([\d.,]+)\s*(mil|k|mil|milhão|mi)/i);
   const temUnidades = numUnidades > 0;
@@ -4649,7 +4341,6 @@ ESTÁGIO 4 — ESCALA (16+ unidades):
 
 6. Responda em português brasileiro, direto e sem jargão desnecessário. Máximo 4 parágrafos objetivos. Use emojis com moderação. O cliente quer DECISÃO, não aula.`;
 
-  // Verifica chave Groq
   let groqKey = localStorage.getItem('mapxpand_groq_key') || '';
   if (!groqKey) {
     iaTyping(false);
@@ -4724,7 +4415,6 @@ function iaConfigurarChave() {
 }
 window.iaConfigurarChave = iaConfigurarChave;
 
-// Avisa o agente após análise de ponto
 const _origAnalyse = window.analyse;
 window.analyse = function(lat, lng, label) {
   _origAnalyse && _origAnalyse(lat, lng, label);
@@ -4737,7 +4427,6 @@ window.analyse = function(lat, lng, label) {
 };
 
 window.enviarMensagemIA = enviarMensagemIA;
-
 
 window.toggleModoPIN = toggleModoPIN;
 
@@ -4754,14 +4443,11 @@ window.limparTodosPins = limparTodosPins;
 
 // CLIQUE NO MAPA
 map.on('click', async e => {
-  // Ignora clique se foi no pin vermelho de análise
   if (window._searchMarkerClicked) return;
 
   const { lat, lng } = e.latlng;
 
-  // Sempre cria pin ao clicar no mapa
   if (true) {
-    // Adiciona pin numerado para análise
     pinContador++;
     const id   = pinContador;
     const cor  = COR_PINS[(id - 1) % COR_PINS.length];
@@ -4784,7 +4470,6 @@ map.on('click', async e => {
     marker._pinId = id;
     _pinsData[id] = { lat, lng, label: label || 'Ponto '+id };
 
-    // Gera score rápido para o popup
     const ibge = getDadosIBGE(lat, lng);
     const pop  = ibge?.pop ? new Intl.NumberFormat('pt-BR').format(ibge.pop) : '—';
 
@@ -4817,7 +4502,6 @@ map.on('click', async e => {
     return;
   }
 
-  // Clique normal — analisa sem pin
   const label = await reverseGeocode(lat, lng);
   analyse(lat, lng, label);
 });
@@ -5022,7 +4706,6 @@ function showSearchError(msg){
   </div>
 </div>
 
-
 <!-- MODAL CONCORRÊNCIA -->
 
     <div style="font-size:12px;color:#64748b;margin-bottom:20px">Informe os concorrentes no raio analisado</div>
@@ -5041,8 +4724,6 @@ function showSearchError(msg){
       <button onclick="confirmarRelatorio()" style="flex:2;background:#0B132B;color:#C6A664;border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">Gerar Relatório →</button>
     </div>
   
-
-
 <!-- MODAL CONCORRÊNCIA -->
 <div id="modal-concorrencia" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(11,19,43,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;font-family:Inter,sans-serif">
   <div style="background:#fff;border-radius:20px;width:100%;max-width:380px;box-shadow:0 24px 80px rgba(0,0,0,.35);overflow:hidden">
@@ -5118,8 +4799,6 @@ function showSearchError(msg){
     </div>
   </div>
 </div>
-
-
 
 <!-- ═══════════════════════════════════════════════════════
      PAINEL DE PERFIL — abre ao clicar no avatar
@@ -5441,10 +5120,8 @@ async function buscarRedeNoMapa(){
   status.style.display='block';
   status.innerHTML='<div style="display:flex;align-items:center;justify-content:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="#64748b" stroke-width="2" stroke-linecap="round"/></svg>Buscando unidades via Google Places...</div>';
 
-  // Limpa anteriores
   limparRedeNoMapa(false);
 
-  // Monta query Text Search
   const query = encodeURIComponent(`${nome}${estadoNome}`);
   let allPlaces=[];
   let nextToken=null;
@@ -5454,7 +5131,6 @@ async function buscarRedeNoMapa(){
     do {
       let url=`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&language=pt-BR&region=br&key=${GKEY}`;
       if(nextToken) url+='&pagetoken='+nextToken;
-      // CORS via proxy
       const proxyUrl='https://api.allorigins.win/get?url='+encodeURIComponent(url);
       const r=await fetchWithTimeout(proxyUrl, {}, 12000);
       const raw=await r.json();
@@ -5467,7 +5143,6 @@ async function buscarRedeNoMapa(){
       else nextToken=null;
     } while(nextToken);
   } catch(err){
-    // Fallback: Google Places Nearby Text Search (New API)
     try {
       const body=JSON.stringify({
         textQuery:`${nome}${estadoNome}`,
@@ -5503,7 +5178,6 @@ async function buscarRedeNoMapa(){
     }
   }
 
-  // Filtra por estado se selecionado (pela address)
   let lugares = allPlaces;
   if(estadoSel){
     lugares = allPlaces.filter(p=>{
@@ -5528,7 +5202,6 @@ async function buscarRedeNoMapa(){
 
   status.style.display='none';
 
-  // Plota no mapa
   const bounds=[];
   const lista=document.getElementById('rede-lista');
   lista.innerHTML='';
@@ -5552,7 +5225,6 @@ async function buscarRedeNoMapa(){
     redeMarkers.push(marker);
     bounds.push([lat,lng]);
 
-    // Card na lista
     const card=document.createElement('div');
     card.style.cssText='background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:9px 11px;cursor:pointer;transition:border-color .15s';
     card.onmouseover=()=>card.style.borderColor='#7c3aed';
@@ -5565,13 +5237,11 @@ async function buscarRedeNoMapa(){
     lista.appendChild(card);
   });
 
-  // Centraliza mapa
   const ec=ESTADO_COORDS[estadoSel]||ESTADO_COORDS[''];
   if(bounds.length>1) map.fitBounds(bounds,{padding:[40,40]});
   else if(bounds.length===1) map.setView(bounds[0],13);
   else map.setView([ec.lat,ec.lng],ec.zoom);
 
-  // Atualiza checkbox como ativo
   const cb=document.getElementById('cb-dfinefit');
   if(cb) cb.checked=true;
 
@@ -5579,19 +5249,16 @@ async function buscarRedeNoMapa(){
   document.getElementById('rede-resultado').style.display='block';
   btn.disabled=false; btn.style.opacity='1';
 
-  // ── Salva unidades para uso nas Zonas de Canibalização ──
   window.redeUnidades = lugares.map(p=>({
     lat: p.geometry?.location?.lat,
     lng: p.geometry?.location?.lng,
     name: p.name
   })).filter(u=>u.lat && u.lng);
 
-  // Re-dispara análise se já havia um ponto analisado (atualiza o card com os novos dados)
   if (_ultimaAnalise?.lat && _ultimaAnalise?.lng) {
     analyse(_ultimaAnalise.lat, _ultimaAnalise.lng, _ultimaAnalise.label);
   }
 
-  // Se as zonas de canibalização estiverem ativas, redesenha com a nova rede
   if(layerState['cannibal'] && window.redeUnidades.length > 0){
     layers.cannibal.clearLayers();
     if(window._zonasCanibal){ window._zonasCanibal.forEach(c=>{try{map.removeLayer(c);}catch(e){}});}
@@ -5612,7 +5279,6 @@ window.buscarRedeNoMapa=buscarRedeNoMapa;
 function limparRedeNoMapa(showMsg=true){
   redeMarkers.forEach(m=>map.removeLayer(m));
   redeMarkers=[];
-  // Limpa referência de unidades salvas e remove zonas de canibalização da rede
   window.redeUnidades = [];
   if(layerState['cannibal']){
     layers.cannibal.clearLayers();
@@ -5711,7 +5377,6 @@ window.limparRedeNoMapa=limparRedeNoMapa;
 
 <script>
 // ── GRUPOS DE CONCORRÊNCIA ──────────────────────────────
-// Types validados contra: https://developers.google.com/maps/documentation/places/web-service/place-types
 const CONC_GRUPOS = [
   { id:'academia',    icon:'💪', label:'Academias & Fitness',       types:['gym'] },
   { id:'esporte',     icon:'⚽', label:'Esporte & Clubes',           types:['sports_club','sports_complex'] },
@@ -5769,13 +5434,11 @@ function _atualizarBadgeSelec() {
 }
 
 function selecionarGrupo(id) {
-  // Toggle: se já está selecionado, remove; senão adiciona
   if (gruposSelec.has(id)) {
     gruposSelec.delete(id);
   } else {
     gruposSelec.add(id);
   }
-  // Limpa campo custom ao usar categorias pré-definidas
   if (gruposSelec.size > 0) document.getElementById('conc-custom-input').value = '';
 
   CONC_GRUPOS.forEach(g => {
@@ -5796,7 +5459,6 @@ window.selecionarGrupo = selecionarGrupo;
 function selecionarGrupoCustom() {
   const val = document.getElementById('conc-custom-input').value.trim();
   if (!val) return;
-  // Busca custom: limpa seleções pré-definidas
   gruposSelec.clear();
   CONC_GRUPOS.forEach(g => {
     const card = document.getElementById('grp-'+g.id);
@@ -5813,7 +5475,6 @@ function abrirPainelConcorrentes(e) {
   document.getElementById('painel-conc').style.display = 'block';
   document.getElementById('conc-backdrop').style.display = 'block';
   renderGrupos();
-  // Verifica se há pin de análise
   if (window.searchMarker && window._lastAnalysisLat) {
     concPinLat  = window._lastAnalysisLat;
     concPinLng  = window._lastAnalysisLng;
@@ -5837,7 +5498,6 @@ window.abrirPainelConcorrentes = abrirPainelConcorrentes;
 function fecharPainelConcorrentes() {
   document.getElementById('painel-conc').style.display = 'none';
   document.getElementById('conc-backdrop').style.display = 'none';
-  // Limpa seleção ao fechar para estado limpo na próxima abertura
   gruposSelec.clear();
   _atualizarBadgeSelec();
 }
@@ -5845,7 +5505,6 @@ window.fecharPainelConcorrentes = fecharPainelConcorrentes;
 
 async function executarBuscaConc() {
   const custom = document.getElementById('conc-custom-input').value.trim();
-  // Multi-seleção: coleta todos os grupos marcados
   const grps = CONC_GRUPOS.filter(g => gruposSelec.has(g.id));
   const grp  = grps.length === 1 ? grps[0] : null; // retrocompatibilidade (1 grupo)
 
@@ -5854,7 +5513,6 @@ async function executarBuscaConc() {
     return;
   }
 
-  // Centro: usa pin de análise se disponível, senão centro do mapa
   const lat = concPinLat ?? map.getCenter().lat;
   const lng = concPinLng ?? map.getCenter().lng;
   const raio = concPinRaio ?? (getRaioAtual() * 1000);
@@ -5874,7 +5532,6 @@ async function executarBuscaConc() {
 
   try {
     if (custom) {
-      // Campo livre → searchText com locationBias
       const bodyTxt = JSON.stringify({
         textQuery: custom,
         maxResultCount: 20,
@@ -5894,7 +5551,6 @@ async function executarBuscaConc() {
       if(d.error) throw new Error(d.error.message);
       places = d.places || [];
     } else {
-      // Tipos pré-definidos → mescla tipos de todos os grupos selecionados
       const tiposMerged = [...new Set(grps.flatMap(g => g.types))];
       const bodyNearby = JSON.stringify({
         includedTypes: tiposMerged,
@@ -5917,7 +5573,6 @@ async function executarBuscaConc() {
       places = d.places || [];
     }
   } catch(err) {
-    // Fallback: Nearby Search v1 via proxy CORS (API antiga mas funciona sem CORS)
     try {
       const tiposFallback = grps.flatMap(g => g.types);
       const typeParam = (!custom && tiposFallback.length) ? `&type=${tiposFallback[0]}` : '';
@@ -5953,7 +5608,6 @@ async function executarBuscaConc() {
     return;
   }
 
-  // Filtra apenas os resultados dentro do raio de análise
   const raioKmFiltro = raio / 1000;
   places = places.filter(p => {
     const plat = p.location?.latitude, plng = p.location?.longitude;
@@ -5968,7 +5622,6 @@ async function executarBuscaConc() {
     return;
   }
 
-  // Plota no mapa
   const lista = document.getElementById('conc-lista');
   lista.innerHTML = '';
   const icon = grp?.icon || '📍';
@@ -6012,7 +5665,6 @@ async function executarBuscaConc() {
   concorrentesAutoAtivo = true;
   document.getElementById('cb-concorrentes-auto').checked = true;
 
-  // Salva lat/lng dos concorrentes para uso no cálculo de score
   window._concorrentesLatLng = places
     .map(p => ({ lat: p.location?.latitude, lng: p.location?.longitude }))
     .filter(c => c.lat && c.lng);
@@ -6021,7 +5673,6 @@ async function executarBuscaConc() {
   document.getElementById('conc-resultado').style.display = 'block';
   btn.disabled=false; btn.style.opacity='1';
 
-  // Re-dispara análise se já havia um ponto analisado (atualiza o card com os novos dados)
   if (_ultimaAnalise?.lat && _ultimaAnalise?.lng) {
     analyse(_ultimaAnalise.lat, _ultimaAnalise.lng, _ultimaAnalise.label);
   }
@@ -6376,17 +6027,15 @@ function confirmarCanibRaio(){
   canibRaioAtual=CANIB_FAIXAS[idx]||1.25;
   fecharModalCanib();
 
-  // Limpa zonas anteriores (layer group + lista auxiliar)
   layers.cannibal.clearLayers();
   if(window._zonasCanibal){ window._zonasCanibal.forEach(c=>{ try{map.removeLayer(c);}catch(e){} }); }
   window._zonasCanibal=[];
 
-  // Prioridade: 1) Rede buscada no painel "Rede em Expansão", 2) cliente ativo, 3) DFINEFIT
   const unidades = (window.redeUnidades?.length > 0)
     ? window.redeUnidades
     : (window.clienteAtivo?.unidades?.length > 0)
         ? window.clienteAtivo.unidades
-        : DFINEFIT;
+        : [];
 
   unidades.forEach(u=>{
     L.circle([u.lat,u.lng],{
@@ -6422,18 +6071,15 @@ const BV_SEGMENTOS = [
 let bvSegmentoSelecionado = null;
 
 function mostrarBoasVindas() {
-  // Zera o mapa antes de tudo
   zerarAnalise();
 
   const modal = document.getElementById('modal-boas-vindas');
   if (!modal) return;
 
-  // Preenche saudação e avatar
   const nome = clienteAtivo?.nome || 'Usuário';
   document.getElementById('bv-saudacao').textContent = 'Olá, ' + nome.split(' ')[0] + '! 👋';
   document.getElementById('bv-avatar').textContent = nome[0].toUpperCase();
 
-  // Verifica filtros salvos
   const filtros = _getFiltros();
   const semFiltros = document.getElementById('bv-sem-filtros');
   const comFiltros = document.getElementById('bv-filtros-recentes');
@@ -6442,7 +6088,6 @@ function mostrarBoasVindas() {
   if (filtros.length > 0) {
     semFiltros.style.display = 'none';
     comFiltros.style.display = 'block';
-    // Mostra os últimos 3 filtros
     listaEl.innerHTML = '';
     filtros.slice(-3).reverse().forEach(f => {
       const item = document.createElement('button');
@@ -6467,11 +6112,9 @@ function mostrarBoasVindas() {
     comFiltros.style.display = 'none';
   }
 
-  // Garante slide 1 visível
   document.getElementById('bv-slide1').style.display = 'block';
   document.getElementById('bv-slide2').style.display = 'none';
 
-  // Monta grid de segmentos
   const grid = document.getElementById('bv-segmentos-grid');
   grid.innerHTML = '';
   bvSegmentoSelecionado = null;
@@ -6534,11 +6177,9 @@ function bvConfirmarSegmento() {
     return;
   }
 
-  // Salva segmento ativo
   window._segmentoAtual = label;
   window._segmentoKey   = bvSegmentoSelecionado || 'custom';
 
-  // Mapeamento: chaves da tela inicial → chaves do painel Score
   const BV_TO_SCORE = {
     academias:   'academia',
     farmacias:   'farmacia',
@@ -6551,7 +6192,6 @@ function bvConfirmarSegmento() {
   };
   const scoreKey = BV_TO_SCORE[window._segmentoKey] || window._segmentoKey || 'academia';
 
-  // Propaga para clienteAtivo e para o select do painel Score
   if (clienteAtivo) clienteAtivo.segmento = scoreKey;
   window._segmentoScoreKey = scoreKey;
   const spSel = document.getElementById('sp-segmento');
@@ -6560,7 +6200,6 @@ function bvConfirmarSegmento() {
     if (typeof atualizarCampoConsumo === 'function') atualizarCampoConsumo(scoreKey);
   }
 
-  // Atualiza badge na sidebar
   const badge = document.getElementById('filtro-ativo-badge');
   if (badge) { badge.textContent = label; badge.style.display = 'inline-block'; }
 
@@ -6644,7 +6283,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.6 · 15/04/2026';
+const MAPXPAND_VERSION = 'v2.7 · 16/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
