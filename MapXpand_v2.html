@@ -1675,13 +1675,22 @@ function analyse(lat,lng,label){
   // IMPORTANTE: não reconstruir popup aqui — causava conflito de abre/fecha com o toggle interno.
   searchMarker.on('click', function(e) {
     L.DomEvent.stopPropagation(e);
+    L.DomEvent.preventDefault(e);
+    // Mostrar sidebar
     const el = document.getElementById('analysisResult');
     if (el) {
       el.style.display = 'block';
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-    if (searchMarker && searchMarker.getPopup()) {
-      searchMarker.openPopup();
+    // Abrir popup: se ainda não existe, sinc primeiro
+    if (searchMarker) {
+      if (!searchMarker.getPopup()) _sincPopup();
+      // Pequeno delay para garantir bindPopup completo antes de abrir
+      setTimeout(() => {
+        if (searchMarker && searchMarker.getPopup()) {
+          map.openPopup(searchMarker.getPopup(), searchMarker.getLatLng());
+        }
+      }, 30);
     }
   });
   window._lastAnalysisLat = lat;
@@ -1739,6 +1748,12 @@ function analyse(lat,lng,label){
     ? renderSemDados(label, raioKm, popFmt, ibge, 'Calculando...', '–', null)
     : renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,ibge,'Calculando...','–',null);
   _sincPopup(); // popup criado logo após sidebar — mesmos dados, zero divergência
+  // Abrir popup automaticamente ao analisar via buscador
+  setTimeout(() => {
+    if (searchMarker && searchMarker.getPopup()) {
+      searchMarker.openPopup();
+    }
+  }, 50);
 
   buscarFluxoVias(lat,lng,raioM).then(({viaTop,vmd})=>{
     if(_ultimaAnalise) { _ultimaAnalise.viaTop=viaTop; _ultimaAnalise.vmd=vmd; }
@@ -6259,13 +6274,14 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.8 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.13 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
   if(el) el.textContent = MAPXPAND_VERSION;
 })();
 </script>
+
 
 </body>
 </html>
