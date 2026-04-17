@@ -1993,7 +1993,8 @@ function fetchWithTimeout(url, opts, ms) {
   ]);
 }
 
-const GMAPS_KEY = 'AIzaSyBxf8WQy6U7eiO_QYQ6KMxPANrFElcQy_Y';
+// Chave lida do localStorage — nunca hardcoded no código-fonte
+let GMAPS_KEY = localStorage.getItem('mapxpand_gmaps_key') || '';
 
 async function geocodeEndereco(query) {
   try {
@@ -5309,6 +5310,32 @@ window.limparRedeNoMapa=limparRedeNoMapa;
 
   <div style="padding:18px">
 
+    <!-- Configuração da Google API Key -->
+    <div id="conc-api-section" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:11px;padding:12px 14px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#64748b" stroke-width="2" stroke-linejoin="round"/></svg>
+          <span style="font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.07em">Google Places API Key</span>
+        </div>
+        <span id="conc-api-status-badge" style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca">Não configurada</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <input id="conc-api-key-input" type="password"
+          placeholder="Cole sua chave AIza..."
+          style="flex:1;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:11px;font-family:Inter,sans-serif;outline:none;color:#1e293b;background:#fff;transition:border-color .2s"
+          onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#e2e8f0'"
+        />
+        <button onclick="salvarGmapsKey()"
+          style="background:#f59e0b;color:#fff;border:none;border-radius:8px;padding:0 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;transition:opacity .2s"
+          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          Salvar
+        </button>
+      </div>
+      <div style="font-size:9px;color:#94a3b8;margin-top:6px;line-height:1.5">
+        🔒 Salva apenas no seu navegador (localStorage). Não vai ao servidor nem ao GitHub.
+      </div>
+    </div>
+
     <!-- Aviso raio -->
     <div id="conc-aviso-pin" style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:11px;color:#92400e;line-height:1.6;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start">
       <span style="font-size:14px;flex-shrink:0">📍</span>
@@ -5461,10 +5488,46 @@ function selecionarGrupoCustom() {
 }
 window.selecionarGrupoCustom = selecionarGrupoCustom;
 
+function _atualizarBadgeApiKey() {
+  const badge = document.getElementById('conc-api-status-badge');
+  const input = document.getElementById('conc-api-key-input');
+  if (!badge) return;
+  if (GMAPS_KEY) {
+    badge.textContent = '✓ Configurada';
+    badge.style.background = '#f0fdf4';
+    badge.style.color = '#166534';
+    badge.style.borderColor = '#bbf7d0';
+    if (input) input.placeholder = '••••••••••••••••••••••';
+  } else {
+    badge.textContent = 'Não configurada';
+    badge.style.background = '#fef2f2';
+    badge.style.color = '#b91c1c';
+    badge.style.borderColor = '#fecaca';
+    if (input) input.placeholder = 'Cole sua chave AIza...';
+  }
+}
+
+function salvarGmapsKey() {
+  const input = document.getElementById('conc-api-key-input');
+  const val = (input?.value || '').trim();
+  if (!val) {
+    // Limpar chave
+    localStorage.removeItem('mapxpand_gmaps_key');
+    GMAPS_KEY = '';
+  } else {
+    localStorage.setItem('mapxpand_gmaps_key', val);
+    GMAPS_KEY = val;
+    if (input) input.value = '';
+  }
+  _atualizarBadgeApiKey();
+}
+window.salvarGmapsKey = salvarGmapsKey;
+
 function abrirPainelConcorrentes(e) {
   if(e) e.preventDefault();
   document.getElementById('painel-conc').style.display = 'block';
   document.getElementById('conc-backdrop').style.display = 'block';
+  _atualizarBadgeApiKey();
   renderGrupos();
   if (window.searchMarker && window._lastAnalysisLat) {
     concPinLat  = window._lastAnalysisLat;
@@ -6274,7 +6337,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.13 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.14 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
