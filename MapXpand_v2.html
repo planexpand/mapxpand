@@ -5687,33 +5687,56 @@ async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
     }
   }
 
-  // 3. Montar queries — usa label do grupo e tipos como termos de busca
-  const queries = [];
-  if (custom) { queries.push(custom); }
-  grps.forEach(g => {
-    // Adiciona o label do grupo como query principal (ex: "Beleza & Estética")
-    if (g.label && !queries.includes(g.label)) queries.push(g.label);
-    // Adiciona cada type como termo complementar (ex: "beauty_salon" → ignora; usa label)
-    // Tipos da Places API não funcionam bem como textQuery — label é mais eficaz
-  });
-  // Se nenhuma query montada (ex: só tipos sem label), fallback para types como texto
-  if (!queries.length) {
-    grps.forEach(g => (g.types||[]).forEach(t => { if (!queries.includes(t)) queries.push(t); }));
-  }
+  // 3. Montar tipos merged de todos grupos selecionados
+  const tiposMerged = [...new Set(grps.flatMap(g => g.types || []))];
 
-  // 4. Buscar em cada ponto × query com dedup por place_id
+  // 4. Buscar em cada ponto do grid — searchNearby (por categoria) + searchText (custom)
+  // searchNearby garante cobertura por tipo (pega Giolaser, Boticário, etc.) sem depender de textQuery
   const placesMap = new Map();
-  let totalBuscas = pontos.length * queries.length;
+  const raioGridFinal = Math.max(raioGrid, 3000); // mínimo 3km por célula
+  let totalBuscas = pontos.length + (custom ? pontos.length : 0);
   let done = 0;
 
-  for (const q of queries) {
+  // 4a. searchNearby com includedTypes para segmentos selecionados
+  if (tiposMerged.length) {
     for (const pt of pontos) {
       done++;
-      status.innerHTML = `<div style="text-align:center;font-size:11px;color:#64748b">🔍 Varrendo região... ${done}/${totalBuscas} áreas</div>`;
+      status.innerHTML = `<div style="text-align:center;font-size:11px;color:#64748b">🔍 Varrendo região... ${done}/${totalBuscas} células</div>`;
       try {
         const body = JSON.stringify({
-          textQuery: q + ' ' + regiaoInput,
-          locationBias: { circle: { center: { latitude: pt.lat, longitude: pt.lng }, radius: Math.max(raioGrid, 5000) } },
+          includedTypes: tiposMerged,
+          maxResultCount: 20,
+          rankPreference: 'DISTANCE',
+          locationRestriction: { circle: { center: { latitude: pt.lat, longitude: pt.lng }, radius: raioGridFinal } },
+          languageCode: 'pt-BR'
+        });
+        const r = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating' },
+          body
+        });
+        if (!r.ok) { console.warn('searchNearby erro:', r.status, await r.text().catch(()=>'')); continue; }
+        const d = await r.json();
+        if (d.error) { console.warn('searchNearby erro body:', d.error); continue; }
+        (d.places || []).forEach(p => {
+          if (p.location && !placesMap.has(p.id)) {
+            placesMap.set(p.id, { name: p.displayName?.text || '', address: p.formattedAddress || '', lat: p.location.latitude, lng: p.location.longitude, rating: p.rating });
+          }
+        });
+      } catch(e) { console.warn('searchNearby grade erro:', e); }
+      await new Promise(r => setTimeout(r, 100));
+    }
+  }
+
+  // 4b. searchText para query custom (nome específico de rede, ex: "Giolaser")
+  if (custom) {
+    for (const pt of pontos) {
+      done++;
+      status.innerHTML = `<div style="text-align:center;font-size:11px;color:#64748b">🔍 Varrendo região (custom)... ${done}/${totalBuscas} células</div>`;
+      try {
+        const body = JSON.stringify({
+          textQuery: custom,
+          locationBias: { circle: { center: { latitude: pt.lat, longitude: pt.lng }, radius: raioGridFinal } },
           maxResultCount: 20,
           languageCode: 'pt-BR'
         });
@@ -5722,17 +5745,16 @@ async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
           headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating' },
           body
         });
-        if (!r.ok) { console.warn('Places API erro:', r.status, await r.text().catch(()=>'')); continue; }
+        if (!r.ok) { console.warn('searchText custom erro:', r.status); continue; }
         const d = await r.json();
-        if (d.error) { console.warn('Places API erro body:', d.error); continue; }
+        if (d.error) { console.warn('searchText custom erro body:', d.error); continue; }
         (d.places || []).forEach(p => {
           if (p.location && !placesMap.has(p.id)) {
-            placesMap.set(p.id, { name: p.displayName?.text || q, address: p.formattedAddress || '', lat: p.location.latitude, lng: p.location.longitude, rating: p.rating });
+            placesMap.set(p.id, { name: p.displayName?.text || custom, address: p.formattedAddress || '', lat: p.location.latitude, lng: p.location.longitude, rating: p.rating });
           }
         });
-      } catch(e) { console.warn('Grade busca erro:', e); }
-      // Pequena pausa pra não throttle
-      await new Promise(r => setTimeout(r, 120));
+      } catch(e) { console.warn('searchText grade erro:', e); }
+      await new Promise(r => setTimeout(r, 100));
     }
   }
 
@@ -6597,7 +6619,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.18 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.19 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
