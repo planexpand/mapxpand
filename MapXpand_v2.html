@@ -1396,17 +1396,17 @@ function targetIcon(id,p){
 
 function concorrIcon(cor='#ef4444', emoji=''){
   const inner = emoji
-    ? `<foreignObject x="4" y="5" width="20" height="20">
-         <div xmlns="http://www.w3.org/1999/xhtml" style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1">${emoji}</div>
+    ? `<foreignObject x="3" y="3" width="14" height="14">
+         <div xmlns="http://www.w3.org/1999/xhtml" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;line-height:1">${emoji}</div>
        </foreignObject>`
-    : `<line x1="9" y1="9" x2="19" y2="19" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
-       <line x1="19" y1="9" x2="9" y2="19" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>`;
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
-    <ellipse cx="14" cy="34.5" rx="5" ry="1.5" fill="rgba(0,0,0,0.18)"/>
-    <path d="M14 1 C7 1 3 7 3 12 C3 20 14 34 14 34 C14 34 25 20 25 12 C25 7 21 1 14 1Z" fill="${cor}" stroke="#fff" stroke-width="1.6"/>
+    : `<line x1="7" y1="7" x2="13" y2="13" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+       <line x1="13" y1="7" x2="7" y2="13" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="26" viewBox="0 0 28 36" opacity="0.9">
+    <ellipse cx="14" cy="34.5" rx="4" ry="1.2" fill="rgba(0,0,0,0.15)"/>
+    <path d="M14 1 C7 1 3 7 3 12 C3 20 14 34 14 34 C14 34 25 20 25 12 C25 7 21 1 14 1Z" fill="${cor}" stroke="#fff" stroke-width="1.4"/>
     ${inner}
   </svg>`;
-  return L.divIcon({className:'',html:svg,iconSize:[28,36],iconAnchor:[14,36],popupAnchor:[0,-34]});
+  return L.divIcon({className:'',html:svg,iconSize:[20,26],iconAnchor:[10,26],popupAnchor:[0,-24]});
 }
 function competitorIcon(nome){ return concorrIcon('#f97316'); }
 
@@ -2444,6 +2444,20 @@ async function buscarUniversal() {
 
   map.flyTo([lat, lng], zoom, { animate:true, duration:1 });
   analyse(lat, lng, label);
+
+  // Auto-busca concorrentes se segmentos já selecionados
+  if (gruposSelec.size > 0) {
+    // Aguarda flyTo terminar, depois dispara busca no raio do ponto
+    setTimeout(() => {
+      if (typeof executarBuscaConc !== 'function') return;
+      // Força modo raio com coords do ponto analisado
+      concPinLat  = lat;
+      concPinLng  = lng;
+      concPinRaio = getRaioAtual() * 1000;
+      window._concModoAtual = 'raio';
+      executarBuscaConc();
+    }, 1200);
+  }
 
   input.style.borderColor = '#22c55e';
   input.style.background  = '#f0fdf4';
@@ -4502,11 +4516,27 @@ map.on('click', async e => {
     marker.addTo(pinsLayer);
     marker.openPopup();
     analyse(lat, lng, label);
+    // Auto-busca concorrentes no raio se segmentos selecionados
+    if (gruposSelec.size > 0 && typeof executarBuscaConc === 'function') {
+      setTimeout(() => {
+        concPinLat = lat; concPinLng = lng; concPinRaio = getRaioAtual() * 1000;
+        window._concModoAtual = 'raio';
+        executarBuscaConc();
+      }, 400);
+    }
     return;
   }
 
   const label = await reverseGeocode(lat, lng);
   analyse(lat, lng, label);
+  // Auto-busca concorrentes no raio se segmentos selecionados
+  if (gruposSelec.size > 0 && typeof executarBuscaConc === 'function') {
+    setTimeout(() => {
+      concPinLat = lat; concPinLng = lng; concPinRaio = getRaioAtual() * 1000;
+      window._concModoAtual = 'raio';
+      executarBuscaConc();
+    }, 400);
+  }
 });
 
 function showSearchError(msg){
@@ -6646,7 +6676,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.24 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.26 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
