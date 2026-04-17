@@ -5687,10 +5687,19 @@ async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
     }
   }
 
-  // 3. Montar queries
+  // 3. Montar queries — usa label do grupo e tipos como termos de busca
   const queries = [];
   if (custom) { queries.push(custom); }
-  grps.forEach(g => g.terms.forEach(t => { if (!queries.includes(t)) queries.push(t); }));
+  grps.forEach(g => {
+    // Adiciona o label do grupo como query principal (ex: "Beleza & Estética")
+    if (g.label && !queries.includes(g.label)) queries.push(g.label);
+    // Adiciona cada type como termo complementar (ex: "beauty_salon" → ignora; usa label)
+    // Tipos da Places API não funcionam bem como textQuery — label é mais eficaz
+  });
+  // Se nenhuma query montada (ex: só tipos sem label), fallback para types como texto
+  if (!queries.length) {
+    grps.forEach(g => (g.types||[]).forEach(t => { if (!queries.includes(t)) queries.push(t); }));
+  }
 
   // 4. Buscar em cada ponto × query com dedup por place_id
   const placesMap = new Map();
@@ -5703,8 +5712,8 @@ async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
       status.innerHTML = `<div style="text-align:center;font-size:11px;color:#64748b">🔍 Varrendo região... ${done}/${totalBuscas} áreas</div>`;
       try {
         const body = JSON.stringify({
-          textQuery: q,
-          locationBias: { circle: { center: { latitude: pt.lat, longitude: pt.lng }, radius: raioGrid } },
+          textQuery: q + ' ' + regiaoInput,
+          locationBias: { circle: { center: { latitude: pt.lat, longitude: pt.lng }, radius: Math.max(raioGrid, 5000) } },
           maxResultCount: 20,
           languageCode: 'pt-BR'
         });
@@ -5713,8 +5722,9 @@ async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
           headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating' },
           body
         });
-        if (!r.ok) continue;
+        if (!r.ok) { console.warn('Places API erro:', r.status, await r.text().catch(()=>'')); continue; }
         const d = await r.json();
+        if (d.error) { console.warn('Places API erro body:', d.error); continue; }
         (d.places || []).forEach(p => {
           if (p.location && !placesMap.has(p.id)) {
             placesMap.set(p.id, { name: p.displayName?.text || q, address: p.formattedAddress || '', lat: p.location.latitude, lng: p.location.longitude, rating: p.rating });
@@ -6587,7 +6597,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.17 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.18 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
