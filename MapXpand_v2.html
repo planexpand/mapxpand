@@ -1670,42 +1670,18 @@ function analyse(lat,lng,label){
   if(!map.hasLayer(layers.search)) layers.search.addTo(map);
   searchMarker=L.marker([lat,lng],{icon:searchIcon(),zIndexOffset:1000}).addTo(layers.search);
   window.searchMarker = searchMarker; // mantém window.searchMarker em sincronia com o let
+  // Handler de clique: apenas garante sidebar visível.
+  // Popup é gerenciado pelo bindPopup (feito em _sincPopup) + toggle automático do Leaflet.
+  // IMPORTANTE: não reconstruir popup aqui — causava conflito de abre/fecha com o toggle interno.
   searchMarker.on('click', function(e) {
-    e.originalEvent && e.originalEvent.stopPropagation();
-    window._searchMarkerClicked = true;
-    setTimeout(() => { window._searchMarkerClicked = false; }, 100);
+    L.DomEvent.stopPropagation(e);
     const el = document.getElementById('analysisResult');
     if (el) {
       el.style.display = 'block';
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-    if (_ultimaAnalise) {
-      const a = _ultimaAnalise;
-      const popupHtml = a.semDados
-        ? `<div style="font-family:Inter,sans-serif;min-width:200px;padding:2px">
-            <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:8px;line-height:1.3">${(a.label||'').split(',').slice(0,2).join(',')}</div>
-            <div style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1e293b,#334155);border-radius:8px;padding:9px 11px;margin-bottom:8px">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,.5)" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="rgba(255,255,255,.6)" stroke-width="2" stroke-linecap="round"/></svg>
-              <div><div style="font-size:11px;font-weight:700;color:#fff">Dados insuficientes</div><div style="font-size:9px;color:rgba(255,255,255,.55)">Configure para calcular a viabilidade</div></div>
-            </div>
-            <div style="font-size:10px;color:#64748b;margin-bottom:10px">👥 Pop. estimada: <strong>${a.popFmt} hab</strong></div>
-            <button onclick="abrirPainelRede(event)" style="width:100%;background:#f0f4ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:5px">+ Cadastrar Rede em Expansão</button>
-            <button onclick="abrirPainelConcorrentes(event)" style="width:100%;background:#fffbeb;color:#b45309;border:1px solid #fde68a;border-radius:7px;padding:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">+ Buscar Concorrentes</button>
-           </div>`
-        : `<div style="font-family:Inter,sans-serif;min-width:190px;padding:2px">
-            <div style="font-size:11px;font-weight:700;color:#0B132B;margin-bottom:6px;line-height:1.3">${(a.label||'').split(',').slice(0,2).join(',')}</div>
-            <div style="display:flex;align-items:center;gap:8px;background:${a.score>=80?'#15803d':a.score>=55?'#b45309':'#b91c1c'};border-radius:8px;padding:7px 10px;margin-bottom:8px">
-              <span style="font-size:18px;font-weight:900;color:#fff">${a.score}%</span>
-              <span style="font-size:11px;color:#fff;font-weight:600">${a.score>=80?'Ideal para rede':a.score>=55?'Ponto viável':'Área saturada'}</span>
-            </div>
-            <div style="font-size:10px;color:#64748b;line-height:1.8;margin-bottom:8px">
-              👥 Pop. estimada: <strong>${a.popFmt} hab</strong><br>
-              🏠 Dist. rede: <strong>${a.dOwn!=null?a.dOwn.toFixed(2)+' km':'—'}</strong><br>
-              ⚔️ Dist. concorrente: <strong>${a.dComp!=null?a.dComp.toFixed(2)+' km':'—'}</strong>
-            </div>
-            <button onclick="abrirModalConcorrencia()" style="width:100%;background:linear-gradient(135deg,#0B132B,#1a2744);color:#C6A664;border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif">📄 Gerar Relatório</button>
-           </div>`;
-      searchMarker.bindPopup(popupHtml, { maxWidth:260, className:'map-popup' }).openPopup();
+    if (searchMarker && searchMarker.getPopup()) {
+      searchMarker.openPopup();
     }
   });
   window._lastAnalysisLat = lat;
@@ -6283,7 +6259,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.7 · 16/04/2026';
+const MAPXPAND_VERSION = 'v2.8 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
