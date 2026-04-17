@@ -1517,7 +1517,7 @@ function updateRaio(idx){
     _ultimaAnalise.dComp = dComp;
 
     // Replotar pins com novo tamanho proporcional ao raio
-    _replotarConcorrentes();
+    if (typeof _replotarConcorrentes === 'function') _replotarConcorrentes();
 
     _ultimaAnalise.raioKm = val;
     _ultimaAnalise.popNoRaio = popNoRaio;
@@ -6142,7 +6142,7 @@ function _plotarConcorrentes(places, grps, custom, btn, status) {
   }
 }
 
-// ── REPLOT: redesenha pins com tamanho do raio atual ─────
+/// ── REPLOT: redesenha pins com tamanho do raio atual ─────
 function _replotarConcorrentes() {
   const data = window._concorrentesData;
   if (!data || !data.length || !concorrentesAutoAtivo) return;
