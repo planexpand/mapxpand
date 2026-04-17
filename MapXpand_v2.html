@@ -1417,19 +1417,32 @@ function targetIcon(id,p){
   return mkIcon(`<div style="width:${s}px;height:${s}px;background:${bg};border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:800;color:#fff;font-family:Inter,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.3)">${id}</div>`,s,s,s/2,s/2);
 }
 
+function _concorrPinSize() {
+  // Tamanho do pin escala com raio de análise (raio maior → zoom out → pin maior)
+  const raio = getRaioAtual ? getRaioAtual() : 1.5;
+  // 0.5km→20px, 1.5km→26px, 3km→30px, 5km→36px — interpolação linear clamped
+  const w = Math.round(Math.min(38, Math.max(20, 20 + (raio - 0.5) * 4.5)));
+  const h = Math.round(w * 1.3);
+  return { w, h };
+}
+
 function concorrIcon(cor='#ef4444', emoji=''){
+  const {w, h} = _concorrPinSize();
+  const cx = w/2, fontSz = Math.round(w * 0.38);
+  const strokeW = Math.max(1.4, w * 0.065);
+  const x1=Math.round(cx*0.55), x2=Math.round(cx*1.45);
   const inner = emoji
-    ? `<foreignObject x="3" y="3" width="14" height="14">
-         <div xmlns="http://www.w3.org/1999/xhtml" style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;line-height:1">${emoji}</div>
+    ? `<foreignObject x="${Math.round(w*0.14)}" y="${Math.round(h*0.12)}" width="${Math.round(w*0.72)}" height="${Math.round(w*0.72)}">
+         <div xmlns="http://www.w3.org/1999/xhtml" style="width:${Math.round(w*0.72)}px;height:${Math.round(w*0.72)}px;display:flex;align-items:center;justify-content:center;font-size:${fontSz}px;line-height:1">${emoji}</div>
        </foreignObject>`
-    : `<line x1="7" y1="7" x2="13" y2="13" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
-       <line x1="13" y1="7" x2="7" y2="13" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>`;
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="26" viewBox="0 0 28 36" opacity="0.9">
-    <ellipse cx="14" cy="34.5" rx="4" ry="1.2" fill="rgba(0,0,0,0.15)"/>
-    <path d="M14 1 C7 1 3 7 3 12 C3 20 14 34 14 34 C14 34 25 20 25 12 C25 7 21 1 14 1Z" fill="${cor}" stroke="#fff" stroke-width="1.4"/>
+    : `<line x1="${x1}" y1="${x1}" x2="${x2}" y2="${x2}" stroke="#fff" stroke-width="${strokeW}" stroke-linecap="round"/>
+       <line x1="${x2}" y1="${x1}" x2="${x1}" y2="${x2}" stroke="#fff" stroke-width="${strokeW}" stroke-linecap="round"/>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 28 36">
+    <ellipse cx="14" cy="34.5" rx="5" ry="1.5" fill="rgba(0,0,0,0.18)"/>
+    <path d="M14 1 C7 1 3 7 3 12 C3 20 14 34 14 34 C14 34 25 20 25 12 C25 7 21 1 14 1Z" fill="${cor}" stroke="#fff" stroke-width="1.6"/>
     ${inner}
   </svg>`;
-  return L.divIcon({className:'',html:svg,iconSize:[20,26],iconAnchor:[10,26],popupAnchor:[0,-24]});
+  return L.divIcon({className:'',html:svg,iconSize:[w,h],iconAnchor:[Math.round(w/2),h],popupAnchor:[0,-h+2]});
 }
 function competitorIcon(nome){ return concorrIcon('#f97316'); }
 
@@ -1502,6 +1515,9 @@ function updateRaio(idx){
     window._concorrentesNoRaio = concNoRaio;
     const dComp = concNoRaio.length > 0 ? Math.min(...concNoRaio.map(c=>dist(pt,c))) : null;
     _ultimaAnalise.dComp = dComp;
+
+    // Replotar pins com novo tamanho proporcional ao raio
+    _replotarConcorrentes();
 
     _ultimaAnalise.raioKm = val;
     _ultimaAnalise.popNoRaio = popNoRaio;
@@ -6025,6 +6041,21 @@ async function executarBuscaConc() {
     .map(p => ({ lat: p.location?.latitude, lng: p.location?.longitude }))
     .filter(c => c.lat && c.lng);
 
+  // Guardar dados completos para replot ao mudar raio
+  const grpRaio = grps.length === 1 ? grps[0] : null;
+  const iconRaio = grpRaio?.icon || '📍';
+  window._concorrentesData = places
+    .filter(p => p.location?.latitude && p.location?.longitude)
+    .map(p => ({
+      lat: p.location.latitude,
+      lng: p.location.longitude,
+      emoji: iconRaio,
+      cor: '#f59e0b',
+      nome: p.displayName?.text || '',
+      end: p.formattedAddress || '',
+      rat: p.rating || null
+    }));
+
   document.getElementById('conc-count-badge').textContent = `${places.length} encontrado${places.length>1?'s':''}`;
   document.getElementById('conc-resultado').style.display = 'block';
   btn.disabled=false; btn.style.opacity='1';
@@ -6083,6 +6114,19 @@ function _plotarConcorrentes(places, grps, custom, btn, status) {
   window._concorrentesLatLng = places.map(p => ({ lat: p.lat, lng: p.lng }));
   window._buscaConcEmAndamento = false;
 
+  // Guardar dados completos para replot ao mudar raio
+  const grpReg = grps.length === 1 ? grps[0] : null;
+  const iconReg = grpReg?.icon || '📍';
+  window._concorrentesData = places.map(p => ({
+    lat: p.lat,
+    lng: p.lng,
+    emoji: iconReg,
+    cor: '#f59e0b',
+    nome: p.name || '',
+    end: p.address || '',
+    rat: p.rating || null
+  }));
+
   document.getElementById('conc-count-badge').textContent = `${places.length} encontrado${places.length > 1 ? 's' : ''}`;
   document.getElementById('conc-resultado').style.display = 'block';
   btn.disabled = false; btn.style.opacity = '1';
@@ -6098,6 +6142,23 @@ function _plotarConcorrentes(places, grps, custom, btn, status) {
   }
 }
 
+// ── REPLOT: redesenha pins com tamanho do raio atual ─────
+function _replotarConcorrentes() {
+  const data = window._concorrentesData;
+  if (!data || !data.length || !concorrentesAutoAtivo) return;
+  concorrentesAutoLayer.clearLayers();
+  data.forEach(p => {
+    L.marker([p.lat, p.lng], { icon: concorrIcon(p.cor, p.emoji) })
+      .bindPopup(`<div style="font-family:Inter,sans-serif;padding:4px;min-width:200px">
+        <div style="font-size:12px;font-weight:700;color:#0B132B;margin-bottom:4px">${p.nome}</div>
+        <div style="font-size:10px;color:#64748b;line-height:1.5;margin-bottom:4px">${p.end}</div>
+        ${p.rat ? `<span style="background:#fef9c3;color:#92400e;padding:2px 7px;border-radius:12px;font-size:10px;font-weight:600">⭐ ${p.rat}</span>` : ''}
+      </div>`, { maxWidth: 240 })
+      .addTo(concorrentesAutoLayer);
+  });
+}
+window._replotarConcorrentes = _replotarConcorrentes;
+
 function limparConcorrentes(updateCb=true){
   concorrentesAutoLayer.clearLayers();
   map.removeLayer(concorrentesAutoLayer);
@@ -6106,6 +6167,7 @@ function limparConcorrentes(updateCb=true){
   // Resetar dados de concorrentes para evitar análise com dados desatualizados
   window._concorrentesLatLng = [];
   window._concorrentesNoRaio = [];
+  window._concorrentesData = [];
 }
 window.limparConcorrentes = limparConcorrentes;
 </script>
@@ -6705,7 +6767,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.28 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.30 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
