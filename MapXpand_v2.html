@@ -665,22 +665,45 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         <div class="chk-styled" id="chk-cannibal"></div>
       </div>
 
-      <!-- Checkboxes simples (exatamente como imagem) -->
-      <div class="cb-group">
-        <label class="cb-item" onclick="abrirPainelRede(event)">
-          <input type="checkbox" id="cb-dfinefit" checked onchange="return false">
-          <span class="cb-label">Rede em Expansão</span>
-        </label>
-        <!-- SCORE DE ADERÊNCIA -->
-        <label class="cb-item" style="border-top:.5px solid #f1f5f9;margin-top:6px;padding-top:8px" onclick="abrirPainelScore(event)">
-          <input type="checkbox" id="cb-heatmap" onchange="return false">
-          <span class="cb-label" style="color:#7c3aed;font-weight:600">🎯 Score de Aderência Regional</span>
-        </label>
-        <!-- CONCORRENTES AUTO -->
-        <label class="cb-item" onclick="abrirPainelConcorrentes(event)">
-          <input type="checkbox" id="cb-concorrentes-auto" onchange="return false">
-          <span class="cb-label" style="color:#f59e0b;font-weight:600">📍 Buscar Concorrentes</span>
-        </label>
+      <!-- Cards de ação — layout padrão preferido -->
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+        <!-- Rede em Expansão -->
+        <div onclick="abrirPainelRede(event)" style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color .15s,box-shadow .15s" onmouseover="this.style.borderColor='#0B132B';this.style.boxShadow='0 2px 8px rgba(11,19,43,.08)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
+          <div style="width:34px;height:34px;border-radius:8px;background:#f0f4ff;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="3" stroke="#2563eb" stroke-width="2"/><circle cx="5" cy="19" r="3" stroke="#2563eb" stroke-width="2"/><circle cx="19" cy="19" r="3" stroke="#2563eb" stroke-width="2"/><path d="M12 8v4M8.5 17l3.5-5M15.5 17L12 12" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700;color:#1e293b">Rede em Expansão</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:1px">Cadastre suas unidades para calcular distâncias</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <!-- Score de Aderência -->
+        <div onclick="abrirPainelScore(event)" style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color .15s,box-shadow .15s" onmouseover="this.style.borderColor='#7c3aed';this.style.boxShadow='0 2px 8px rgba(124,58,237,.08)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
+          <div style="width:34px;height:34px;border-radius:8px;background:#f5f3ff;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700;color:#7c3aed">Score de Aderência Regional</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:1px">Mapa de calor por potencial de mercado</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <!-- Buscar Concorrentes -->
+        <div onclick="abrirPainelConcorrentes(event)" style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color .15s,box-shadow .15s" onmouseover="this.style.borderColor='#f59e0b';this.style.boxShadow='0 2px 8px rgba(245,158,11,.1)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'">
+          <div style="width:34px;height:34px;border-radius:8px;background:#fffbeb;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#f59e0b" stroke-width="2"/><circle cx="12" cy="9" r="2.5" stroke="#f59e0b" stroke-width="1.8"/></svg>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700;color:#b45309">Buscar Concorrentes</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:1px">Mapeie os concorrentes no raio de análise</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <!-- checkboxes ocultos para manter estado interno -->
+        <input type="checkbox" id="cb-dfinefit" checked style="display:none">
+        <input type="checkbox" id="cb-heatmap" style="display:none">
+        <input type="checkbox" id="cb-concorrentes-auto" style="display:none">
       </div>
     </div>
 
@@ -6676,7 +6699,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.26 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.27 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
