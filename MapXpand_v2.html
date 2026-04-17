@@ -5573,7 +5573,11 @@ function abrirPainelConcorrentes(e) {
   document.getElementById('conc-backdrop').style.display = 'block';
   _atualizarBadgeApiKey();
   renderGrupos();
-  if (window.searchMarker && window._lastAnalysisLat) {
+
+  const temPonto = !!(window.searchMarker && window._lastAnalysisLat);
+  const btnRaio = document.getElementById('conc-modo-raio-btn');
+
+  if (temPonto) {
     concPinLat  = window._lastAnalysisLat;
     concPinLng  = window._lastAnalysisLng;
     concPinRaio = getRaioAtual() * 1000;
@@ -5583,12 +5587,19 @@ function abrirPainelConcorrentes(e) {
     document.getElementById('conc-aviso-pin').style.background = '#f0fdf4';
     document.getElementById('conc-aviso-pin').style.borderColor = '#bbf7d0';
     document.getElementById('conc-aviso-pin').style.color = '#166534';
+    // Raio disponível — habilitar botão
+    if (btnRaio) { btnRaio.disabled = false; btnRaio.style.opacity = '1'; btnRaio.title = ''; }
+    setConcModo('raio');
   } else {
     concPinLat = null; concPinLng = null;
-    document.getElementById('conc-aviso-pin').style.background = '#fffbeb';
-    document.getElementById('conc-aviso-pin').style.borderColor = '#fde68a';
-    document.getElementById('conc-aviso-pin').style.color = '#92400e';
-    document.getElementById('conc-aviso-txt').textContent = 'Analise um ponto no mapa primeiro para definir o centro e raio da busca.';
+    // Sem ponto — desabilitar Raio, forçar Região Ampla
+    if (btnRaio) {
+      btnRaio.disabled = true;
+      btnRaio.style.opacity = '.4';
+      btnRaio.style.cursor = 'not-allowed';
+      btnRaio.title = 'Analise um ponto no mapa primeiro';
+    }
+    setConcModo('regiao');
   }
 }
 window.abrirPainelConcorrentes = abrirPainelConcorrentes;
@@ -5605,6 +5616,8 @@ window.fecharPainelConcorrentes = fecharPainelConcorrentes;
 window._concModoAtual = 'raio';
 
 function setConcModo(modo) {
+  // Bloquear modo raio se não tiver ponto analisado
+  if (modo === 'raio' && !window._lastAnalysisLat) return;
   window._concModoAtual = modo;
   const btnRaio   = document.getElementById('conc-modo-raio-btn');
   const btnRegiao = document.getElementById('conc-modo-regiao-btn');
@@ -6574,7 +6587,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.16 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.17 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
