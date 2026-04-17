@@ -2600,29 +2600,37 @@ function fazerLogin() {
   btn.disabled = true;
 
   setTimeout(() => {
-    const cliente = CLIENTES[email];
-    if (!cliente) {
-      erro.textContent = 'E-mail ou senha incorretos.';
-      erro.style.display = 'block';
-      btn.textContent = 'ENTRAR NA PLATAFORMA';
-      btn.disabled = false;
-      return;
-    }
-    const senhaSalva = (() => { try { return JSON.parse(localStorage.getItem('mx_senha_' + email)); } catch(e){ return null; } })();
-    const senhaValida = senhaSalva ? senhaSalva === senha : cliente.senha === senha;
-    if (!senhaValida) {
-      erro.textContent = 'E-mail ou senha incorretos.';
-      erro.style.display = 'block';
-      btn.textContent = 'ENTRAR NA PLATAFORMA';
-      btn.disabled = false;
-      return;
-    }
+    try {
+      const cliente = CLIENTES[email];
+      if (!cliente) {
+        erro.textContent = 'E-mail ou senha incorretos.';
+        erro.style.display = 'block';
+        btn.textContent = 'ENTRAR NA PLATAFORMA';
+        btn.disabled = false;
+        return;
+      }
+      const senhaSalva = (() => { try { return JSON.parse(localStorage.getItem('mx_senha_' + email)); } catch(e){ return null; } })();
+      const senhaValida = senhaSalva ? senhaSalva === senha : cliente.senha === senha;
+      if (!senhaValida) {
+        erro.textContent = 'E-mail ou senha incorretos.';
+        erro.style.display = 'block';
+        btn.textContent = 'ENTRAR NA PLATAFORMA';
+        btn.disabled = false;
+        return;
+      }
 
-    clienteAtivo = { ...cliente, email };
-    if (document.getElementById('lembrar-check')?.checked) salvarCredenciais(email, senha);
-    else { try { localStorage.removeItem('mx_email'); localStorage.removeItem('mx_senha'); } catch(e){} }
-    document.getElementById('login-screen').style.display = 'none';
-    inicializarParaCliente(clienteAtivo);
+      clienteAtivo = { ...cliente, email };
+      if (document.getElementById('lembrar-check')?.checked) salvarCredenciais(email, senha);
+      else { try { localStorage.removeItem('mx_email'); localStorage.removeItem('mx_senha'); } catch(e){} }
+      document.getElementById('login-screen').style.display = 'none';
+      try { inicializarParaCliente(clienteAtivo); } catch(e2) { console.error('[INIT ERROR]', e2); }
+    } catch(e) {
+      console.error('[LOGIN ERROR]', e);
+      erro.textContent = 'Erro interno: ' + e.message;
+      erro.style.display = 'block';
+      btn.textContent = 'ENTRAR NA PLATAFORMA';
+      btn.disabled = false;
+    }
   }, 800);
 }
 
