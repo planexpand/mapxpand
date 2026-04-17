@@ -5312,34 +5312,65 @@ window.limparRedeNoMapa=limparRedeNoMapa;
 
     <!-- Configuração da Google API Key -->
     <div id="conc-api-section" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:11px;padding:12px 14px;margin-bottom:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="display:flex;align-items:center;gap:6px">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#64748b" stroke-width="2" stroke-linejoin="round"/></svg>
           <span style="font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.07em">Google Places API Key</span>
         </div>
-        <span id="conc-api-status-badge" style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca">Não configurada</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="conc-api-status-badge" style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca">Não configurada</span>
+          <button id="conc-api-alterar-btn" onclick="mostrarCampoApiKey()" style="display:none;background:none;border:none;font-size:9px;color:#94a3b8;cursor:pointer;font-family:Inter,sans-serif;text-decoration:underline;padding:0">Alterar</button>
+        </div>
       </div>
-      <div style="display:flex;gap:6px">
-        <input id="conc-api-key-input" type="password"
-          placeholder="Cole sua chave AIza..."
-          style="flex:1;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:11px;font-family:Inter,sans-serif;outline:none;color:#1e293b;background:#fff;transition:border-color .2s"
-          onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#e2e8f0'"
-        />
-        <button onclick="salvarGmapsKey()"
-          style="background:#f59e0b;color:#fff;border:none;border-radius:8px;padding:0 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;transition:opacity .2s"
-          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-          Salvar
-        </button>
-      </div>
-      <div style="font-size:9px;color:#94a3b8;margin-top:6px;line-height:1.5">
-        🔒 Salva apenas no seu navegador (localStorage). Não vai ao servidor nem ao GitHub.
+      <!-- Campo input — oculto quando chave já configurada -->
+      <div id="conc-api-input-wrap" style="margin-top:8px">
+        <div style="display:flex;gap:6px">
+          <input id="conc-api-key-input" type="password"
+            placeholder="Cole sua chave AIza..."
+            style="flex:1;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:11px;font-family:Inter,sans-serif;outline:none;color:#1e293b;background:#fff;transition:border-color .2s"
+            onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#e2e8f0'"
+          />
+          <button onclick="salvarGmapsKey()"
+            style="background:#f59e0b;color:#fff;border:none;border-radius:8px;padding:0 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;transition:opacity .2s"
+            onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+            Salvar
+          </button>
+        </div>
+        <div style="font-size:9px;color:#94a3b8;margin-top:6px;line-height:1.5">
+          🔒 Salva apenas no seu navegador (localStorage). Não vai ao servidor nem ao GitHub.
+        </div>
       </div>
     </div>
 
-    <!-- Aviso raio -->
+    <!-- Modo de busca -->
+    <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Modo de busca</div>
+    <div style="display:flex;gap:6px;margin-bottom:14px">
+      <button id="conc-modo-raio-btn" onclick="setConcModo('raio')"
+        style="flex:1;padding:8px 6px;border-radius:9px;font-size:10px;font-weight:700;font-family:Inter,sans-serif;cursor:pointer;border:1.5px solid #0B132B;background:#0B132B;color:#C6A664;transition:all .2s">
+        📍 Raio do Ponto
+      </button>
+      <button id="conc-modo-regiao-btn" onclick="setConcModo('regiao')"
+        style="flex:1;padding:8px 6px;border-radius:9px;font-size:10px;font-weight:700;font-family:Inter,sans-serif;cursor:pointer;border:1.5px solid #e2e8f0;background:#f8fafc;color:#475569;transition:all .2s">
+        🗺️ Região Ampla
+      </button>
+    </div>
+
+    <!-- Aviso raio (modo raio) -->
     <div id="conc-aviso-pin" style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:11px;color:#92400e;line-height:1.6;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start">
       <span style="font-size:14px;flex-shrink:0">📍</span>
       <span id="conc-aviso-txt">Analise um ponto no mapa primeiro para definir o centro e raio da busca.</span>
+    </div>
+
+    <!-- Campo região ampla (modo regiao) -->
+    <div id="conc-regiao-wrap" style="display:none;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px">Cidade / Região</div>
+      <input id="conc-regiao-input" type="text" placeholder="Ex: São Paulo/SP, Campinas, ABC Paulista..."
+        style="width:100%;padding:9px 11px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:12px;font-family:Inter,sans-serif;outline:none;color:#1e293b;transition:border-color .2s;box-sizing:border-box"
+        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e2e8f0'"
+      />
+      <div style="font-size:9px;color:#94a3b8;margin-top:5px;line-height:1.5">
+        Busca em grade de pontos cobrindo toda a área. Pode levar alguns segundos.
+      </div>
     </div>
 
     <!-- Grupos pré-definidos -->
@@ -5489,29 +5520,42 @@ function selecionarGrupoCustom() {
 window.selecionarGrupoCustom = selecionarGrupoCustom;
 
 function _atualizarBadgeApiKey() {
-  const badge = document.getElementById('conc-api-status-badge');
-  const input = document.getElementById('conc-api-key-input');
+  const badge   = document.getElementById('conc-api-status-badge');
+  const wrap    = document.getElementById('conc-api-input-wrap');
+  const altBtn  = document.getElementById('conc-api-alterar-btn');
+  const input   = document.getElementById('conc-api-key-input');
   if (!badge) return;
   if (GMAPS_KEY) {
     badge.textContent = '✓ Configurada';
     badge.style.background = '#f0fdf4';
     badge.style.color = '#166534';
     badge.style.borderColor = '#bbf7d0';
-    if (input) input.placeholder = '••••••••••••••••••••••';
+    if (wrap) wrap.style.display = 'none';       // oculta campo
+    if (altBtn) altBtn.style.display = 'inline'; // mostra "Alterar"
   } else {
     badge.textContent = 'Não configurada';
     badge.style.background = '#fef2f2';
     badge.style.color = '#b91c1c';
     badge.style.borderColor = '#fecaca';
+    if (wrap) wrap.style.display = 'block';       // mostra campo
+    if (altBtn) altBtn.style.display = 'none';
     if (input) input.placeholder = 'Cole sua chave AIza...';
   }
 }
+
+function mostrarCampoApiKey() {
+  const wrap = document.getElementById('conc-api-input-wrap');
+  const altBtn = document.getElementById('conc-api-alterar-btn');
+  if (wrap) wrap.style.display = 'block';
+  if (altBtn) altBtn.style.display = 'none';
+  document.getElementById('conc-api-key-input')?.focus();
+}
+window.mostrarCampoApiKey = mostrarCampoApiKey;
 
 function salvarGmapsKey() {
   const input = document.getElementById('conc-api-key-input');
   const val = (input?.value || '').trim();
   if (!val) {
-    // Limpar chave
     localStorage.removeItem('mapxpand_gmaps_key');
     GMAPS_KEY = '';
   } else {
@@ -5557,6 +5601,124 @@ function fecharPainelConcorrentes() {
 }
 window.fecharPainelConcorrentes = fecharPainelConcorrentes;
 
+// ── MODO DE BUSCA ─────────────────────────────────────────
+window._concModoAtual = 'raio';
+
+function setConcModo(modo) {
+  window._concModoAtual = modo;
+  const btnRaio   = document.getElementById('conc-modo-raio-btn');
+  const btnRegiao = document.getElementById('conc-modo-regiao-btn');
+  const avisoPin  = document.getElementById('conc-aviso-pin');
+  const regiaoWrap= document.getElementById('conc-regiao-wrap');
+  if (modo === 'raio') {
+    btnRaio.style.background = '#0B132B'; btnRaio.style.color = '#C6A664'; btnRaio.style.borderColor = '#0B132B';
+    btnRegiao.style.background = '#f8fafc'; btnRegiao.style.color = '#475569'; btnRegiao.style.borderColor = '#e2e8f0';
+    avisoPin.style.display = 'flex';
+    regiaoWrap.style.display = 'none';
+  } else {
+    btnRegiao.style.background = '#0B132B'; btnRegiao.style.color = '#C6A664'; btnRegiao.style.borderColor = '#0B132B';
+    btnRaio.style.background = '#f8fafc'; btnRaio.style.color = '#475569'; btnRaio.style.borderColor = '#e2e8f0';
+    avisoPin.style.display = 'none';
+    regiaoWrap.style.display = 'block';
+  }
+}
+window.setConcModo = setConcModo;
+
+// ── BUSCA EM GRADE (REGIÃO AMPLA) ─────────────────────────
+async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
+  const regiaoInput = document.getElementById('conc-regiao-input').value.trim();
+  if (!regiaoInput) {
+    alert('Informe a cidade ou região para busca.');
+    btn.disabled = false; btn.style.opacity = '1';
+    document.getElementById('conc-status').style.display = 'none';
+    return;
+  }
+
+  status.innerHTML = '<div style="text-align:center;font-size:11px;color:#64748b">🔍 Geocodificando região...</div>';
+
+  // 1. Geocode da região
+  let bbox = null;
+  try {
+    const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(regiaoInput+', Brasil')}&key=${KEY}`;
+    const geoR = await fetch(geoUrl);
+    const geoD = await geoR.json();
+    if (geoD.results?.[0]?.geometry?.viewport) {
+      const vp = geoD.results[0].geometry.viewport;
+      bbox = { minLat: vp.southwest.lat, maxLat: vp.northeast.lat, minLng: vp.southwest.lng, maxLng: vp.northeast.lng };
+    } else if (geoD.results?.[0]?.geometry?.location) {
+      const loc = geoD.results[0].geometry.location;
+      bbox = { minLat: loc.lat - 0.25, maxLat: loc.lat + 0.25, minLng: loc.lng - 0.3, maxLng: loc.lng + 0.3 };
+    }
+  } catch(e) { console.warn('Geocode região falhou:', e); }
+
+  if (!bbox) {
+    alert('Não foi possível localizar a região informada. Tente ser mais específico (ex: "São Paulo, SP").');
+    btn.disabled = false; btn.style.opacity = '1';
+    document.getElementById('conc-status').style.display = 'none';
+    return;
+  }
+
+  // 2. Gerar grade de pontos sobre o bbox
+  const GRID = 4; // 4x4 = 16 pontos de busca
+  const latStep = (bbox.maxLat - bbox.minLat) / GRID;
+  const lngStep = (bbox.maxLng - bbox.minLng) / GRID;
+  const raioGrid = Math.round(Math.max(latStep, lngStep) * 111000 * 0.8); // ~80% do passo em metros
+
+  const pontos = [];
+  for (let i = 0; i < GRID; i++) {
+    for (let j = 0; j < GRID; j++) {
+      pontos.push({
+        lat: bbox.minLat + latStep * (i + 0.5),
+        lng: bbox.minLng + lngStep * (j + 0.5)
+      });
+    }
+  }
+
+  // 3. Montar queries
+  const queries = [];
+  if (custom) { queries.push(custom); }
+  grps.forEach(g => g.terms.forEach(t => { if (!queries.includes(t)) queries.push(t); }));
+
+  // 4. Buscar em cada ponto × query com dedup por place_id
+  const placesMap = new Map();
+  let totalBuscas = pontos.length * queries.length;
+  let done = 0;
+
+  for (const q of queries) {
+    for (const pt of pontos) {
+      done++;
+      status.innerHTML = `<div style="text-align:center;font-size:11px;color:#64748b">🔍 Varrendo região... ${done}/${totalBuscas} áreas</div>`;
+      try {
+        const body = JSON.stringify({
+          textQuery: q,
+          locationBias: { circle: { center: { latitude: pt.lat, longitude: pt.lng }, radius: raioGrid } },
+          maxResultCount: 20,
+          languageCode: 'pt-BR'
+        });
+        const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating' },
+          body
+        });
+        if (!r.ok) continue;
+        const d = await r.json();
+        (d.places || []).forEach(p => {
+          if (p.location && !placesMap.has(p.id)) {
+            placesMap.set(p.id, { name: p.displayName?.text || q, address: p.formattedAddress || '', lat: p.location.latitude, lng: p.location.longitude, rating: p.rating });
+          }
+        });
+      } catch(e) { console.warn('Grade busca erro:', e); }
+      // Pequena pausa pra não throttle
+      await new Promise(r => setTimeout(r, 120));
+    }
+  }
+
+  // 5. Plotar todos no mapa
+  const places = [...placesMap.values()];
+  _plotarConcorrentes(places, grps, custom, btn, status);
+}
+window.executarBuscaRegiaoAmpla = executarBuscaRegiaoAmpla;
+
 async function executarBuscaConc() {
   const custom = document.getElementById('conc-custom-input').value.trim();
   const grps = CONC_GRUPOS.filter(g => gruposSelec.has(g.id));
@@ -5580,7 +5742,20 @@ async function executarBuscaConc() {
 
   limparConcorrentes(false);
 
-  const KEY = 'AIzaSyBxf8WQy6U7eiO_QYQ6KMxPANrFElcQy_Y';
+  const KEY = GMAPS_KEY;
+  if (!KEY) {
+    alert('Configure a Google Places API Key no painel para buscar concorrentes.');
+    btn.disabled = false; btn.style.opacity = '1';
+    status.style.display = 'none';
+    return;
+  }
+
+  // Modo região ampla
+  if (window._concModoAtual === 'regiao') {
+    await executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status);
+    return;
+  }
+
   let places = [];
   const raioFinal = Math.min(raio, 5000);
 
@@ -5732,6 +5907,68 @@ async function executarBuscaConc() {
   }
 }
 window.executarBuscaConc = executarBuscaConc;
+
+// ── PLOTAR CONCORRENTES (modo regional) ───────────────────
+function _plotarConcorrentes(places, grps, custom, btn, status) {
+  const statusEl = document.getElementById('conc-status');
+  if (!places.length) {
+    statusEl.style.display = 'block';
+    statusEl.innerHTML = '<div style="color:#94a3b8;font-size:11px;text-align:center">Nenhum concorrente encontrado na região.</div>';
+    btn.disabled = false; btn.style.opacity = '1';
+    return;
+  }
+
+  const lista = document.getElementById('conc-lista');
+  lista.innerHTML = '';
+  const grp = grps.length === 1 ? grps[0] : null;
+  const icon = grp?.icon || '📍';
+  if (statusEl) statusEl.style.display = 'none';
+
+  places.forEach(p => {
+    const nome = p.name || custom || 'Concorrente';
+    const end  = p.address || '';
+    const rat  = p.rating ? `⭐ ${p.rating}` : '';
+
+    L.marker([p.lat, p.lng], { icon: concorrIcon('#f59e0b', icon) })
+      .bindPopup(`<div style="font-family:Inter,sans-serif;padding:4px;min-width:200px">
+        <div style="font-size:12px;font-weight:700;color:#0B132B;margin-bottom:4px">${nome}</div>
+        <div style="font-size:10px;color:#64748b;line-height:1.5;margin-bottom:4px">${end}</div>
+        ${rat ? `<span style="background:#fef9c3;color:#92400e;padding:2px 7px;border-radius:12px;font-size:10px;font-weight:600">${rat}</span>` : ''}
+      </div>`, { maxWidth: 240 })
+      .addTo(concorrentesAutoLayer);
+
+    const card = document.createElement('div');
+    card.style.cssText = 'background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:8px 11px;cursor:pointer;transition:border-color .15s';
+    card.onmouseover = () => card.style.borderColor = '#f59e0b';
+    card.onmouseout  = () => card.style.borderColor = '#e2e8f0';
+    card.onclick = () => map.setView([p.lat, p.lng], 16);
+    card.innerHTML = `
+      <div style="font-size:11px;font-weight:700;color:#1e293b;margin-bottom:2px">${icon} ${nome}</div>
+      <div style="font-size:10px;color:#94a3b8;line-height:1.4">${end.split(',').slice(-3).join(',').trim()}</div>
+      ${rat ? `<div style="font-size:10px;color:#f59e0b;margin-top:2px">${rat}</div>` : ''}`;
+    lista.appendChild(card);
+  });
+
+  concorrentesAutoLayer.addTo(map);
+  concorrentesAutoAtivo = true;
+  document.getElementById('cb-concorrentes-auto').checked = true;
+
+  window._concorrentesLatLng = places.map(p => ({ lat: p.lat, lng: p.lng }));
+
+  document.getElementById('conc-count-badge').textContent = `${places.length} encontrado${places.length > 1 ? 's' : ''}`;
+  document.getElementById('conc-resultado').style.display = 'block';
+  btn.disabled = false; btn.style.opacity = '1';
+
+  // Fit mapa aos resultados
+  if (places.length > 0) {
+    const latlngs = places.map(p => [p.lat, p.lng]);
+    map.fitBounds(L.latLngBounds(latlngs), { padding: [40, 40] });
+  }
+
+  if (_ultimaAnalise?.lat && _ultimaAnalise?.lng) {
+    analyse(_ultimaAnalise.lat, _ultimaAnalise.lng, _ultimaAnalise.label);
+  }
+}
 
 function limparConcorrentes(updateCb=true){
   concorrentesAutoLayer.clearLayers();
@@ -6337,7 +6574,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.14 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.16 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
