@@ -1840,7 +1840,7 @@ function renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,
       <div class="ar-row"><span>🚗 Fluxo via principal</span><strong>${vmd}</strong></div>
       <div class="ar-row" style="font-size:9px;color:#64748b"><span>Via</span><span>${viaTop}</span></div>
       ${dOwn!==null?`<div class="ar-row"><span>Dist. unidade própria</span><strong>${dOwn.toFixed(2)} km</strong></div>`:''}
-      ${(()=>{ const n=(window._concorrentesNoRaio||[]).length; return n>0?`<div class="ar-row"><span>⚔️ Concorrentes no raio</span><strong style="color:#dc2626">${n} encontrado${n>1?'s':''}</strong></div>`:''; })()}
+      ${(()=>{ if(window._buscaConcEmAndamento) return `<div class="ar-row"><span>⚔️ Concorrentes no raio</span><strong style="color:#94a3b8">buscando...</strong></div>`; const n=(window._concorrentesNoRaio||[]).length; return n>0?`<div class="ar-row"><span>⚔️ Concorrentes no raio</span><strong style="color:#dc2626">${n} encontrado${n>1?'s':''}</strong></div>`:''; })()}
       ${dComp!==null?`<div class="ar-row"><span>Dist. concorrente mais próx.</span><strong>${dComp.toFixed(2)} km</strong></div>`:''}
       <span class="ar-tag ${tc}">${ttxt}</span>
       <div style="margin-top:6px;font-size:9px;color:#64748b">${bdcFonte}</div>
@@ -5685,11 +5685,11 @@ async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
     return;
   }
 
-  // 2. Gerar grade de pontos sobre o bbox
-  const GRID = 4; // 4x4 = 16 pontos de busca
+  // 2. Gerar grade de pontos sobre o bbox — 3x3=9 células com raio maior (cobertura equivalente, menos chamadas)
+  const GRID = 3; // 3x3 = 9 pontos — 44% menos chamadas que 4x4
   const latStep = (bbox.maxLat - bbox.minLat) / GRID;
   const lngStep = (bbox.maxLng - bbox.minLng) / GRID;
-  const raioGrid = Math.round(Math.max(latStep, lngStep) * 111000 * 0.8); // ~80% do passo em metros
+  const raioGridFinal = Math.max(Math.round(Math.max(latStep, lngStep) * 111000 * 1.1), 4000); // 110% sobreposição
 
   const pontos = [];
   for (let i = 0; i < GRID; i++) {
@@ -5704,18 +5704,33 @@ async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
   // 3. Montar tipos merged de todos grupos selecionados
   const tiposMerged = [...new Set(grps.flatMap(g => g.types || []))];
 
-  // 4. Buscar em cada ponto do grid — searchNearby (por categoria) + searchText (custom)
-  // searchNearby garante cobertura por tipo (pega Giolaser, Boticário, etc.) sem depender de textQuery
+  // Helper: processa resultado e deduplica no placesMap compartilhado
   const placesMap = new Map();
-  const raioGridFinal = Math.max(raioGrid, 3000); // mínimo 3km por célula
-  let totalBuscas = pontos.length + (custom ? pontos.length : 0);
-  let done = 0;
+  const mergeResults = (places, fallbackName) => {
+    (places || []).forEach(p => {
+      if (p.location && !placesMap.has(p.id)) {
+        placesMap.set(p.id, { name: p.displayName?.text || fallbackName || '', address: p.formattedAddress || '', lat: p.location.latitude, lng: p.location.longitude, rating: p.rating });
+      }
+    });
+  };
 
-  // 4a. searchNearby com includedTypes para segmentos selecionados
+  // Helper: fetch com lote paralelo (BATCH_SIZE simultâneos)
+  const BATCH_SIZE = 5; // 5 fetches simultâneos — seguro para Places API v1
+  let done = 0;
+  const totalBuscas = pontos.length + (custom ? pontos.length : 0);
+
+  async function runBatch(tasks) {
+    for (let i = 0; i < tasks.length; i += BATCH_SIZE) {
+      const lote = tasks.slice(i, i + BATCH_SIZE);
+      await Promise.all(lote.map(t => t()));
+      done += lote.length;
+      status.innerHTML = `<div style="text-align:center;font-size:11px;color:#64748b">🔍 Varrendo região... ${Math.min(done,totalBuscas)}/${totalBuscas} células</div>`;
+    }
+  }
+
+  // 4a. searchNearby paralelo com includedTypes
   if (tiposMerged.length) {
-    for (const pt of pontos) {
-      done++;
-      status.innerHTML = `<div style="text-align:center;font-size:11px;color:#64748b">🔍 Varrendo região... ${done}/${totalBuscas} células</div>`;
+    const tasks = pontos.map(pt => async () => {
       try {
         const body = JSON.stringify({
           includedTypes: tiposMerged,
@@ -5729,24 +5744,18 @@ async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
           headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating' },
           body
         });
-        if (!r.ok) { console.warn('searchNearby erro:', r.status, await r.text().catch(()=>'')); continue; }
+        if (!r.ok) { console.warn('searchNearby erro:', r.status); return; }
         const d = await r.json();
-        if (d.error) { console.warn('searchNearby erro body:', d.error); continue; }
-        (d.places || []).forEach(p => {
-          if (p.location && !placesMap.has(p.id)) {
-            placesMap.set(p.id, { name: p.displayName?.text || '', address: p.formattedAddress || '', lat: p.location.latitude, lng: p.location.longitude, rating: p.rating });
-          }
-        });
-      } catch(e) { console.warn('searchNearby grade erro:', e); }
-      await new Promise(r => setTimeout(r, 100));
-    }
+        if (d.error) { console.warn('searchNearby erro body:', d.error); return; }
+        mergeResults(d.places, '');
+      } catch(e) { console.warn('searchNearby erro:', e); }
+    });
+    await runBatch(tasks);
   }
 
-  // 4b. searchText para query custom (nome específico de rede, ex: "Giolaser")
+  // 4b. searchText paralelo para custom (ex: "Giolaser")
   if (custom) {
-    for (const pt of pontos) {
-      done++;
-      status.innerHTML = `<div style="text-align:center;font-size:11px;color:#64748b">🔍 Varrendo região (custom)... ${done}/${totalBuscas} células</div>`;
+    const tasks = pontos.map(pt => async () => {
       try {
         const body = JSON.stringify({
           textQuery: custom,
@@ -5759,17 +5768,13 @@ async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
           headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': KEY, 'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating' },
           body
         });
-        if (!r.ok) { console.warn('searchText custom erro:', r.status); continue; }
+        if (!r.ok) { console.warn('searchText custom erro:', r.status); return; }
         const d = await r.json();
-        if (d.error) { console.warn('searchText custom erro body:', d.error); continue; }
-        (d.places || []).forEach(p => {
-          if (p.location && !placesMap.has(p.id)) {
-            placesMap.set(p.id, { name: p.displayName?.text || custom, address: p.formattedAddress || '', lat: p.location.latitude, lng: p.location.longitude, rating: p.rating });
-          }
-        });
-      } catch(e) { console.warn('searchText grade erro:', e); }
-      await new Promise(r => setTimeout(r, 100));
-    }
+        if (d.error) { console.warn('searchText custom erro body:', d.error); return; }
+        mergeResults(d.places, custom);
+      } catch(e) { console.warn('searchText custom erro:', e); }
+    });
+    await runBatch(tasks);
   }
 
   // 5. Plotar todos no mapa
@@ -5803,6 +5808,7 @@ async function executarBuscaConc() {
   document.getElementById('conc-resultado').style.display = 'none';
 
   limparConcorrentes(false);
+  window._buscaConcEmAndamento = true;
 
   const KEY = GMAPS_KEY;
   if (!KEY) {
@@ -6016,6 +6022,7 @@ function _plotarConcorrentes(places, grps, custom, btn, status) {
   document.getElementById('cb-concorrentes-auto').checked = true;
 
   window._concorrentesLatLng = places.map(p => ({ lat: p.lat, lng: p.lng }));
+  window._buscaConcEmAndamento = false;
 
   document.getElementById('conc-count-badge').textContent = `${places.length} encontrado${places.length > 1 ? 's' : ''}`;
   document.getElementById('conc-resultado').style.display = 'block';
@@ -6037,6 +6044,9 @@ function limparConcorrentes(updateCb=true){
   map.removeLayer(concorrentesAutoLayer);
   if(updateCb){ document.getElementById('cb-concorrentes-auto').checked=false; concorrentesAutoAtivo=false; }
   document.getElementById('conc-resultado').style.display='none';
+  // Resetar dados de concorrentes para evitar análise com dados desatualizados
+  window._concorrentesLatLng = [];
+  window._concorrentesNoRaio = [];
 }
 window.limparConcorrentes = limparConcorrentes;
 </script>
@@ -6636,7 +6646,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.22 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.24 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
