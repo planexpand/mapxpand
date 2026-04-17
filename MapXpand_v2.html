@@ -1466,12 +1466,19 @@ function updateRaio(idx){
   }
 
   if (_ultimaAnalise) {
-    const { lat, lng, score, label: endLabel, hBg, stxt, tc, ttxt, dOwn, dComp, ibge, viaTop, vmd } = _ultimaAnalise;
+    const { lat, lng, score, label: endLabel, hBg, stxt, tc, ttxt, dOwn, ibge, viaTop, vmd } = _ultimaAnalise;
     const areaKm2 = Math.PI * val * val;
     const dens = calcularDensidadeLocal(lat, lng);
     const fator = Math.min(0.85, 0.55 + val * 0.12);
     const popNoRaio = Math.round(dens * areaKm2 * fator);
     const popFmt = new Intl.NumberFormat('pt-BR').format(popNoRaio);
+
+    // Recalcular concorrentes no novo raio
+    const pt = { lat, lng };
+    const concNoRaio = (window._concorrentesLatLng||[]).filter(c => dist(pt,c) <= val);
+    window._concorrentesNoRaio = concNoRaio;
+    const dComp = concNoRaio.length > 0 ? Math.min(...concNoRaio.map(c=>dist(pt,c))) : null;
+    _ultimaAnalise.dComp = dComp;
 
     _ultimaAnalise.raioKm = val;
     _ultimaAnalise.popNoRaio = popNoRaio;
@@ -1716,8 +1723,11 @@ function analyse(lat,lng,label){
   const dOwn = temRede ? Math.min(...unidadesRede.map(u=>dist(pt,u))) : null;
   const RAIO_CANIB_KM = window.canibRaioAtual || 1.25;
   const emZonaCanib = temRede && unidadesRede.some(u => dist(pt,u) < RAIO_CANIB_KM);
-  const temConc = window._concorrentesLatLng?.length > 0;
-  const dComp = temConc ? Math.min(...window._concorrentesLatLng.map(c=>dist(pt,c))) : null;
+  // Filtra concorrentes DENTRO do raio do ponto analisado
+  const concNoRaio = (window._concorrentesLatLng||[]).filter(c => dist(pt,c) <= raioKm);
+  const temConc = concNoRaio.length > 0;
+  const dComp = temConc ? Math.min(...concNoRaio.map(c=>dist(pt,c))) : null;
+  window._concorrentesNoRaio = concNoRaio; // expõe para uso no card
   const semDados = !temRede && !temConc;
 
   let score=50;
@@ -1830,7 +1840,8 @@ function renderAnalise(score,hBg,stxt,tc,ttxt,label,dOwn,dComp,mt,raioKm,popFmt,
       <div class="ar-row"><span>🚗 Fluxo via principal</span><strong>${vmd}</strong></div>
       <div class="ar-row" style="font-size:9px;color:#64748b"><span>Via</span><span>${viaTop}</span></div>
       ${dOwn!==null?`<div class="ar-row"><span>Dist. unidade própria</span><strong>${dOwn.toFixed(2)} km</strong></div>`:''}
-      ${dComp!==null?`<div class="ar-row"><span>Dist. concorrente</span><strong>${dComp.toFixed(2)} km</strong></div>`:''}
+      ${(()=>{ const n=(window._concorrentesNoRaio||[]).length; return n>0?`<div class="ar-row"><span>⚔️ Concorrentes no raio</span><strong style="color:#dc2626">${n} encontrado${n>1?'s':''}</strong></div>`:''; })()}
+      ${dComp!==null?`<div class="ar-row"><span>Dist. concorrente mais próx.</span><strong>${dComp.toFixed(2)} km</strong></div>`:''}
       <span class="ar-tag ${tc}">${ttxt}</span>
       <div style="margin-top:6px;font-size:9px;color:#64748b">${bdcFonte}</div>
     </div>
@@ -5778,6 +5789,9 @@ async function executarBuscaConc() {
   const lng = concPinLng ?? map.getCenter().lng;
   const raio = concPinRaio ?? (getRaioAtual() * 1000);
 
+  // Fechar painel lateral — busca roda em background, mapa fica visível
+  fecharPainelConcorrentes();
+
   const btn = document.getElementById('btn-buscar-conc');
   const status = document.getElementById('conc-status');
   btn.disabled = true; btn.style.opacity = '.6';
@@ -6619,7 +6633,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.19 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.21 · 17/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
