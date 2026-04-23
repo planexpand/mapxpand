@@ -441,53 +441,74 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   <div id="sidebar-head" style="justify-content:space-between">
     <!-- Logo -->
     <div style="display:flex;align-items:center;gap:10px">
-      <svg width="38" height="46" viewBox="0 0 60 72" fill="none">
+      <svg width="44" height="52" viewBox="0 0 64 76" fill="none">
         <defs>
-          <linearGradient id="gPinS" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#F2DC8C"/>
-            <stop offset="40%" stop-color="#C6A664"/>
-            <stop offset="100%" stop-color="#8A6A2A"/>
+          <!-- Ouro metálico com 5 stops para bevel 3D -->
+          <linearGradient id="gPinS" x1="20%" y1="0%" x2="80%" y2="100%">
+            <stop offset="0%" stop-color="#FFF3B8"/>
+            <stop offset="22%" stop-color="#F2DC8C"/>
+            <stop offset="50%" stop-color="#C6A664"/>
+            <stop offset="78%" stop-color="#9A7B36"/>
+            <stop offset="100%" stop-color="#5E4415"/>
           </linearGradient>
-          <clipPath id="gcS"><circle cx="30" cy="25.6" r="16.8"/></clipPath>
+          <linearGradient id="gPinEdgeS" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFE98A" stop-opacity=".9"/>
+            <stop offset="100%" stop-color="#6B4F1C" stop-opacity="0"/>
+          </linearGradient>
+          <radialGradient id="gGlobeS" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="#1A2648"/>
+            <stop offset="100%" stop-color="#050912"/>
+          </radialGradient>
+          <linearGradient id="gMapS" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#E4C97A"/>
+            <stop offset="100%" stop-color="#8C6A2A"/>
+          </linearGradient>
+          <clipPath id="gcS"><circle cx="32" cy="27.5" r="17.2"/></clipPath>
         </defs>
-        <!-- Pin outer gold -->
-        <path d="M30 2C16.8 2 6 12.8 6 24C6 42 30 70 30 70C30 70 54 42 54 24C54 12.8 43.2 2 30 2Z" fill="url(#gPinS)"/>
-        <!-- Pin inner navy -->
-        <path d="M30 5.5C20 5.5 9.5 15 9.5 24C9.5 41 30 66 30 66C30 66 50.5 41 50.5 24C50.5 15 40 5.5 30 5.5Z" fill="#0B132B"/>
-        <!-- Globe boundary circle (+25%) -->
-        <circle cx="30" cy="25.6" r="16.9" fill="none" stroke="url(#gPinS)" stroke-width="1.1"/>
-        <!-- Geodesic mesh lines (+25%) -->
-        <g clip-path="url(#gcS)" stroke="#C6A664" stroke-width="0.65" opacity="0.85" fill="none">
-          <line x1="30" y1="8.7" x2="20" y2="13.1"/><line x1="30" y1="8.7" x2="30.6" y2="11.9"/><line x1="30" y1="8.7" x2="40.6" y2="13.7"/>
-          <line x1="20" y1="13.1" x2="30.6" y2="11.9"/><line x1="20" y1="13.1" x2="14.4" y2="20.6"/><line x1="20" y1="13.1" x2="23.1" y2="18.7"/>
-          <line x1="30.6" y1="11.9" x2="40.6" y2="13.7"/><line x1="30.6" y1="11.9" x2="23.1" y2="18.7"/><line x1="30.6" y1="11.9" x2="32.5" y2="17.5"/>
-          <line x1="40.6" y1="13.7" x2="32.5" y2="17.5"/><line x1="40.6" y1="13.7" x2="42.5" y2="21.9"/>
-          <line x1="14.4" y1="20.6" x2="23.1" y2="18.7"/><line x1="14.4" y1="20.6" x2="13.1" y2="26.9"/><line x1="14.4" y1="20.6" x2="21.3" y2="25"/>
-          <line x1="23.1" y1="18.7" x2="32.5" y2="17.5"/><line x1="23.1" y1="18.7" x2="21.3" y2="25"/><line x1="23.1" y1="18.7" x2="31.3" y2="24.4"/>
-          <line x1="32.5" y1="17.5" x2="42.5" y2="21.9"/><line x1="32.5" y1="17.5" x2="31.3" y2="24.4"/><line x1="32.5" y1="17.5" x2="41.3" y2="26.2"/>
-          <line x1="42.5" y1="21.9" x2="41.3" y2="26.2"/><line x1="42.5" y1="21.9" x2="46.9" y2="25.6"/>
-          <line x1="13.1" y1="26.9" x2="21.3" y2="25"/><line x1="13.1" y1="26.9" x2="17.5" y2="33.1"/>
-          <line x1="21.3" y1="25" x2="31.3" y2="24.4"/><line x1="21.3" y1="25" x2="17.5" y2="33.1"/><line x1="21.3" y1="25" x2="26.9" y2="31.9"/>
-          <line x1="31.3" y1="24.4" x2="41.3" y2="26.2"/><line x1="31.3" y1="24.4" x2="26.9" y2="31.9"/><line x1="31.3" y1="24.4" x2="35.6" y2="31.9"/>
-          <line x1="41.3" y1="26.2" x2="46.9" y2="25.6"/><line x1="41.3" y1="26.2" x2="35.6" y2="31.9"/><line x1="41.3" y1="26.2" x2="42.5" y2="32.5"/>
-          <line x1="46.9" y1="25.6" x2="42.5" y2="32.5"/>
-          <line x1="17.5" y1="33.1" x2="26.9" y2="31.9"/><line x1="17.5" y1="33.1" x2="21.3" y2="39.4"/>
-          <line x1="26.9" y1="31.9" x2="35.6" y2="31.9"/><line x1="26.9" y1="31.9" x2="21.3" y2="39.4"/><line x1="26.9" y1="31.9" x2="31.3" y2="40"/>
-          <line x1="35.6" y1="31.9" x2="42.5" y2="32.5"/><line x1="35.6" y1="31.9" x2="31.3" y2="40"/><line x1="35.6" y1="31.9" x2="38.8" y2="37.5"/>
-          <line x1="42.5" y1="32.5" x2="38.8" y2="37.5"/>
-          <line x1="21.3" y1="39.4" x2="31.3" y2="40"/><line x1="21.3" y1="39.4" x2="30" y2="42.5"/>
-          <line x1="31.3" y1="40" x2="38.8" y2="37.5"/><line x1="31.3" y1="40" x2="30" y2="42.5"/>
-          <line x1="38.8" y1="37.5" x2="30" y2="42.5"/>
+        <!-- Mapa dobrado na base (atrás do pin) -->
+        <g opacity=".95">
+          <path d="M10 56 L26 52 L44 56 L54 52 L54 64 L44 68 L26 64 L10 68 Z" fill="url(#gMapS)" stroke="#5E4415" stroke-width=".6" stroke-linejoin="round"/>
+          <path d="M26 52 L26 64 M44 56 L44 68" stroke="#5E4415" stroke-width=".5" opacity=".55"/>
+          <path d="M14 60 Q22 58 30 61 T46 61" stroke="#5E4415" stroke-width=".4" fill="none" opacity=".5"/>
         </g>
-        <!-- Geodesic nodes (+25%) -->
-        <g clip-path="url(#gcS)" fill="#C6A664">
-          <circle cx="30" cy="8.7" r="1.6"/>
-          <circle cx="20" cy="13.1" r="1.2"/><circle cx="30.6" cy="11.9" r="1.2"/><circle cx="40.6" cy="13.7" r="1.2"/>
-          <circle cx="14.4" cy="20.6" r="1.1"/><circle cx="23.1" cy="18.7" r="1.1"/><circle cx="32.5" cy="17.5" r="1.1"/><circle cx="42.5" cy="21.9" r="1.1"/>
-          <circle cx="13.1" cy="26.9" r="1.1"/><circle cx="21.3" cy="25" r="1.1"/><circle cx="31.3" cy="24.4" r="1.1"/><circle cx="41.3" cy="26.2" r="1.1"/><circle cx="46.9" cy="25.6" r="1.1"/>
-          <circle cx="17.5" cy="33.1" r="1.1"/><circle cx="26.9" cy="31.9" r="1.1"/><circle cx="35.6" cy="31.9" r="1.1"/><circle cx="42.5" cy="32.5" r="1.1"/>
-          <circle cx="21.3" cy="39.4" r="1.1"/><circle cx="31.3" cy="40" r="1.1"/><circle cx="38.8" cy="37.5" r="1.1"/>
-          <circle cx="30" cy="42.5" r="1.6"/>
+        <!-- Pin outer gold -->
+        <path d="M32 3C18.3 3 7 14.2 7 25.8C7 44.6 32 72 32 72C32 72 57 44.6 57 25.8C57 14.2 45.7 3 32 3Z" fill="url(#gPinS)"/>
+        <!-- Borda externa luminosa -->
+        <path d="M32 3C18.3 3 7 14.2 7 25.8C7 44.6 32 72 32 72C32 72 57 44.6 57 25.8C57 14.2 45.7 3 32 3Z" fill="none" stroke="url(#gPinEdgeS)" stroke-width=".8"/>
+        <!-- Pin inner navy (globo) -->
+        <path d="M32 6.2C22 6.2 10.8 15.6 10.8 25.8C10.8 43.2 32 68 32 68C32 68 53.2 43.2 53.2 25.8C53.2 15.6 42 6.2 32 6.2Z" fill="url(#gGlobeS)"/>
+        <!-- Highlight bevel superior (3D) -->
+        <path d="M18 12 Q32 4 46 12" stroke="#FFF3B8" stroke-width=".7" fill="none" opacity=".7" stroke-linecap="round"/>
+        <!-- Globe boundary -->
+        <circle cx="32" cy="27.5" r="17.3" fill="none" stroke="url(#gPinS)" stroke-width="1.1"/>
+        <!-- Continentes estilizados -->
+        <g clip-path="url(#gcS)" fill="#C6A664" opacity=".55">
+          <path d="M22 18 Q25 16 28 17 L30 20 Q29 23 26 23 L23 22 Z"/>
+          <path d="M34 15 Q38 14 41 16 L42 19 L40 21 L36 20 Z"/>
+          <path d="M20 28 Q24 26 27 29 L27 33 Q24 35 21 33 Z"/>
+          <path d="M33 27 Q38 26 42 29 L43 34 Q39 36 35 34 L33 31 Z"/>
+          <path d="M26 37 Q30 36 34 38 L33 40 L28 40 Z"/>
+        </g>
+        <!-- Malha geodésica -->
+        <g clip-path="url(#gcS)" stroke="#E4C97A" stroke-width=".55" opacity=".9" fill="none">
+          <ellipse cx="32" cy="27.5" rx="17" ry="6"/>
+          <ellipse cx="32" cy="27.5" rx="17" ry="12"/>
+          <ellipse cx="32" cy="27.5" rx="10" ry="17"/>
+          <ellipse cx="32" cy="27.5" rx="4" ry="17"/>
+          <line x1="15" y1="27.5" x2="49" y2="27.5"/>
+          <line x1="32" y1="10.5" x2="32" y2="44.5"/>
+        </g>
+        <!-- Nós luminosos -->
+        <g clip-path="url(#gcS)" fill="#FFE98A">
+          <circle cx="32" cy="10.5" r="1.2"/>
+          <circle cx="23" cy="18" r=".9"/><circle cx="41" cy="18" r=".9"/>
+          <circle cx="18" cy="27.5" r=".9"/><circle cx="46" cy="27.5" r=".9"/>
+          <circle cx="23" cy="37" r=".9"/><circle cx="41" cy="37" r=".9"/>
+          <circle cx="32" cy="44.5" r="1.2"/>
+        </g>
+        <!-- Sparkle -->
+        <g opacity=".85">
+          <path d="M52 10 L53 13 L56 14 L53 15 L52 18 L51 15 L48 14 L51 13 Z" fill="#FFF3B8"/>
         </g>
       </svg>
       <div class="logo-text-wrap">
@@ -2565,7 +2586,7 @@ window.fecharSidebar = fecharSidebar;
 // ═══════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════
 
-const CLIENTES = {
+var CLIENTES = {
   'admin@planexpand.com.br': {
     senha: 'mapxpand2025',
     nome: 'Ricardo Chaves',
@@ -6836,7 +6857,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.31 · 23/04/2026';
+const MAPXPAND_VERSION = 'v2.32 · 23/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
