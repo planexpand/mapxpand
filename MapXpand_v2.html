@@ -701,7 +701,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/></svg>
         </div>
         <!-- checkboxes ocultos para manter estado interno -->
-        <input type="checkbox" id="cb-dfinefit" checked style="display:none">
+        <input type="checkbox" id="cb-dfinefit" style="display:none">
         <input type="checkbox" id="cb-heatmap" style="display:none">
         <input type="checkbox" id="cb-concorrentes-auto" style="display:none">
       </div>
@@ -981,6 +981,43 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 </div>
 
 <script>
+// ── Utilitário de segurança: escape HTML contra XSS via nomes de cliente/unidade ──
+window.mxEsc = function(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
+};
+
+// ── Sistema de toast (substitui alert() bloqueante) ──
+window.mxToast = function(msg, tipo){
+  tipo = tipo || 'info';
+  let host = document.getElementById('mx-toast-host');
+  if(!host){
+    host = document.createElement('div');
+    host.id = 'mx-toast-host';
+    host.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:360px';
+    document.body.appendChild(host);
+  }
+  const cores = {
+    info:    {bg:'#0B132B', fg:'#C6A664', br:'#C6A664'},
+    sucesso: {bg:'#166534', fg:'#fff',    br:'#15803d'},
+    alerta:  {bg:'#b45309', fg:'#fff',    br:'#f59e0b'},
+    erro:    {bg:'#991b1b', fg:'#fff',    br:'#dc2626'}
+  };
+  const c = cores[tipo] || cores.info;
+  const t = document.createElement('div');
+  t.style.cssText = `background:${c.bg};color:${c.fg};border:1px solid ${c.br};border-radius:8px;padding:12px 16px;font-family:Inter,sans-serif;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);pointer-events:auto;cursor:pointer;animation:mx-toast-in .3s ease-out`;
+  t.textContent = msg;
+  t.onclick = () => t.remove();
+  host.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300); }, 4500);
+};
+if(!document.getElementById('mx-toast-style')){
+  const st = document.createElement('style');
+  st.id = 'mx-toast-style';
+  st.textContent = '@keyframes mx-toast-in{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}';
+  document.head.appendChild(st);
+}
 const DFINEFIT=[
   {name:"D.Finefit — Campo Limpo",lat:-23.6491,lng:-46.7481,pop:"82.400",renda:"R$ 2.800",score:78},
   {name:"D.Finefit — Jd. Jacira",lat:-23.6374,lng:-46.7430,pop:"43.200",renda:"R$ 2.200",score:71},
@@ -1285,7 +1322,7 @@ function _svgLocate(estado) {
 
 function localizarUsuario(btn) {
   if (!navigator.geolocation) {
-    alert('Geolocalização não suportada neste navegador.');
+    mxToast('Geolocalização não suportada neste navegador.','erro');
     return;
   }
 
@@ -1343,7 +1380,7 @@ function localizarUsuario(btn) {
         2: 'Não foi possível determinar sua posição.',
         3: 'Tempo esgotado ao buscar localização.'
       };
-      alert(msgs[err.code] || 'Erro ao obter localização.');
+      mxToast(msgs[err.code] || 'Erro ao obter localização.','erro');
     },
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
   );
@@ -1467,16 +1504,10 @@ function octagon(lat,lng,km){
 
 const popOpts={className:'',maxWidth:260};
 
-// DFINEFIT
-DFINEFIT.forEach(u=>{
-  const sc=u.score>=80?'#15803d':u.score>=70?'#b45309':'#b91c1c';
-  L.marker([u.lat,u.lng],{icon:dfineFitIcon()})
-    .bindPopup(`<div class="pop-inner">
-      <span class="pop-badge" style="background:#fef3c7;color:#92400e;border:0.5px solid #fde68a">Unidade ativa</span>
-      <div class="pop-name">${u.name}</div>
-      <div class="pop-sub">Populacao: <strong>${u.pop}</strong> hab · Renda: <strong>${u.renda}</strong><br>Score MapXpand: <strong style="color:${sc}">${u.score}/100</strong></div>
-    </div>`,popOpts).addTo(layers.dfinefit);
-});
+// DFINEFIT: render estático REMOVIDO.
+// Demo D.Finefit agora só aparece quando cliente faz login com conta ceo@dfinefit.com.br
+// e suas `unidades` são desenhadas em `layers.dfinefit` via ativarCliente().
+// Mantém array global pra compat, mas NÃO adiciona ao mapa na inicialização.
 
 // COMPETITORS
 COMPETITORS.forEach(c=>{
@@ -2416,9 +2447,10 @@ async function resolverLinkCurto(url) {
   return null;
 }
 
-function showSearchError(msg) {
+function showSearchBarError(msg) {
   const el = document.getElementById('search-error');
-  el.innerHTML = msg;
+  if(!el) return;
+  el.textContent = msg;
   el.style.display = 'block';
   setTimeout(() => el.style.display = 'none', 5000);
 }
@@ -2460,7 +2492,7 @@ async function buscarUniversal() {
     if (!result) result = await geocodeEndereco(parsed.query + ', Brasil'); // fallback 4: Google Geocoding
     if (!result) {
       reset();
-      showSearchError('Local não encontrado. Tente adicionar a cidade (ex: "Shopping X, São Paulo") ou cole as coordenadas.');
+      showSearchBarError('Local não encontrado. Tente adicionar a cidade (ex: "Shopping X, São Paulo") ou cole as coordenadas.');
       return;
     }
     lat   = parseFloat(result.lat);
@@ -2474,7 +2506,7 @@ async function buscarUniversal() {
     if (!result) result = await geocodeOpenMeteo(parsed.query);   // fallback 4: Open-Meteo (sem chave)
     if (!result) {
       reset();
-      showSearchError('Endereço não encontrado. Tente outro formato ou clique no mapa.');
+      showSearchBarError('Endereço não encontrado. Tente outro formato ou clique no mapa.');
       return;
     }
     lat   = parseFloat(result.lat);
@@ -2510,30 +2542,23 @@ async function buscarUniversal() {
 }
 window.buscarUniversal = buscarUniversal;
 
-// ── SIDEBAR MOBILE ──────────────────────
-function toggleSidebar() {
+// ── SIDEBAR MOBILE (legacy — mantido apenas fecharSidebar) ──
+function fecharSidebar() {
   const sb = document.getElementById('sidebar');
   const ov = document.getElementById('map-overlay');
   const btn = document.getElementById('sidebar-toggle');
-  const aberto = sb.classList.toggle('open');
-  ov.classList.toggle('show', aberto);
-  btn.textContent = aberto ? '✕' : '☰';
+  if(sb) sb.classList.remove('open');
+  if(ov) ov.classList.remove('show');
+  if(btn) btn.textContent = '☰';
 }
-function fecharSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('map-overlay').classList.remove('show');
-  document.getElementById('sidebar-toggle').textContent = '☰';
-}
-window.toggleSidebar = toggleSidebar;
 
-function baixarPlataforma() {
+function _baixarPlataformaLegacy() {
   const blob = new Blob([document.documentElement.outerHTML], {type:'text/html'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'MapXpand_' + new Date().toISOString().slice(0,10) + '.html';
   a.click();
 }
-window.baixarPlataforma = baixarPlataforma;
 
 window.fecharSidebar = fecharSidebar;
 
@@ -2642,7 +2667,7 @@ function inicializarParaCliente(cliente) {
       logoTxt.innerHTML = 'MAP<span style="color:#C6A664">X</span>PAND';
       logoSub.textContent = 'Painel Admin';
     } else {
-      logoTxt.innerHTML = `<span style="font-size:13px;letter-spacing:.06em">${cliente.empresa}</span>`;
+      logoTxt.innerHTML = `<span style="font-size:13px;letter-spacing:.06em">${mxEsc(cliente.empresa)}</span>`;
       logoSub.textContent = 'by MapXpand';
     }
   }
@@ -2673,6 +2698,10 @@ function inicializarParaCliente(cliente) {
 
   if (cliente.unidades && cliente.unidades.length > 0) {
     layers.dfinefit.clearLayers();
+    // só ativar visibilidade automática quando o próprio cliente dono das unidades faz login
+    const cbDfine = document.getElementById('cb-dfinefit');
+    if (cbDfine) cbDfine.checked = true;
+    if (typeof layerState !== 'undefined') layerState.dfinefit = true;
     const raioCanib = (window.canibRaioAtual || 1.25) * 1000;
     cliente.unidades.forEach(u => {
       const c = L.circle([u.lat, u.lng], {
@@ -2683,10 +2712,10 @@ function inicializarParaCliente(cliente) {
       window._zonasCanibal.push(c);
       const icon = L.divIcon({
         className: '', iconSize:[0,0],
-        html: `<div style="background:#0B132B;color:#C6A664;border:2px solid #C6A664;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;white-space:nowrap;font-family:Inter,sans-serif">${u.name.split('—')[0].trim()}</div>`
+        html: `<div style="background:#0B132B;color:#C6A664;border:2px solid #C6A664;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;white-space:nowrap;font-family:Inter,sans-serif">${mxEsc(u.name.split('—')[0].trim())}</div>`
       });
       L.marker([u.lat, u.lng], {icon})
-        .bindPopup(`<strong>${u.name}</strong><br>Pop: ${u.pop} hab<br>Renda: ${u.renda}<br>Score: ${u.score}/100`)
+        .bindPopup(`<strong>${mxEsc(u.name)}</strong><br>Pop: ${mxEsc(u.pop)} hab<br>Renda: ${mxEsc(u.renda)}<br>Score: ${Number(u.score)||0}/100`)
         .addTo(layers.dfinefit);
     });
 
@@ -2724,11 +2753,11 @@ function enviarSolicitacao() {
   const emp   = document.getElementById('cad-empresa').value;
   const email = document.getElementById('cad-email').value;
   const wa    = document.getElementById('cad-whats').value;
-  if (!nome || !email) { alert('Preencha nome e e-mail.'); return; }
+  if (!nome || !email) { mxToast('Preencha nome e e-mail.','alerta'); return; }
   const msg = encodeURIComponent(`Novo lead MapXpand!\nNome: ${nome}\nEmpresa: ${emp}\nEmail: ${email}\nWhatsApp: ${wa}`);
   window.open(`https://wa.me/5513982305997?text=${msg}`, '_blank');
   fecharCadastro();
-  alert('Solicitação enviada! Ricardo entrará em contato em breve.');
+  mxToast('Solicitação enviada! Ricardo entrará em contato em breve.','sucesso');
 }
 
 function toggleSenha() {
@@ -3438,7 +3467,7 @@ function salvarPerfil() {
   const nome    = document.getElementById('perfil-edit-nome').value.trim();
   const empresa = document.getElementById('perfil-edit-empresa').value.trim();
   const whats   = document.getElementById('perfil-edit-whats').value.trim();
-  if (!nome) { alert('O nome não pode ficar em branco.'); return; }
+  if (!nome) { mxToast('O nome não pode ficar em branco.','alerta'); return; }
   clienteAtivo.nome    = nome;
   clienteAtivo.empresa = empresa;
   clienteAtivo.whatsapp= whats;
@@ -3450,7 +3479,7 @@ function salvarPerfil() {
   document.getElementById('perfil-empresa-display').textContent = empresa;
   atualizarAvatarHeader(null, nome);
   const logoTxt = document.getElementById('logo-txt');
-  if (logoTxt) logoTxt.innerHTML = `<span style="font-size:13px;letter-spacing:.06em">${empresa}</span>`;
+  if (logoTxt) logoTxt.innerHTML = `<span style="font-size:13px;letter-spacing:.06em">${mxEsc(empresa)}</span>`;
   const btn = event.target.closest('button');
   const orig = btn.innerHTML;
   btn.innerHTML = '✅ Salvo!';
@@ -3605,7 +3634,7 @@ function capturarEstadoAtual() {
     raioIdx:      raioIdx,
     raioLabel:    raioLabel,
     layers: {
-      dfinefit:  document.getElementById('cb-dfinefit')?.checked  ?? true,
+      dfinefit:  document.getElementById('cb-dfinefit')?.checked  ?? false,
       expansion: layerState?.expansion ?? true,
       cannibal:  layerState?.cannibal  ?? false,
       competitor:layerState?.competitor?? false,
@@ -3880,6 +3909,38 @@ if (document.readyState !== 'loading') renderFiltros();
 let topViasData = [];
 let overpassCache = {};
 
+// persistência do cache Overpass (TTL 7d) — reduz chamadas à API pública
+const OVERPASS_CACHE_KEY = 'mx_overpass_cache_v1';
+const OVERPASS_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+function _overpassCacheLoad(){
+  try {
+    const raw = localStorage.getItem(OVERPASS_CACHE_KEY);
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    const agora = Date.now();
+    Object.entries(parsed).forEach(([k,v]) => {
+      if (v && v.ts && (agora - v.ts) < OVERPASS_TTL_MS) overpassCache[k] = v.vias;
+    });
+  } catch(e){}
+}
+function _overpassCacheSave(key, vias){
+  overpassCache[key] = vias;
+  try {
+    const raw = localStorage.getItem(OVERPASS_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    parsed[key] = { ts: Date.now(), vias };
+    // limite 50 entradas pra não estourar localStorage
+    const keys = Object.keys(parsed);
+    if (keys.length > 50) {
+      keys.sort((a,b) => (parsed[a].ts||0) - (parsed[b].ts||0))
+          .slice(0, keys.length - 50)
+          .forEach(k => delete parsed[k]);
+    }
+    localStorage.setItem(OVERPASS_CACHE_KEY, JSON.stringify(parsed));
+  } catch(e){}
+}
+_overpassCacheLoad();
+
 async function buscarViasOverpass(lat, lng, raioMetros) {
   const cacheKey = `${lat.toFixed(3)}_${lng.toFixed(3)}_${raioMetros}`;
   if (overpassCache[cacheKey]) return overpassCache[cacheKey];
@@ -3914,7 +3975,7 @@ async function buscarViasOverpass(lat, lng, raioMetros) {
         else if (vmd > existente.vmd) existente.vmd = vmd;
       });
 
-      overpassCache[cacheKey] = vias;
+      _overpassCacheSave(cacheKey, vias);
       return vias;
     } catch(e) { continue; }
   }
@@ -3978,7 +4039,7 @@ async function gerarRelatorio() {
 
   try {
     if (!_ultimaAnalise) {
-      alert('Analise um ponto no mapa antes de gerar o relatório.');
+      mxToast('Analise um ponto no mapa antes de gerar o relatório.','alerta');
       btn.innerHTML = orig; btn.disabled = false; return;
     }
     const { score, label: enderecoAnalisado, raioKm, popNoRaio, ibge, lat, lng, viaTop, vmd, bdc } = _ultimaAnalise;
@@ -4085,7 +4146,7 @@ async function gerarRelatorio() {
 
   } catch(e) {
     console.error('Erro ao gerar relatório:', e);
-    alert('Erro ao gerar relatório. Clique em um ponto no mapa primeiro.');
+    mxToast('Erro ao gerar relatório. Clique em um ponto no mapa primeiro.','erro');
   }
 
   btn.innerHTML = orig;
@@ -4699,7 +4760,7 @@ function showSearchError(msg){
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="margin-bottom:6px"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/></svg>
         <div style="font-size:9px;font-weight:700;text-transform:uppercase">Clique em "Anexar Mapa" para inserir screenshot</div>
       </div>
-      <img id="rep-mapa-img" style="width:100%;height:100%;object-fit:cover;display:none">
+      <img id="rep-mapa-img" alt="Mapa do ponto analisado" style="width:100%;height:100%;object-fit:cover;display:none">
     </div>
 
     <!-- DADOS QUANTITATIVOS -->
@@ -5196,7 +5257,7 @@ window.fecharPainelRede=fecharPainelRede;
 
 async function buscarRedeNoMapa(){
   const nome = document.getElementById('rede-nome-input').value.trim();
-  if(!nome){ alert('Por favor, informe o nome da rede.'); return; }
+  if(!nome){ mxToast('Por favor, informe o nome da rede.','alerta'); return; }
   const estadoSel = document.getElementById('rede-estado-select').value;
   const estadoNome = estadoSel ? `, ${estadoSel}, Brasil` : ', Brasil';
 
@@ -5738,7 +5799,7 @@ window.setConcModo = setConcModo;
 async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
   const regiaoInput = document.getElementById('conc-regiao-input').value.trim();
   if (!regiaoInput) {
-    alert('Informe a cidade ou região para busca.');
+    mxToast('Informe a cidade ou região para busca.','alerta');
     btn.disabled = false; btn.style.opacity = '1';
     document.getElementById('conc-status').style.display = 'none';
     return;
@@ -5762,7 +5823,7 @@ async function executarBuscaRegiaoAmpla(grps, custom, KEY, btn, status) {
   } catch(e) { console.warn('Geocode região falhou:', e); }
 
   if (!bbox) {
-    alert('Não foi possível localizar a região informada. Tente ser mais específico (ex: "São Paulo, SP").');
+    mxToast('Região não localizada. Tente ser mais específico (ex: "São Paulo, SP").','erro');
     btn.disabled = false; btn.style.opacity = '1';
     document.getElementById('conc-status').style.display = 'none';
     return;
@@ -5872,7 +5933,7 @@ async function executarBuscaConc() {
   const grp  = grps.length === 1 ? grps[0] : null; // retrocompatibilidade (1 grupo)
 
   if (!grps.length && !custom) {
-    alert('Selecione ao menos um segmento ou informe um grupo personalizado.');
+    mxToast('Selecione ao menos um segmento ou informe um grupo personalizado.','alerta');
     return;
   }
 
@@ -5895,7 +5956,7 @@ async function executarBuscaConc() {
 
   const KEY = GMAPS_KEY;
   if (!KEY) {
-    alert('Configure a Google Places API Key no painel para buscar concorrentes.');
+    mxToast('Configure a Google Places API Key no painel para buscar concorrentes.','alerta');
     btn.disabled = false; btn.style.opacity = '1';
     status.style.display = 'none';
     return;
@@ -6775,7 +6836,7 @@ window.fecharBoasVindas     = fecharBoasVindas;
 
 <script>
 // ── BUILD VERSION — atualizado a cada deploy ──────────────
-const MAPXPAND_VERSION = 'v2.30 · 17/04/2026';
+const MAPXPAND_VERSION = 'v2.31 · 23/04/2026';
 // ─────────────────────────────────────────────────────────
 (function(){
   const el = document.getElementById('login-version-badge');
